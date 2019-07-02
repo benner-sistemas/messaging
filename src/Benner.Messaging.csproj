@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject></StartupObject>
+    <Version>0.0.1</Version>
+    <AssemblyName>Benner.Messaging</AssemblyName>
+    <Authors>Benner Sistemas</Authors>
+    <Company>Benner Sistemas</Company>
+    <Product>Benner Tecnologia</Product>
+    <Copyright>Benner Sistemas</Copyright>
+    <Description>A lightweight messaging library for easily deal with any message broker, like RabbitMQ, ActiveMQ, AmazonSQS, AzureMQ, ...</Description>
+    <PackageProjectUrl>https://github.com/benner-sistemas/messaging</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/benner-sistemas/messaging</RepositoryUrl>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageTags>messaging; message broker; broker; message; queue; topics; rabbit; rabbitmq; azuremq; activemq; amazonsqs; amazon sqs; aws sqs;</PackageTags>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\key.snk</AssemblyOriginatorKeyFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>messaging
+messaging-library
+messaging-api
+message-queue
+message-broker
+message-broker-client
+queues
+rabbitmq
+rabbit-mq
+rabbitmq-producer
+rabbitmq-consumer
+activemq
+activemq-client
+activemq-server
+amazon-sqs
+azure-mq
+aws-sqs
+fifo-queue
+publisher-subscriber</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="messaging.config.modelo" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="messaging.config.modelo">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Apache.NMS.ActiveMQ.NetStd" Version="1.7.2.4115" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.3.100.42" />
+    <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+  </ItemGroup>
+
+</Project>

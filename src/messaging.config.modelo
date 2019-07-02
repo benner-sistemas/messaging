@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <configSections>
+    <section name="MessagingConfigSection" type="Benner.Messaging.MessagingFileConfigSection, Benner.Messaging" />
+  </configSections>
+  <MessagingConfigSection>
+    <queues>
+      <queue name="nome_da_fila" broker="Name_do_broker" />
+    </queues>
+    <brokerList default="Name_do_broker_default">
+      <broker name="Name_do_broker" type="Namespace.Classname, Namespace">
+        <add key="Propriedade" value="Valor" />
+      </broker>
+    </brokerList>
+  </MessagingConfigSection>
+</configuration>
