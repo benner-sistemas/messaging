@@ -45,7 +45,7 @@ namespace Benner.Messaging
         public FileMessagingConfig(string fileName)
         {
             if (!File.Exists(fileName))
-                throw new FileNotFoundException($"Arquivo de configuração '{fileName}' não encontrado.");
+                throw new FileNotFoundException($"Messaging config not found '{fileName}'", fileName);
 
             var map = new ExeConfigurationFileMap() { ExeConfigFilename = fileName };
             var configManager = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);

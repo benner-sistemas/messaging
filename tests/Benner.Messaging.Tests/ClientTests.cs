@@ -28,12 +28,15 @@ namespace Benner.Messaging.Tests
             var memoryConfig = new MemoryMessageConfig(defaultBroker: "MockMQ", defaultBrokerConfigType: typeof(MockMQConfig)).WithQueue("teste", "MockMQ");
 
             string receivedByMemory = "";
-            new Client(memoryConfig).EnqueueMessage("teste", mensagem);
-            new Client(memoryConfig).StartListening("teste", (args) =>
+            Messaging.Enqueue("teste", mensagem, memoryConfig);
+            using (var client = new Messaging(memoryConfig))
             {
-                receivedByMemory = args.AsString;
-                return true;
-            });
+                client.StartListening("teste", (args) =>
+                {
+                    receivedByMemory = args.AsString;
+                    return true;
+                });
+            }
 
             Assert.AreEqual(mensagem, receivedByMemory);
 
@@ -52,12 +55,8 @@ namespace Benner.Messaging.Tests
 
             string receivedByFile = "";
 
-            new Client(fileConfig).EnqueueMessage("teste-arquivo", mensagem);
-            new Client(fileConfig).StartListening("teste-arquivo", (args) =>
-            {
-                receivedByFile = args.AsString;
-                return true;
-            });
+            Messaging.Enqueue("teste-arquivo", mensagem, fileConfig);
+            receivedByFile = Messaging.Dequeue("teste-arquivo", fileConfig);
 
             Assert.AreEqual(mensagem, receivedByFile);
         }
@@ -70,7 +69,7 @@ namespace Benner.Messaging.Tests
             if (!File.Exists(fullPath))
                 Assert.Fail("Arquivo não encontrado.");
 
-            var clientSemException = new Client();
+            var clientSemException = new Messaging();
             clientSemException.Dispose();
 
             //renomear o arquivo
@@ -78,7 +77,7 @@ namespace Benner.Messaging.Tests
             file.MoveTo(Path.Combine(folder, "renomeado.txt"));
 
             //Instancia deve não encontrar mais o arquivo
-            Assert.ThrowsException<FileNotFoundException>(() => new Client());
+            Assert.ThrowsException<FileNotFoundException>(() => new Messaging());
 
             //Des-renomear
             file.MoveTo(fullPath);
@@ -126,14 +125,10 @@ namespace Benner.Messaging.Tests
 
             var sentMsg = "Teste de fila case insensitive";
 
-            new Client(new FileMessagingConfig(path)).EnqueueMessage("testE-caSE-inSEnsitive", sentMsg);
+            var config = new FileMessagingConfig(path);
+            Messaging.Enqueue("testE-caSE-inSEnsitive", sentMsg, config);
 
-            string received = "";
-            new Client(new FileMessagingConfig(path)).StartListening("testE-caSE-inSeNsITIve", (args) =>
-            {
-                received = args.AsString;
-                return true;
-            });
+            string received = Messaging.Dequeue("TESte-CAse-INSENsITIve", config);
 
             Assert.AreEqual(sentMsg, received);
         }
@@ -164,14 +159,10 @@ namespace Benner.Messaging.Tests
             string queueName = "teste-CASE-insensitive-BROKERname";
             var sentMsg = "Teste de broker case insensitive";
 
-            new Client(new FileMessagingConfig(path)).EnqueueMessage(queueName, sentMsg);
+            var config = new FileMessagingConfig(path);
+            Messaging.Enqueue(queueName, sentMsg, config);
 
-            string received = "";
-            new Client(new FileMessagingConfig(path)).StartListening(queueName, (args) =>
-            {
-                received = args.AsString;
-                return true;
-            });
+            string received = Messaging.Dequeue(queueName, config);
 
             Assert.AreEqual(sentMsg, received);
         }
@@ -198,13 +189,13 @@ namespace Benner.Messaging.Tests
 
 
             var mockMQConfig = new MemoryMessageConfig(defaultBroker: "MockMQ", defaultBrokerConfigType: typeof(MockMQConfig));
-            using (var client = new Client(mockMQConfig))
+            using (var client = new Messaging(mockMQConfig))
             {
                 client.EnqueueMessage("invoices-a", message);
             }
 
 
-            using (var client = new Client(mockMQConfig))
+            using (var client = new Messaging(mockMQConfig))
             {
                 client.StartListening("invoices-a", (args) =>
                 {
@@ -247,9 +238,9 @@ namespace Benner.Messaging.Tests
 
             var mockMQConfig = new MemoryMessageConfig(defaultBroker: "MockMQ", defaultBrokerConfigType: typeof(MockMQConfig));
 
-            Client.EnqueueSingleMessage("invoices-b", message, mockMQConfig);
+            Messaging.Enqueue("invoices-b", message, mockMQConfig);
 
-            var typedMessage = Client.DequeueSingleMessage<Invoice>("invoices-b", mockMQConfig);
+            var typedMessage = Messaging.Dequeue<Invoice>("invoices-b", mockMQConfig);
 
             Assert.AreEqual(message.AccountReference, typedMessage.AccountReference);
             Assert.AreEqual(message.CurrencyUsed, typedMessage.CurrencyUsed);

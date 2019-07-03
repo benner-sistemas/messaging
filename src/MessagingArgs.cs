@@ -4,7 +4,7 @@ using System.Text;
 namespace Benner.Messaging
 {
     /// <summary>
-    /// Classe base para armazenar e desserializar mensagens recebidas por um listener de um <see cref="Client"/>.
+    /// Classe base para armazenar e desserializar mensagens recebidas por um listener de um <see cref="Messaging"/>.
     /// A criptografia padrão para conversão de mensagens é <see cref="Encoding.UTF8"/>.
     /// </summary>
     public class MessagingArgs

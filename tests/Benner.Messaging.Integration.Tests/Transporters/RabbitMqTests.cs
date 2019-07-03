@@ -13,16 +13,18 @@ namespace Benner.Messaging.Tests.Transporters
             var guid = Guid.NewGuid().ToString();
             string queueName = $"fila-teste-rabbitmq-{guid}";
             string message = $"Mensagem que deve retornar {guid}";
-            var config = new MemoryMessagingConfigBuilder("RabbitMQ", Messaging.Broker.Rabbit, new Dictionary<string, string>()
-            {
-                {"UserName", "guest"},
-                {"Password", "guest"},
-                {"HostName", ServerName}
-            })
-            .Create();
+            var config = MessagingConfigFactory
+                .NewMessagingConfigFactory()
+                .WithRabbitMQBroker(new Dictionary<string, string>()
+                {
+                    {"UserName", "guest"},
+                    {"Password", "guest"},
+                    {"HostName", ServerName}
+                })
+                .Create();
 
-            Client.EnqueueSingleMessage(queueName, message, config);
-            var received = Client.DequeueSingleMessage(queueName, config);
+            Messaging.Enqueue(queueName, message, config);
+            var received = Messaging.Dequeue(queueName, config);
 
             Assert.AreEqual(message, received);
         }
@@ -35,9 +37,9 @@ namespace Benner.Messaging.Tests.Transporters
             string message = $"Mensagem que deve retornar {guid}";
             var config = new FileMessagingConfig(LoadFileConfig(Broker.RabbitMQ));
 
-            Client.EnqueueSingleMessage(queueName, message, config);
+            Messaging.Enqueue(queueName, message, config);
 
-            using (var receiver = new Client(config))
+            using (var receiver = new Messaging(config))
             {
                 receiver.StartListening(queueName, (args) =>
                 {
@@ -46,10 +48,10 @@ namespace Benner.Messaging.Tests.Transporters
                 System.Threading.Thread.Sleep(100);
             }
 
-            var received = Client.DequeueSingleMessage(queueName, config);
+            var received = Messaging.Dequeue(queueName, config);
             Assert.IsNull(received);
 
-            var errorMessage = Client.DequeueSingleMessage($"{queueName}-error", config);
+            var errorMessage = Messaging.Dequeue($"{queueName}-error", config);
             Assert.AreEqual($"Vai para fila de error.\r\n{message}", errorMessage);
         }
 
@@ -61,12 +63,12 @@ namespace Benner.Messaging.Tests.Transporters
             string message = $"Mensagem que deve retornar {guid}";
             var config = new FileMessagingConfig(LoadFileConfig(Broker.RabbitMQ));
 
-            Client.EnqueueSingleMessage(queueName, message, config);
+            Messaging.Enqueue(queueName, message, config);
 
             string received = "";
             bool isFirst = true;
             int attempts = 0;
-            using (var receiver = new Client(config))
+            using (var receiver = new Messaging(config))
             {
                 bool shouldRun = true;
                 receiver.StartListening(queueName, (args) =>
@@ -99,11 +101,11 @@ namespace Benner.Messaging.Tests.Transporters
             string queueName = $"fila-teste-rabbitmq-{guid}";
             string message = $"Mensagem teste para RabbitMQ with guid {guid}";
             var config = new FileMessagingConfig(LoadFileConfig(Broker.RabbitMQ));
-            using (Client sender = new Client(config))
+            using (var sender = new Messaging(config))
                 sender.EnqueueMessage(queueName, message);
 
             string received = "";
-            using (var receiver = new Client(config))
+            using (var receiver = new Messaging(config))
             {
                 System.Threading.AutoResetEvent waiter = new System.Threading.AutoResetEvent(false);
                 receiver.StartListening(queueName, (args) =>
@@ -123,8 +125,8 @@ namespace Benner.Messaging.Tests.Transporters
             var config = new FileMessagingConfig(LoadFileConfig(Broker.RabbitMQ));
             string queueName = $"fila-teste-rabbitmq-{Guid.NewGuid()}";
 
-            Client.EnqueueSingleMessage(queueName, _invoiceMessage, config);
-            var typedMessage = Client.DequeueSingleMessage<Invoice>(queueName, config);
+            Messaging.Enqueue(queueName, _invoiceMessage, config);
+            var typedMessage = Messaging.Dequeue<Invoice>(queueName, config);
 
             Assert.AreEqual(_invoiceMessage.AccountReference, typedMessage.AccountReference);
             Assert.AreEqual(_invoiceMessage.CurrencyUsed, typedMessage.CurrencyUsed);
@@ -141,7 +143,7 @@ namespace Benner.Messaging.Tests.Transporters
         [TestMethod]
         public void RabbitMQ_deve_receber_nulo_ao_ouvir_mensagem_inexistente()
         {
-            var single = Client.DequeueSingleMessage($"fila-teste-rabbitmq-{Guid.NewGuid()}", new FileMessagingConfig(LoadFileConfig(Broker.RabbitMQ)));
+            var single = Messaging.Dequeue($"fila-teste-rabbitmq-{Guid.NewGuid()}", new FileMessagingConfig(LoadFileConfig(Broker.RabbitMQ)));
             Assert.IsNull(single);
         }
     }

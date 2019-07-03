@@ -13,15 +13,17 @@ namespace Benner.Messaging.Tests.Transporters
             var guid = Guid.NewGuid().ToString();
             string queueName = $"fila-teste-azure-{guid}";
             string message = $"Mensagem que deve retornar {guid}";
-            var config = new MemoryMessagingConfigBuilder("AzureQueue", Messaging.Broker.AzureQueue, new Dictionary<string, string>()
-            {
-                {"InvisibilityTime", "15"},
-                {"ConnectionString", AzureConnectionString},
-            })
-            .Create();
+            var config = MessagingConfigFactory
+                .NewMessagingConfigFactory()
+                .WithAzureQueueBroker(new Dictionary<string, string>()
+                {
+                    {"InvisibilityTime", "15"},
+                    {"ConnectionString", AzureConnectionString},
+                })
+                .Create();
 
-            Client.EnqueueSingleMessage(queueName, message, config);
-            var received = Client.DequeueSingleMessage(queueName, config);
+            Messaging.Enqueue(queueName, message, config);
+            var received = Messaging.Dequeue(queueName, config);
 
             Assert.AreEqual(message, received);
         }
@@ -34,9 +36,9 @@ namespace Benner.Messaging.Tests.Transporters
             string message = $"Mensagem que deve retornar {guid}";
             var config = new FileMessagingConfig(LoadFileConfig(Broker.AzureQueue));
 
-            Client.EnqueueSingleMessage(queueName, message, config);
+            Messaging.Enqueue(queueName, message, config);
 
-            using (var receiver = new Client(config))
+            using (var receiver = new Messaging(config))
             {
                 receiver.StartListening(queueName, (args) =>
                 {
@@ -45,10 +47,10 @@ namespace Benner.Messaging.Tests.Transporters
                 System.Threading.Thread.Sleep(100);
             }
 
-            var received = Client.DequeueSingleMessage(queueName, config);
+            var received = Messaging.Dequeue(queueName, config);
             Assert.IsNull(received);
 
-            var errorMessage = Client.DequeueSingleMessage($"{queueName}-error", config);
+            var errorMessage = Messaging.Dequeue($"{queueName}-error", config);
             Assert.AreEqual($"Vai para fila de error.\r\n{message}", errorMessage);
         }
 
@@ -60,12 +62,12 @@ namespace Benner.Messaging.Tests.Transporters
             string message = $"Mensagem que deve retornar {guid}";
             var config = new FileMessagingConfig(LoadFileConfig(Broker.AzureQueue));
 
-            Client.EnqueueSingleMessage(queueName, message, config);
+            Messaging.Enqueue(queueName, message, config);
 
             string received = "";
             bool isFirst = true;
             int attempts = 0;
-            using (var receiver = new Client(config))
+            using (var receiver = new Messaging(config))
             {
                 bool shouldRun = true;
                 receiver.StartListening(queueName, (args) =>
@@ -98,8 +100,8 @@ namespace Benner.Messaging.Tests.Transporters
             string queueName = $"fila-teste-azurequeue-{guid}";
             string message = $"Mensagem teste para Azure Queue with guid {guid}";
             var config = new FileMessagingConfig(LoadFileConfig(Broker.AzureQueue));
-            Client.EnqueueSingleMessage(queueName, message, config);
-            string received = Client.DequeueSingleMessage(queueName, config);
+            Messaging.Enqueue(queueName, message, config);
+            string received = Messaging.Dequeue(queueName, config);
             Assert.AreEqual(message, received);
         }
 
@@ -108,8 +110,8 @@ namespace Benner.Messaging.Tests.Transporters
         {
             var config = new FileMessagingConfig(LoadFileConfig(Broker.AzureQueue));
             string queueName = $"fila-teste-azurequeue-{Guid.NewGuid()}";
-            Client.EnqueueSingleMessage(queueName, _invoiceMessage, config);
-            var typedMessage = Client.DequeueSingleMessage<Invoice>(queueName, config);
+            Messaging.Enqueue(queueName, _invoiceMessage, config);
+            var typedMessage = Messaging.Dequeue<Invoice>(queueName, config);
 
             Assert.AreEqual(_invoiceMessage.AccountReference, typedMessage.AccountReference);
             Assert.AreEqual(_invoiceMessage.CurrencyUsed, typedMessage.CurrencyUsed);
@@ -126,7 +128,7 @@ namespace Benner.Messaging.Tests.Transporters
         [TestMethod]
         public void AzureQueue_deve_receber_nulo_ao_ouvir_mensagem_inexistente()
         {
-            var single = Client.DequeueSingleMessage($"fila-teste-azurequeue-{Guid.NewGuid()}", new FileMessagingConfig(LoadFileConfig(Broker.AzureQueue)));
+            var single = Messaging.Dequeue($"fila-teste-azurequeue-{Guid.NewGuid()}", new FileMessagingConfig(LoadFileConfig(Broker.AzureQueue)));
             Assert.IsNull(single);
         }
     }

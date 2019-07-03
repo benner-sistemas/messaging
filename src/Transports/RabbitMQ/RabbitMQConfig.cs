@@ -14,13 +14,13 @@ namespace Benner.Messaging
         internal string Password { get; set; }
         internal int Port { get; set; }
 
-        public RabbitMQConfig(Dictionary<string, string> configurations)
+        public RabbitMQConfig(Dictionary<string, string> brokerSettings)
         {
-            HostName = configurations.GetValue("HostName", true);
-            UserName = configurations.GetValue("UserName", false, "guest");
-            Password = configurations.GetValue("Password", false, "guest");
+            HostName = brokerSettings.GetValue("HostName", true);
+            UserName = brokerSettings.GetValue("UserName", false, "guest");
+            Password = brokerSettings.GetValue("Password", false, "guest");
 
-            string informedPort = configurations.GetValue("Port", false);
+            string informedPort = brokerSettings.GetValue("Port", false);
             if (!string.IsNullOrWhiteSpace(informedPort))
             {
                 if (!int.TryParse(informedPort, out int port))

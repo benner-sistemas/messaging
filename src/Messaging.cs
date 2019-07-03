@@ -8,28 +8,28 @@ namespace Benner.Messaging
     /// <summary>
     /// Classe responsável pelo envio e recebimento de mensagens.
     /// </summary>
-    public class Client : IDisposable
+    public class Messaging : IDisposable
     {
         private readonly IMessagingConfig _config;
         private readonly Dictionary<string, IBrokerTransport> _brokers;
 
         /// <summary>
-        /// Instancia um <see cref="Client"/> com configuração padrão de <see cref="FileMessagingConfig"/>.
+        /// Instancia um <see cref="Messaging"/> com configuração padrão de <see cref="FileMessagingConfig"/>.
         /// </summary>
-        public Client() : this(new FileMessagingConfig())
+        public Messaging() : this(new FileMessagingConfig())
         { }
 
         /// <summary>
-        /// Instancia um <see cref="Client"/> com a configuração informada.
+        /// Instancia um <see cref="Messaging"/> com a configuração informada.
         /// </summary>
         /// <param name="config"></param>
-        public Client(IMessagingConfig config)
+        public Messaging(IMessagingConfig config)
         {
-            _config = config;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             _brokers = new Dictionary<string, IBrokerTransport>(StringComparer.OrdinalIgnoreCase);
         }
 
-        ~Client()
+        ~Messaging()
         {
             Dispose();
         }
@@ -53,12 +53,29 @@ namespace Benner.Messaging
         /// </summary>
         /// <typeparam name="T">O tipo para qual a mensagem será desserializada.</typeparam>
         /// <param name="queueName">Nome da fila.</param>
+        /// <returns>O objeto desserializado da mensagem.</returns>
+        /// <exception cref="InvalidOperationException">Ocorre quando a conexão com o servidor de filas falha.</exception>
+        public static T Dequeue<T>(string queueName)
+        {
+            return Dequeue<T>(queueName, new FileMessagingConfig());
+        }
+
+        /// <summary>
+        /// Encapsulamento seguro para receber a próxima mensagem da fila.
+        /// Obtém a próxima mensagem da fila informada e desserializa para um objeto. 
+        /// Uma vez que a mensagem é recuperada da fila, esta é removida da fila. 
+        /// Caso ocorra erro de desserialização por serem objetos de tipos diferentes, a mensagem é perdida.
+        /// Dependendo do serviço utilizado, este método pode levar alguns segundos esperando por novas mensagens até retornar.
+        /// Caso não existam mensagens, retorna <see cref="null"/>. 
+        /// </summary>
+        /// <typeparam name="T">O tipo para qual a mensagem será desserializada.</typeparam>
+        /// <param name="queueName">Nome da fila.</param>
         /// <param name="config">A configuração de filas.</param>
         /// <returns>O objeto desserializado da mensagem.</returns>
         /// <exception cref="InvalidOperationException">Ocorre quando a conexão com o servidor de filas falha.</exception>
-        public static T DequeueSingleMessage<T>(string queueName, IMessagingConfig config = default(FileMessagingConfig))
+        public static T Dequeue<T>(string queueName, IMessagingConfig config)
         {
-            var rawMessage = DequeueSingleMessage(queueName, config);
+            var rawMessage = Dequeue(queueName, config);
             var jsSettings = new JsonSerializerSettings
             {
                 ObjectCreationHandling = ObjectCreationHandling.Replace
@@ -77,15 +94,30 @@ namespace Benner.Messaging
         /// Caso não existam mensagens, retorna <see cref="null"/>. 
         /// </summary>
         /// <param name="queueName">Nome da fila.</param>
+        /// <returns>A mensagem recebida.</returns>
+        /// <exception cref="InvalidOperationException">Ocorre quando a conexão com o servidor de filas falha.</exception>
+        public static string Dequeue(string queueName)
+        {
+            return Dequeue(queueName, new FileMessagingConfig());
+        }
+
+        /// <summary>
+        /// Encapsulamento seguro para receber a próxima mensagem da fila.
+        /// Obtém a próxima mensagem da fila informada.
+        /// Uma vez que a mensagem é recuperada da fila, esta é removida da fila. 
+        /// Dependendo do serviço utilizado, este método pode levar alguns segundos esperando por novas mensagens até retornar.
+        /// Caso não existam mensagens, retorna <see cref="null"/>. 
+        /// </summary>
+        /// <param name="queueName">Nome da fila.</param>
         /// <param name="config">A configuração de filas.</param>
         /// <returns>A mensagem recebida.</returns>
         /// <exception cref="InvalidOperationException">Ocorre quando a conexão com o servidor de filas falha.</exception>
-        public static string DequeueSingleMessage(string queueName, IMessagingConfig config = default(FileMessagingConfig))
+        public static string Dequeue(string queueName, IMessagingConfig config)
         {
             queueName = queueName.ToLower();
             Utils.ValidateQueueName(queueName, true);
 
-            using (var client = new Client(config))
+            using (var client = new Messaging(config))
             {
                 var transporter = client.GetTransporter(queueName);
                 return transporter.DequeueSingleMessage(queueName);
@@ -98,12 +130,23 @@ namespace Benner.Messaging
         /// </summary>
         /// <param name="queueName">Nome da fila.</param>
         /// <param name="objMessage">O objeto a ser serializado e enviado como mensagem.</param>
+        /// <exception cref="InvalidOperationException">Ocorre quando a conexão com o servidor de filas falha.</exception>
+        public static void Enqueue(string queueName, object objMessage)
+        {
+            Enqueue(queueName, objMessage, new FileMessagingConfig());
+        }
+
+        /// <summary>
+        /// Encapsulamento seguro para receber a próxima mensagem da fila.
+        /// Envia um objeto para o serviço configurado.
+        /// </summary>
+        /// <param name="queueName">Nome da fila.</param>
+        /// <param name="objMessage">O objeto a ser serializado e enviado como mensagem.</param>
         /// <param name="config">A configuração de filas.</param>
         /// <exception cref="InvalidOperationException">Ocorre quando a conexão com o servidor de filas falha.</exception>
-        public static void EnqueueSingleMessage(string queueName, object objMessage, IMessagingConfig config = default(FileMessagingConfig))
+        public static void Enqueue(string queueName, object objMessage, IMessagingConfig config)
         {
-            var messageString = JsonConvert.SerializeObject(objMessage);
-            EnqueueSingleMessage(queueName, messageString, config);
+            Enqueue(queueName, JsonConvert.SerializeObject(objMessage), config);
         }
 
         /// <summary>
@@ -111,12 +154,24 @@ namespace Benner.Messaging
         /// Envia uma mensagem para o serviço configurado.
         /// </summary>
         /// <param name="queueName">Nome da fila.</param>
-        /// <param name="objMessage">O objeto a ser serializado e enviado como mensagem.</param>
+        /// <param name="message">O objeto a ser serializado e enviado como mensagem.</param>
+        /// <exception cref="InvalidOperationException">Ocorre quando a conexão com o servidor de filas falha.</exception>
+        public static void Enqueue(string queueName, string message)
+        {
+            Enqueue(queueName, message, new FileMessagingConfig());
+        }
+
+        /// <summary>
+        /// Encapsulamento seguro para receber a próxima mensagem da fila.
+        /// Envia uma mensagem para o serviço configurado.
+        /// </summary>
+        /// <param name="queueName">Nome da fila.</param>
+        /// <param name="message">O objeto a ser serializado e enviado como mensagem.</param>
         /// <param name="config">A configuração de filas.</param>
         /// <exception cref="InvalidOperationException">Ocorre quando a conexão com o servidor de filas falha.</exception>
-        public static void EnqueueSingleMessage(string queueName, string message, IMessagingConfig config = default(FileMessagingConfig))
+        public static void Enqueue(string queueName, string message, IMessagingConfig config)
         {
-            using (var client = new Client(config))
+            using (var client = new Messaging(config))
                 client.EnqueueMessage(queueName, message);
         }
 
@@ -124,7 +179,7 @@ namespace Benner.Messaging
         /// Envia um objeto para o serviço configurado.
         /// É extremamente recomendado fazer o <see cref="Dispose"/> na instância após todos os objetos enviados.
         /// Este método é recomendado quando há muitos objetos a serem enviados de uma vez. 
-        /// Caso queira enviar apenas um, utilize <see cref="Client.EnqueueMessage(string, object)"/>.
+        /// Caso queira enviar apenas um, utilize <see cref="Messaging.EnqueueMessage(string, object)"/>.
         /// </summary>
         /// <param name="queueName">Nome da fila.</param>
         /// <param name="objMessage">O objeto a ser serializado e enviado como mensagem.</param>
@@ -139,7 +194,7 @@ namespace Benner.Messaging
         /// Envia uma mensagem para o serviço configurado.
         /// É extremamente recomendado fazer o <see cref="Dispose"/> na instância após todas as mensagens enviadas.
         /// Este método é recomendado quando há muitas mensagens a serem enviadas de uma vez. 
-        /// Caso queira enviar apenas uma utilize <see cref="Client.EnqueueMessage(string, string)"/>.
+        /// Caso queira enviar apenas uma utilize <see cref="Messaging.EnqueueMessage(string, string)"/>.
         /// </summary>
         /// <param name="queueName">Nome da fila.</param>
         /// <param name="message">O objeto a ser serializado e enviado como mensagem.</param>

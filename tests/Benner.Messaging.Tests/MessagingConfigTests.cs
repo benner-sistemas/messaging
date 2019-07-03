@@ -29,15 +29,17 @@ namespace Benner.Messaging.Tests
             string sentMsg = "Teste de configuração em memória";
 
 
-            Client client = new Client(mmc);
-            client.EnqueueMessage(queueName, sentMsg);
+            Messaging.Enqueue(queueName, sentMsg, mmc);
 
             string received = "";
-            new Client(mmc).StartListening(queueName, (args) =>
+            using (var client = new Messaging(mmc))
             {
-                received = args.AsString;
-                return true;
-            });
+                client.StartListening(queueName, (args) =>
+                 {
+                     received = args.AsString;
+                     return true;
+                 });
+            }
 
             Assert.AreEqual(sentMsg, received);
         }
@@ -65,15 +67,13 @@ namespace Benner.Messaging.Tests
             string queueName = "broker-padrao-para-fila-nao-configurada";
             var sentMsg = "Teste automatizado da fila broker_padrao_para_fila_nao_configurada";
 
-            new Client(new FileMessagingConfig(_testeConfigPath)).EnqueueMessage(queueName, sentMsg);
+            var config = new FileMessagingConfig(_testeConfigPath);
+            var configType = config.GetConfigForQueue(queueName);
+            Assert.IsNotNull(configType);
+            Assert.AreEqual(typeof(MockMQConfig).FullName, configType.GetType().FullName);
 
-            string received = "";
-            new Client(new FileMessagingConfig(_testeConfigPath)).StartListening(queueName, (args) =>
-            {
-                received = args.AsString;
-                return true;
-            });
-
+            Messaging.Enqueue(queueName, sentMsg, config);
+            string received = Messaging.Dequeue(queueName, config);
             Assert.AreEqual(sentMsg, received);
         }
 
@@ -101,16 +101,9 @@ namespace Benner.Messaging.Tests
             string queueName = "broker-especifico-para-fila-informada";
             var sentMsg = "Teste automatizado da fila broker_especifico_para_fila_informada";
 
-            new Client(new FileMessagingConfig(_testeConfigPath)).EnqueueMessage(queueName, sentMsg);
-
-            string received = "";
-            new Client(new FileMessagingConfig(_testeConfigPath)).StartListening(queueName, (args) =>
-            {
-                received = args.AsString;
-                return true;
-            }
-            );
-
+            var config = new FileMessagingConfig(_testeConfigPath);
+            Messaging.Enqueue(queueName, sentMsg, config);
+            string received = Messaging.Dequeue(queueName, config);
             Assert.AreEqual(sentMsg, received);
         }
 
@@ -152,35 +145,12 @@ namespace Benner.Messaging.Tests
             Assert.ThrowsException<ArgumentException>(() => new FileMessagingConfig(_testeConfigPath).GetConfigForQueue("teste"));
 
             // memória
-            var config = new MemoryMessagingConfigBuilder("RabbitMQ", Messaging.Broker.Rabbit, new Dictionary<string, string>())
-                .WithQueue("teste", "naoexiste")
+            var config = MessagingConfigFactory
+                .NewMessagingConfigFactory()
+                .WithRabbitMQBroker("",0,"","")
+                .WithMappedQueue("teste", "naoexiste")
                 .Create();
             Assert.ThrowsException<ArgumentException>(() => config.GetConfigForQueue("teste"));
-        }
-
-        [TestMethod]
-        public void Configuracao_deve_emitir_exception_para_broker_sem_configuracoes()
-        {
-            // arquivo
-            var fileContent = @"<?xml version='1.0' encoding='utf-8' ?><configuration><configSections>
-                    <section name='MessagingConfigSection' type='Benner.Messaging.MessagingFileConfigSection, Benner.Messaging' />
-                    </configSections><MessagingConfigSection>
-                    <queues>
-                    </queues>
-                    <brokerList default='MockMQ'> 
-                        <broker name='RabbitMQ' type='Benner.Messaging.RabbitMQConfig, Benner.Messaging'></broker>
-                        <broker name='MockMQ' type='Benner.Messaging.Tests.MockMQConfig, Benner.Messaging.Tests'>
-                        </broker>
-                    </brokerList>
-                    </MessagingConfigSection></configuration>";
-
-            File.AppendAllText(_testeConfigPath, fileContent);
-
-            // usando default
-            Assert.ThrowsException<XmlException>(() => new FileMessagingConfig(_testeConfigPath));
-
-            // memória
-            Assert.ThrowsException<ArgumentNullException>(() => new MemoryMessagingConfigBuilder("fila-padrao", Messaging.Broker.ActiveMQ, null));
         }
 
         [TestMethod]
@@ -217,16 +187,27 @@ namespace Benner.Messaging.Tests
         {
             var devemReprovar = new string[]
             {
-                "a", "aa", "MA", "a_a", "e#%", "aaaa--a", "maiUSCULA", "-aaaaaaaaaa",
+                "a",
+                "aa",
+                "MA",
+                "a_a",
+                "e#%",
+                "aaaa--a",
+                "maiUSCULA",
+                "-aaaaaaaaaa",
                 "aaaaaaaaaaaaaaaaaaaa-aaaaaaaaaaaaaaaaaaaa-aaaaaaaaaaaaaaaaaaaa-",
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
             };
 
             foreach (string queueName in devemReprovar)
             {
-                Assert.ThrowsException<ArgumentException>(() => 
-                new MemoryMessagingConfigBuilder("teste", Broker.ActiveMQ, new Dictionary<string, string>()).WithQueue(queueName, "teste"), 
-                $"Tag que falhou: {queueName}");
+                
+                Assert.ThrowsException<ArgumentException>(() =>
+                    MessagingConfigFactory
+                        .NewMessagingConfigFactory()
+                        .WithMappedQueue(queueName, "teste")
+                        .Create(), 
+                    $"Tag que falhou: {queueName}");
             }
         }
 
