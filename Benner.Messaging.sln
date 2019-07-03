@@ -9,6 +9,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.Tests", "t
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.Integration.Tests", "tests\Benner.Messaging.Integration.Tests\Benner.Messaging.Integration.Tests.csproj", "{C2505B47-2A47-40C1-931C-2A6C2FE0123E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{97839F13-D676-4324-941A-16FD5151B2F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{39620032-C7D7-4A3E-95C3-614C3A0A0208}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "producer", "samples\producer\producer.csproj", "{EDF4CA56-0AC7-4514-A793-972400C5F7AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,9 +34,14 @@ Global
 		{791A4BA8-3049-4A3E-8FF0-EF973AF61C16}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C2505B47-2A47-40C1-931C-2A6C2FE0123E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C2505B47-2A47-40C1-931C-2A6C2FE0123E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDF4CA56-0AC7-4514-A793-972400C5F7AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDF4CA56-0AC7-4514-A793-972400C5F7AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EDF4CA56-0AC7-4514-A793-972400C5F7AB} = {97839F13-D676-4324-941A-16FD5151B2F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E33B176C-4421-406A-A00A-0FCB277089B1}
