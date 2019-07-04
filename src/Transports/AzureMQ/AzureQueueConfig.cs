@@ -8,12 +8,12 @@ namespace Benner.Messaging
     /// <summary>
     /// Classe de configuração do Azure Queue.
     /// </summary>
-    internal class AzureMQConfig : IInternalBrokerConfig
+    internal class AzureQueueConfig : IInternalBrokerConfig
     {
         internal CloudStorageAccount StorageAccount { get; set; }
         internal int InvisibilityTimeInMinutes { get; set; }
 
-        public AzureMQConfig(Dictionary<string, string> configurations)
+        public AzureQueueConfig(Dictionary<string, string> configurations)
         {
             string connectionString = configurations.GetValue("ConnectionString", true);
             CloudStorageAccount.TryParse(connectionString, out CloudStorageAccount storageAccount);
@@ -25,6 +25,6 @@ namespace Benner.Messaging
                 throw new ArgumentException("O tempo de invisibilidade informado não é um valor inteiro válido");
         }
 
-        public BrokerTransport CreateTransporterInstance() => new AzureMQTransport(this);
+        public BrokerTransport CreateTransporterInstance() => new AzureQueueTransport(this);
     }
 }

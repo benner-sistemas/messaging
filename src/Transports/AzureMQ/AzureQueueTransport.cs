@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Benner.Messaging
 {
-    internal class AzureMQTransport : BrokerTransport
+    internal class AzureQueueTransport : BrokerTransport
     {
-        private readonly AzureMQConfig _config;
+        private readonly AzureQueueConfig _config;
         private readonly CloudQueueClient _queueClient;
         private readonly Dictionary<string, CloudQueue> _declaredQueues;
         private Task _listeningTask;
         private bool _keepListenerAlive;
 
-        public AzureMQTransport(AzureMQConfig config)
+        public AzureQueueTransport(AzureQueueConfig config)
         {
             _config = config;
             _queueClient = _config.StorageAccount.CreateCloudQueueClient();
@@ -107,7 +107,7 @@ namespace Benner.Messaging
             return message.AsString;
         }
 
-        ~AzureMQTransport()
+        ~AzureQueueTransport()
         {
             Dispose();
         }
