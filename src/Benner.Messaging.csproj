@@ -5,7 +5,7 @@
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject></StartupObject>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <AssemblyName>Benner.Messaging</AssemblyName>
     <Authors>Benner Sistemas</Authors>
     <Company>Benner Sistemas</Company>
