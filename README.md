@@ -91,6 +91,8 @@ Well, you need a `messaging.config` file, like that (don't worry, we will get de
       </broker>
       <broker name="ActiveMQ" type="Benner.Tecnologia.Messaging.ActiveMQConfig, Benner.Tecnologia.Messaging">
         <add key="Hostname" value="servername" />
+        <add key="Password" value="password" />
+        <add key="Hostname" value="servername" />
       </broker>
     </brokerList>
   </MessagingConfigSection>
