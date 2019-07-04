@@ -18,14 +18,12 @@ master | [![Build Status](https://dev.azure.com/benner-tecnologia/benner-tecnolo
 
 We provide an extremely simple and intuitive API for sending and receiving messages to either RabbitMQ, ActiveMQ, AmazonSQS or AzureQueue:
 
-How to send a message:
 `Messaging.Enqueue("queue-name", "hello world!");`
 
-How to receive a message:
 `var message = Messaging.Dequeue("queue-name");`
 
 Yep, you got that right! You code just once, on a extremly simple way, and run over any message broker. No vendor lock-in, no code refactoring.
-All the magic relies on configuration file, or configuration easily injected.
+All the magic relies on configuration (file or injected code).
 
 ## Behavior matters
 
@@ -38,7 +36,7 @@ It's important to notice that Messaging API was born to work on an specific way:
 
 Enqueue and Dequeue operations was designed to ensure that an sent message by the _sender_ sucessfuly arrives on the _receiver_. That means that we pursuit _Publisher Confirms_ and  _Consumer Acknoledgement_ approach across any supported broker.
 
-## Tutorial
+## Get Started
 
 ### Sending message
 
@@ -67,21 +65,24 @@ Messaging config not found
 
 ### Brokers configuration
 
-Well, you need a `messaging.config` file, like that:
+Well, you need a `messaging.config` file, like that (don't worry, we will get deeper on configuration ahead):
 ```
-
+TODO: Léo, colocar aqui o conteúdo do .config.modelo completo
 ```
 
 Or..! You can inject config throught code:
 ```
-var config = new MessagingConfig()
-   .AddRabbitMQBroker("hostname", 5672, "user", "password");
+var config = MessagingConfigFactory
+    .NewMessagingConfigFactory()
+    .WithRabbitMQBroker("hostname", 5672, "user", "password")
+    .Create();
+
 Messaging.Enqueue("queue-name", "hello world!", config);
 ```
 
 That's it! `dotnet run` it and you will get:
 ```
-TODO: Colocar aqui o erro que acontece caso nao tenha um Rabbit no endereço
+Unable to connect to RabbitMQ server
 ```
 
 ### Provisioning a broker
@@ -114,12 +115,17 @@ dotnet add package benner.messaging
 code .
 ```
 
-Add _using_ and just receive a message to some queue, dont forget configuration:
+Add _using_ and just receive a message from the queue, dont forget configuration:
 ```
 using Benner.Messaging;
-var config = new MessagingConfig()
-   .AddRabbitMQBroker("hostname", 5672, "user", "password");
+
+var config = MessagingConfigFactory
+    .NewMessagingConfigFactory()
+    .WithRabbitMQBroker("hostname", 5672, "user", "password")
+    .Create();
+
 var message = Messaging.Dequeue("queue-name", config);
+
 Console.Write(message);
 
 ```
