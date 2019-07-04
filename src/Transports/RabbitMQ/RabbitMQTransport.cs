@@ -65,7 +65,7 @@ namespace Benner.Messaging
                     }
                     catch (BrokerUnreachableException e)
                     {
-                        throw new InvalidOperationException("Não foi possível se conectar ao servidor RabbitMQ.", e);
+                        throw new InvalidOperationException("Unable to connect to RabbitMQ server.", e);
                     }
                 case ConectionType.Consume:
                     if (_consumeConnection != null && _consumeConnection.IsOpen)

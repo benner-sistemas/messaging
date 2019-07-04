@@ -102,7 +102,7 @@ namespace Benner.Messaging
             }
             catch (NMSConnectionException e)
             {
-                throw new InvalidOperationException("Não foi possível se conectar ao servidor ActiveMQ.", e);
+                throw new InvalidOperationException("Unable to connect to ActiveMQ server", e);
             }
         }
 

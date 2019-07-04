@@ -43,7 +43,7 @@ namespace Benner.Messaging
             }
             catch (StorageException e)
             {
-                throw new InvalidOperationException("Não foi possível se conectar ao servidor Azure.", e);
+                throw new InvalidOperationException("Unable to connect to AzureQueue server", e);
             }
         }
 

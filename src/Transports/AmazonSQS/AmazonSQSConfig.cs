@@ -9,11 +9,11 @@ namespace Benner.Messaging
     /// <summary>
     /// Classe de configuração do Amazon SQS.
     /// </summary>
-    internal class AmazonSqsConfig : IInternalBrokerConfig
+    internal class AmazonSQSConfig : IInternalBrokerConfig
     {
         internal int InvisibilityTimeInMinutes { get; set; }
 
-        public AmazonSqsConfig(Dictionary<string, string> configurations)
+        public AmazonSQSConfig(Dictionary<string, string> configurations)
         {
             ValidateCredentialsFileExists();
 
@@ -41,7 +41,7 @@ namespace Benner.Messaging
             }
             catch (Exception e)
             {
-                throw new AmazonSQSException("Não foi possível configurar o serviço AmazonSQS.", e);
+                throw new AmazonSQSException("Unable to connect to AmazonSQS server", e);
             }
         }
 

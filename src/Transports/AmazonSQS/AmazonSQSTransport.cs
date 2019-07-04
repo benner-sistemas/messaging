@@ -10,13 +10,13 @@ namespace Benner.Messaging
 {
     internal class AmazonSqsTransport : BrokerTransport
     {
-        private readonly AmazonSqsConfig _config;
+        private readonly AmazonSQSConfig _config;
         private IAmazonSQS _client;
         private readonly Dictionary<string, string> _declaredQueues;
         private bool _keepListenerAlive;
         private Task _listeningTask;
 
-        public AmazonSqsTransport(AmazonSqsConfig config)
+        public AmazonSqsTransport(AmazonSQSConfig config)
         {
             _config = config;
             _client = null;
@@ -68,7 +68,7 @@ namespace Benner.Messaging
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Não foi possível se conectar ao servidor Amazon.", e);
+                throw new InvalidOperationException("Unable to connect to AmazonSQS server", e);
             }
         }
 
