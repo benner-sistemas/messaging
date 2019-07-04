@@ -1,7 +1,7 @@
 # Benner.Messaging
 
-Benner.Messaging is a .NET Standard lightweight messaging library for deal with any message broker, easily.
-Benner.Messaging support RabbitMQ, ActiveMQ, AmazonSQS and AzureMQ. It is _free and open-source_ under MIT License.
+Benner.Messaging is a .NET Standard lightweight messaging library to deal with any message broker with ease.
+Benner.Messaging supports RabbitMQ, ActiveMQ, Amazon SQS and Azure Queue. It is _free and open-source_ under MIT License.
 
 ## Build Status
 Branch | Status
@@ -16,25 +16,25 @@ master | [![Build Status](https://dev.azure.com/benner-tecnologia/benner-tecnolo
 
 ## One Messaging API to rule them all!
 
-We provide an extremely simple and intuitive API for sending and receiving messages to either RabbitMQ, ActiveMQ, AmazonSQS or AzureQueue:
+We provide an extremely simple and intuitive API for sending and receiving messages to either RabbitMQ, ActiveMQ, Amazon SQS or Azure Queue:
 
 `Messaging.Enqueue("queue-name", "hello world!");`
 
 `var message = Messaging.Dequeue("queue-name");`
 
-Yep, you got that right! You code just once, on a extremly simple way, and run over any message broker. No vendor lock-in, no code refactoring.
+Yep, you got that right! You code just once, on an extremly simple way, and run over any message broker. No vendor lock-in, no code refactoring.
 All the magic relies on configuration (file or injected code).
 
 ## Behavior matters
 
-It's important to notice that Messaging API was born to work on an specific way:
+It's important to notice that Messaging API was born to work on a specific way:
 * First in, first out 
-* One producer send
-* Only one consumer receive
-* If consumer fails receiving or processing, message returns to queue
-* Message will not be lost
+* One producer sends
+* Only one consumer receives
+* If consumer fails at receiving or processing, the message returns to queue
+* The message will not be lost
 
-Enqueue and Dequeue operations was designed to ensure that an sent message by the _sender_ sucessfuly arrives on the _receiver_. That means that we pursuit _Publisher Confirms_ and  _Consumer Acknoledgement_ approach across any supported broker.
+Enqueue and Dequeue operations were designed to ensure that a sent message by the _sender_ successfully arrives on the _receiver_. That means that we pursuit _Publisher Confirms_ and  _Consumer Acknoledgement_ approach across any supported broker.
 
 ## Get Started
 
@@ -67,10 +67,37 @@ Messaging config not found
 
 Well, you need a `messaging.config` file, like that (don't worry, we will get deeper on configuration ahead):
 ```
-TODO: Léo, colocar aqui o conteúdo do .config.modelo completo
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <configSections>
+    <section name="MessagingConfigSection" type="Benner.Tecnologia.Messaging.MessagingFileConfigSection, Benner.Tecnologia.Messaging" />
+  </configSections>
+  <MessagingConfigSection>
+    <queues>
+      <queue name="queue-name" broker="broker-name" />
+    </queues>
+    <brokerList default="RabbitMQ">
+      <broker name="AzureMQ" type="Benner.Tecnologia.Messaging.AzureMQConfig, Benner.Tecnologia.Messaging">
+        <add key="ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=accountName;AccountKey=accountKey;EndpointSuffix=core.windows.net" />
+        <add key="InvisibilityTime" value="15" />
+      </broker>
+      <broker name="RabbitMQ" type="Benner.Tecnologia.Messaging.RabbitMQConfig, Benner.Tecnologia.Messaging">
+        <add key="Username" value="username" />
+        <add key="Password" value="password" />
+        <add key="Hostname" value="servername" />
+      </broker>
+      <broker name="Amazon" type="Benner.Tecnologia.Messaging.AmazonSqsConfig, Benner.Tecnologia.Messaging">
+        <add key="InvisibilityTime" value="15" />
+      </broker>
+      <broker name="ActiveMQ" type="Benner.Tecnologia.Messaging.ActiveMQConfig, Benner.Tecnologia.Messaging">
+        <add key="Hostname" value="servername" />
+      </broker>
+    </brokerList>
+  </MessagingConfigSection>
+</configuration>
 ```
 
-Or..! You can inject config throught code:
+You can also inject config through code:
 ```
 var config = MessagingConfigFactory
     .NewMessagingConfigFactory()
@@ -89,17 +116,17 @@ Unable to connect to RabbitMQ server
 
 Well... you need, in this case, a RabbitMQ runnig according to your configuration.
 
-Thankfully humanity evolved, we have containers Docker to help us out. So, let's just run it!
+Thankfully humanity evolved and we have Docker containers to help us out. So, let's just run it!
 ```
-TODO: review all params to run RabbitMQ on container
-docker run -d -v rabbitmq_data:/var/lib/rabbitmq --hostname wes-management --name wes-management -p 15672:15672 -p 15671:15671 -p 5672:5672 -p 5671:5671 rabbitmq:3.7-management
+docker run -d -v <path/to/rabbit/volume/folder:/var/lib/rabbitmq --hostname rabbit-management --name rabbit-management -p 15672:15672 -p 15671:15671 -p 5672:5672 -p 5671:5671 rabbitmq:3.7-management
 ```
 
-TODO:(more details) Now we are good to go! `dotnet run` it. No error.. good.. so what?!
+TODO:(more details) 
+Now we are good to go! `dotnet run` it. No error.. good.. so what?!
 
 ### Check broker management console
 
-and access Rabbit management console at `TODO: http?://hostname:????` and You will see your queue and your message.
+On your browser, access `http://hostname::15672` to manage rabbit and you'll be able to see your queue with your messages inside it.
 
 
 ### Receive message
@@ -115,7 +142,7 @@ dotnet add package benner.messaging
 code .
 ```
 
-Add _using_ and just receive a message from the queue, dont forget configuration:
+Add _using_ and just receive a message from the queue, not forgeting configuration:
 ```
 using Benner.Messaging;
 
