@@ -4,13 +4,21 @@
     <section name="MessagingConfigSection" type="Benner.Messaging.MessagingFileConfigSection, Benner.Messaging" />
   </configSections>
   <MessagingConfigSection>
-    <queues>
-      <queue name="nome_da_fila" broker="Name_do_broker" />
-    </queues>
-    <brokerList default="Name_do_broker_default">
-      <broker name="Name_do_broker" type="Namespace.Classname, Namespace">
-        <add key="Propriedade" value="Valor" />
+    <!--Benner.Messaging is multi broker, chose the default-->
+    <brokerList default="RabbitMQ">
+      <broker name="RabbitMQ" type="Benner.Messaging.RabbitMQConfig, Benner.Messaging">
+        <add key="HostName" value="servername" />
+        <add key="UserName" value="username" />
+        <add key="Password" value="password" />
+      </broker>
+      <broker name="ActiveMQ" type="Benner.Messaging.ActiveMQConfig, Benner.Messaging">
+      </broker>
+      <broker name="AmazonSQS" type="Benner.Messaging.AmazonSQSConfig, Benner.Messaging">
       </broker>
     </brokerList>
+    <!--specify only queues that should use other than default broker-->
+    <queues>
+      <queue name="non-default-broker-queue" broker="AmazonSQS" />
+    </queues>
   </MessagingConfigSection>
 </configuration>
