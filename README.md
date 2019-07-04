@@ -85,6 +85,7 @@ Well, you need a `messaging.config` file, like that (don't worry, we will get de
         <add key="Username" value="username" />
         <add key="Password" value="password" />
         <add key="Hostname" value="servername" />
+        <add key="Port" value="port" />
       </broker>
       <broker name="Amazon" type="Benner.Tecnologia.Messaging.AmazonSqsConfig, Benner.Tecnologia.Messaging">
         <add key="InvisibilityTime" value="15" />
@@ -93,6 +94,7 @@ Well, you need a `messaging.config` file, like that (don't worry, we will get de
         <add key="Hostname" value="servername" />
         <add key="Password" value="password" />
         <add key="Hostname" value="servername" />
+        <add key="Port" value="port" />
       </broker>
     </brokerList>
   </MessagingConfigSection>
