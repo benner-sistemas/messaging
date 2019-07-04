@@ -83,7 +83,7 @@ namespace Benner.Messaging
                 case BrokerType.ActiveMQ:
                     return typeof(ActiveMQConfig);
                 case BrokerType.AmazonSQS:
-                    return typeof(AmazonSqsConfig);
+                    return typeof(AmazonSQSConfig);
                 case BrokerType.AzureQueue:
                     return typeof(AzureMQConfig);
                 case BrokerType.RabbitMQ:
