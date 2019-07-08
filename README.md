@@ -31,10 +31,11 @@ It's important to notice that Messaging API was born to work on a specific way:
 * First in, first out 
 * One producer sends
 * Only one consumer receives
-* If consumer fails at receiving or processing, the message returns to queue
-* The message will not be lost
+* If consumer fails at receiving or processing, the message returns to queue (***MENTIRA***)
+* The message will not be lost (***MENTIRA***)
 
-Enqueue and Dequeue operations were designed to ensure that a sent message by the _sender_ successfully arrives on the _receiver_. That means that we pursuit _Publisher Confirms_ and  _Consumer Acknoledgement_ approach across any supported broker.
+Enqueue and Dequeue operations were designed to ensure that a sent message by the _sender_ successfully arrives on the _receiver_. 
+That means that we pursuit _Publisher Confirms_ and _Consumer Acknoledgement_ approach across any supported broker. (***MENTIRA***)
 
 ## Get Started
 
@@ -69,44 +70,44 @@ Well, you need a `messaging.config` file, like that (don't worry, we will get de
 ```
 <?xml version="1.0" encoding="utf-8" ?>
 <configuration>
-  <configSections>
-    <section name="MessagingConfigSection" type="Benner.Tecnologia.Messaging.MessagingFileConfigSection, Benner.Tecnologia.Messaging" />
-  </configSections>
-  <MessagingConfigSection>
-    <queues>
-      <queue name="queue-name" broker="broker-name" />
-    </queues>
-    <brokerList default="RabbitMQ">
-      <broker name="AzureMQ" type="Benner.Tecnologia.Messaging.AzureMQConfig, Benner.Tecnologia.Messaging">
-        <add key="ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=accountName;AccountKey=accountKey;EndpointSuffix=core.windows.net" />
-        <add key="InvisibilityTime" value="15" />
-      </broker>
-      <broker name="RabbitMQ" type="Benner.Tecnologia.Messaging.RabbitMQConfig, Benner.Tecnologia.Messaging">
-        <add key="Username" value="username" />
-        <add key="Password" value="password" />
-        <add key="Hostname" value="servername" />
-        <add key="Port" value="port" />
-      </broker>
-      <broker name="Amazon" type="Benner.Tecnologia.Messaging.AmazonSqsConfig, Benner.Tecnologia.Messaging">
-        <add key="InvisibilityTime" value="15" />
-      </broker>
-      <broker name="ActiveMQ" type="Benner.Tecnologia.Messaging.ActiveMQConfig, Benner.Tecnologia.Messaging">
-        <add key="Hostname" value="servername" />
-        <add key="Password" value="password" />
-        <add key="Hostname" value="servername" />
-        <add key="Port" value="port" />
-      </broker>
-    </brokerList>
-  </MessagingConfigSection>
+	<configSections>
+		<section name="MessagingConfigSection" type="Benner.Tecnologia.Messaging.MessagingFileConfigSection, Benner.Tecnologia.Messaging" />
+	</configSections>
+	<MessagingConfigSection>
+		<queues>
+			<queue name="queue-name" broker="broker-name" />
+		</queues>
+		<brokerList default="RabbitMQ">
+			<broker name="AzureMQ" type="Benner.Tecnologia.Messaging.AzureMQConfig, Benner.Tecnologia.Messaging">
+				<add key="ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=accountName;AccountKey=accountKey;EndpointSuffix=core.windows.net" />
+				<add key="InvisibilityTime" value="15" />
+			</broker>
+			<broker name="RabbitMQ" type="Benner.Tecnologia.Messaging.RabbitMQConfig, Benner.Tecnologia.Messaging">
+				<add key="Username" value="username" />
+				<add key="Password" value="password" />
+				<add key="Hostname" value="servername" />
+				<add key="Port" value="port" />
+			</broker>
+			<broker name="Amazon" type="Benner.Tecnologia.Messaging.AmazonSqsConfig, Benner.Tecnologia.Messaging">
+				<add key="InvisibilityTime" value="15" />
+			</broker>
+			<broker name="ActiveMQ" type="Benner.Tecnologia.Messaging.ActiveMQConfig, Benner.Tecnologia.Messaging">
+				<add key="Hostname" value="servername" />
+				<add key="Password" value="password" />
+				<add key="Hostname" value="servername" />
+				<add key="Port" value="port" />
+			</broker>
+		</brokerList>
+	</MessagingConfigSection>
 </configuration>
 ```
 
 You can also inject config through code:
 ```
 var config = MessagingConfigFactory
-    .NewMessagingConfigFactory()
-    .WithRabbitMQBroker("hostname", 5672, "user", "password")
-    .Create();
+	.NewMessagingConfigFactory()
+	.WithRabbitMQBroker("hostname", 5672, "user", "password")
+	.Create();
 
 Messaging.Enqueue("queue-name", "hello world!", config);
 ```
@@ -122,7 +123,7 @@ Well... you need, in this case, a RabbitMQ runnig according to your configuratio
 
 Thankfully humanity evolved and we have Docker containers to help us out. So, let's just run it!
 ```
-docker run -d -v <path/to/rabbit/volume/folder:/var/lib/rabbitmq --hostname rabbit-management --name rabbit-management -p 15672:15672 -p 15671:15671 -p 5672:5672 -p 5671:5671 rabbitmq:3.7-management
+docker run -d -v path/to/rabbit/volume/folder:/var/lib/rabbitmq --hostname rabbit-management --name rabbit-management -p 15672:15672 -p 15671:15671 -p 5672:5672 -p 5671:5671 rabbitmq:3.7-management
 ```
 
 TODO:(more details) 
@@ -151,9 +152,9 @@ Add _using_ and just receive a message from the queue, not forgeting configurati
 using Benner.Messaging;
 
 var config = MessagingConfigFactory
-    .NewMessagingConfigFactory()
-    .WithRabbitMQBroker("hostname", 5672, "user", "password")
-    .Create();
+	.NewMessagingConfigFactory()
+	.WithRabbitMQBroker("hostname", 5672, "user", "password")
+	.Create();
 
 var message = Messaging.Dequeue("queue-name", config);
 
@@ -182,166 +183,173 @@ TODO
 
 `dotnet run` it and see what happen
 
+### The "type" attribute
+O atributo "type" do broker deve ser um nome de assembly completo, por exemplo *Benner.Messaging.ActiveMQConfig, Benner.Messaging*.
+The broker's "type" attribute must be an assembly fullname, e.g. *Benner.Messaging.ActiveMQConfig, Benner.Messaging*.
 
-### Atributo "type"
-O atributo "type" do broker deve ser um nome de assembly completo, por exemplo *Benner.Tecnologia.Messaging.ActiveMQConfig, Benner.Tecnologia.Messaging*.
+### Queue names rules and restrictions
+There are a few rules for the creation and usage of queues when it comes to their names:
 
-### Restrição para nome de filas
-Existem algumas regras para a criação e utilização de filas ao que diz respeito ao seu nome:
+ 1. A queue name must start with a letter or number, and can only contain letters, numbers, and the dash (-) character.
+ 2. The first and last letters in the queue name must be alphanumeric. The dash (-) character cannot be the first or last character. Consecutive dash characters are not permitted in the queue name.
+ 3. All letters in a queue name must be lowercase.
+ 4. A queue name must be from 3 through 63 characters long.
 
- 1. Um nome de fila deve começar com uma letra ou número, e pode conter apenas letras, números e hífen (-).
- 2. A primeira e última letras devem ser alfanuméricos. O hífen (-) não pode ser o primeiro nem último caractere. Hífens consecutivos também não são permitidos.
- 3. Todas as letras no nome devem ser minúsculas.
- 4. O nome deve possuir de 3 a 63 caracteres.
+These rules are validated by both memory and file configurations.
 
-Estas regras são validadas na configuração em memória e por arquivo (a seguir).
+### File structure
 
-### Estrutura do arquivo
-O arquivo de configuração para o serviço de mensageria, conforme o arquivo messaging.config.modelo, tem a seguinte estrutura:
+The configuration file for the API, according to 'messaging.config.model', presents the following structure:
 
 	<?xml version="1.0" encoding="utf-8" ?>
 	<configuration>
-	  <configSections>
-	    <section name="MessagingConfigSection" type="Benner.Tecnologia.Messaging.MessagingFileConfigSection, Benner.Tecnologia.Messaging" />
-	  </configSections>
-	  <MessagingConfigSection>
-	    <queues>
-	      <queue name="nome_da_fila" broker="nome_do_broker" />
-	    </queues>
-	    <brokerList default="Name_do_broker_default">
-	      <broker name="nome_do_broker" type="Benner.Tecnologia.Messaging.Classname, Benner.Tecnologia.Messaging">
-	        <add key="Propriedade" value="Valor" />
-	      </broker>
-	    </brokerList>
-	  </MessagingConfigSection>
+		<configSections>
+			<section name="MessagingConfigSection" type="Benner.Messaging.MessagingFileConfigSection, Benner.Messaging" />
+		</configSections>
+		<MessagingConfigSection>
+			<queues>
+				<queue name="nome_da_fila" broker="nome_do_broker" />
+			</queues>
+			<brokerList default="Name_do_broker_default">
+				<broker name="nome_do_broker" type="Benner.Messaging.Classname, Benner.Messaging">
+					<add key="Propriedade" value="Valor" />
+				</broker>
+			</brokerList>
+		</MessagingConfigSection>
 	</configuration>
 
-Para utilizar esta forma de configuração na API, utiliza-se a classe *Benner.Tecnologia.Messaging.FileMessagingConfig*.
+To use this type of configuration, use the *Benner.Messaging.FileMessagingConfig* class.
 
-|Construtor|Descrição|
+|Constructor|Description|
 |--|--|
-|FileMessagingConfig()|Utiliza-se o arquivo *messaging.config* encontrado no mesmo diretório que a dll do seu projeto.|
-|FileMessagingConfig(string)|Utiliza o arquivo *.config* informado. Deve-se informar o caminho completo do arquivo.|
+|FileMessagingConfig()|It uses the *messaging.config* file found in the same directory of the executing assembly.|
+|FileMessagingConfig(string)|It uses the passed *.config* file. The string must be the file's full path.|
 
-Esta classe faz diversas validações na estrutura do arquivo, portanto se houver algum erro de estrutura, uma exceção é acionada.
+This class does many validations about the file structure, thereby, if any structure flaw is found, an exception is thrown.
 
 ### Tags
- - **MessagingConfigSection**: Responsável por toda a configuração de filas e serviços da API.
-	 - **queues**: Contém todas as filas pré-configuradas.
-		 - **queue**:Uma fila pré-configurada. Contém o nome da fila que será criada ou usada (name) e qual configuração de serviço utilizar (broker). O broker equivale ao *name* da tag *broker* (ver abaixo).
-	 - **brokerList**: Contém todas as configurações de serviços. O atributo *default* define a configuração que será utilizada caso seja informada uma fila que não está pré-configurada. Equivale ao *name* da tag *broker*.
-		 - **broker**: A tag de configuração. O atributo *name* nomeia a configuração, pois é possível configurar o mesmo serviço de vários modos diferentes, com diferentes nomes. O atributo *type* informa qual classe de configuração é utilizada, ou seja, o serviço em si. Deve-se alterar apenas *classname*.
-			 - **add**: Tag de propriedades para os serviços. Cada serviço terá suas próprias propriedades e particularidades.
+ - **MessagingConfigSection**: Responsible for all queues and brokers configurations.
+	 - **queues**: Contains all pre-configured queues.
+		 - **queue**: A pre-configured queue. Contains the queue name that will be created or used, and the broker configuration name. The *name* attribute from the *broker* tag corresponds to the *broker* tag of this *queue* tag.
+	 - **brokerList**: Contains all broker configurations. The *default* attribute defines the broker configuration that shall be used when one not pre-configured queue is informed. Corresponds to the *name* attribute from *broker* tag.
+		 - **broker**: The broker configuration itself. The *name* attribute exists because it is possible to configure the same broker service in different ways, by using different names. The *type* attribute contains the configuration class to be used, i.e. the service. Only *classname* must be changed.
+			 - **add**: Tag for filling the broker properties. Each service will have their own properties and peculiarities.
 
-### Configuração em memória
-Além da configuração fixa por arquivo, também é possível configurar a API através da classe *Benner.Tecnologia.Messaging.MemoryMessagingConfig*, que é obtida através da classe builder *Benner.Tecnologia.Messaging.MemoryMessagingConfigBuilder*.
-Por exemplo, vamos criar uma configuração para utilizar 2 serviços, ActiveMQ e RabbitMQ, usando RabbitMQ como default
+### In-memory configuration
 
-	// Propriedades de configuração do RabbitMQ
-	var configRabbit = new Dictionary<string, string>() { { "Hostname", "bnu-vtec012" } };
-	
-	// Propriedades de configuração do ActiveMQ
-    var configActive = new Dictionary<string, string>() { { "Hostname", "bnu-vtec012" } };
-    
-    // Instanciando o Builder informando o nome do broker padrão, seu tipo e configurações
-	var config = new MemoryMessagingConfigBuilder("rabbit", Broker.Rabbit, configRabbit)
-		 //Adicionando o broker active e sua respectiva configuração
-         .WithBroker("active", Broker.ActiveMQ, configActive)
-         // Adicionando algumas filas pré-configuradas para utilização
-         .WithQueues(new Dictionary<string, string>
-         {
-             {"fila-notas", "rabbit"},
-             {"fila-lancamentos", "rabbit"},
-             {"fila-financeiro", "active"}
-         })
-         // Criando o objeto MemoryMessagingConfig
-         .Create();
+Besides the file configuration, it is also possible to configure the API through the *Benner.Messaging.MessagingConfig* class, obtained by *Benner.Messaging.MessagingConfigFactory* class.
+As an example, let's make a configuration to use 2 brokers, ActiveMQ and RabbitMQ, setting RabbitMQ as default: (***MENTIRA***)
 
-### ActiveMQConfig Settings
-|Nome|Descrição|
+	// RabbitMQ's configuration properties
+	var configRabbit = new Dictionary<string, string>() { { "Hostname", "server-name" } };
+
+	// ActiveMQ's configuration properties
+	var configActive = new Dictionary<string, string>() { { "Hostname", "server-name" } };
+
+	var config = MessagingConfigFactory.NewMessagingConfigFactory()
+		// Adding activemq broker and its configuration
+		.WithActiveMQBroker(configActive)
+		// Adding rabbitmq broker and its configuration
+		.WithRabbitMQBroker(configRabbit)
+		// Adding some pre-configured queues
+		.WithMappedQueue("fila-notas", "rabbit")
+		.WithMappedQueue("fila-lancamentos", "rabbit")
+		.WithMappedQueue("fila-financeiro", "active")
+		// Creating the MessagingConfig instance
+		.Create();
+
+### ActiveMQConfig settings
+
+|Name|Description|
 |--|--|
-|Hostname|O nome do host, por exemplo o servidor que o contêiner está rodando.|
-|Username|O nome de usuário para login no serviço. Padrão: admin.|
-|Password|A senha para login no serviço. Padrão: admin.|
-|Port|O número da porta do host do serviço. Padrão: 61616.|
+|Hostname|The hostname, e.g. the server which the container is running in.|
+|Username|The service log-in username. Default: admin.|
+|Password|The service log-in password. Default: admin.|
+|Port|The port number to the service host. Default: 61616.|
 
-### AmazonSQSConfig  Settings
-O serviço da amazon possui uma particularidade quanto ao modo de estabelecer uma conexão. Para mais informações: [Configurando credenciais AWS (em inglês)](https://docs.aws.amazon.com/sdk-for-net/v2/developer-guide/net-dg-config-creds.html)
+### AmazonSQSConfig settings
+Amazon's service has one particularity about conecting to their servers. For more information: [Configuring AWS Credentials](https://docs.aws.amazon.com/sdk-for-net/v2/developer-guide/net-dg-config-creds.html)
 
-|Nome|Descrição|
+|Name|Description|
 |--|--|
-|InvisibilityTime|O tempo em minutos que a mensagem recuperada ficará invisível para outros consumidores até ser consumida com sucesso e deletada. Caso o processamento demore mais para retornar do que o tempo de invisibilidade, a mensagem fica visível novamente na fila, disponível para outros consumidores.|
+|InvisibilityTime|The time, in minutes, in which the received message will stay invisible to other consumers until it is successfully consumed and deleted. In case of a processing taking longer to finish than the invisibility time, the message stays visible again in the queue, available to other consumers.|
 
-### AzureMQConfig Settings
-|Nome|Descrição|
+### AzureMQConfig settings
+|Name|Description|
 |--|--|
-|ConnectionString|A string de conexão fornecida pelo serviço para estabelecer a conexão|
-|InvisibilityTime|O tempo em minutos que a mensagem recuperada ficará invisível para outros consumidores até ser consumida com sucesso e deletada. Caso o processamento demore mais para retornar do que o tempo de invisibilidade, a mensagem fica visível novamente na fila, disponível para outros consumidores.|
+|ConnectionString|The connection string provided by Azure Queue service to stablish connection|
+|InvisibilityTime|The time, in minutes, in which the received message will stay invisible to other consumers until it is successfully consumed and deleted. In case of a processing taking longer to finish than the invisibility time, the message stays visible again in the queue, available to other consumers.|
 
-### RabbitMQConfig Settings
-|Nome|Descrição|
+### RabbitMQConfig settings
+|Name|Description|
 |--|--|
-|Hostname|O nome do host, por exemplo o servidor que o contêiner está rodando.|
-|Username|O nome de usuário para login no serviço. Padrão: guest.|
-|Password|A senha para login no serviço. Padrão: guest.|
-|Port|O número da porta do host do serviço. Padrão: 5672.|
+|Hostname|The hostname, e.g. the server which the container is running in.|
+|Username|The service log-in username. Default: guest.|
+|Password|The service log-in password. Default: guest.|
+|Port|The port number to the service host. Default: 5672.|
 
-## A classe *Client*
-A principal classe para uso da API é a *Benner.Tecnologia.Messaging.Client*. Ela possui os métodos para envio e recebimento de mensagens, e pode ser usada como estática ou instância. 
+## The *Messaging* class
+The API's main class is *Benner.Messaging.Messaging*. It has the delivery and receipt methods and can be used as static or instance.
 
+### As instance
 
-### Como instância
-
-|Construtor|Descrição|
+|Constructor|Description|
 |--|--|
-|Client()|Instancia um objeto *Client* utilizando configuração de arquivo (padrão de *FileMessagingConfig*).|
-|Client(IMessagingConfig)|Recebe a configuração a ser utilizada (arquivo ou memória).|
+|Messaging()|Instantiates a *Messaging* object using file configuration (*FileMessagingConfig* default constructor).|
+|Messaging(IMessagingConfig)|Receives the configuration that will be used (in-memory or file).|
 
-|Método|Descrição|
+|Method|Description|
 |--|--|
-|EnqueueMessage(string, string)|Enfileira uma mensagem *string* na fila informada|
-|EnqueueMessage(string, object)|Enfileira uma mensagem de um *object* (serializado) na fila informada|
-|StartListening(string, Func<MessagingArgs, bool>)|Escuta a fila informada, recebendo as mensagens através de um método (anônimo ou não) que recebe as mensagens por um objeto *MessagingArgs*|
+|EnqueueMessage(string, string)|Enqueues one *string* message in the passed queue.|
+|EnqueueMessage(string, object)|Enqueues one *object* message (serialized) in the passed queue.|
+|StartListening(string, Func<MessagingArgs, bool>)|Listens to the passed queue, receiving the messages through a method (anonymous or not) by a *MessagingArgs* object from parameter.|
 
-Quando utilizado o método ***StartListening***, existem 3 simples cenários  para o recebimento das mensagens. O método informado no parâmetro *Func* recebe um parâmetro *MessagingArgs* que possui a mensagem em forma de *string* e *byte[]*, e também um método para desserializar a mensagem para um objeto. 
-O método faz seus tratamentos com a mensagem e retorna *true*, *false* ou aciona uma exceção:
+When the ***StartListening*** method is used, there are 3 possible situations for the messages receipt.
+The method passed to the ***StartListening***'s *Func* parameter receives a *MessagingArgs* parameter, that has the message as *string*, as *byte[]* and also a method to deserialize the message to an object.
 
- - **True**: a mensagem é considerada consumida com sucesso, portanto esta é deletada da fila.
- - **False**: a mensagem é considerada recebida mas com alguma falha de processamento. A mensagem volta para fila e fica disponível para outros consumidores.
- - **Exceção**: a mensagem é considerada perigosa, sendo retirada da fila e enfileirada em uma outra fila de erros, cujo nome é o nome da fila que está sendo consumida com um sufixo '-error'. Por exemplo: se o nome  for 'fila-teste', a fila de erros será 'fila-teste-error'. 
+The receiver method (Func parameter) may return *true*, *false* or throw an exception:
 
-Deve-se utilizar esse método com certo cuidado, uma vez que ele é um "escutador", recomenda-se deixá-lo parado, como algum tipo de espera após ele, por exemplo:
+ - **True**: the message is considered successfully consumed, therefore it is deleted from queue.
+ - **False**: the message is considered received, but something on processing went wrong. The message returns to the queue and become available again to other consumers.
+ - **Exceção**: the message is considered dangerous, hence being withdrawn from the queue and enqueued in another error queue, whose name is the consumed queue name followed by '-error', e.g. if the consumed queue name is 'test-queue', the error queue will be called 'test-queue-error'.
+
+This method must be used cautiously, once it is a listener, it is recommended to let it in stand-by, with some kind of waiting after it, e.g.:
 			
-	// Instanciando um novo Client de configuração padrão
-    var client = new Client();
+	// Instantiating a new default configuration Messaging
+	var messaging = new Messaging();
 
-    // Escutando a fila
-    client.StartListening("fila", (args) =>
-    {
-        if (!args.AsString.Contains("zyx"))
-            throw new Exception("Mensagem em formato incorreto.");
+	// Listening to the queue
+	messaging.StartListening("queue", (args) =>
+	{
+		if (!args.AsString.Contains("zyx"))
+			throw new Exception("Invalid format.");
 
-        if (args.AsString.Contains("abxz"))
-        {
-            Console.WriteLine(args.AsString);
-            return true;
-        }
-        return false;
-    });
+		if (args.AsString.Contains("abxz"))
+		{
+			Console.WriteLine(args.AsString);
+			return true;
+		}
+		return false;
+	});
 
-    // Deixando o programa em espera, permitindo o consumo de mensagens
-    Console.ReadKey();
+	// Letting the application in stand-by mode, allowing the message consuming
+	Console.ReadKey();
 
-    // Liberando o objeto das conexões. Fortemente recomendado
-    client.Dispose();
+	// Freeing resources. Strongly recommended
+	messaging.Dispose();
 
-### Como estática
+### As static
 
-|Método|Descrição|
+|Method|Description|
 |--|--|
-|DequeueSingleMessage(string, IMessagingConfig)|Recebe a próxima mensagem da fila, retornando-a em *string*.|
-|DequeueSingleMessage<T>(string, IMessagingConfig)|Recebe a próxima mensagem da fila e a desserializa para um objeto do tipo ***T***. Caso ocorra um erro de desserialização a mensagem é perdida.|
-|EnqueueSingleMessage(string, object, IMessagingConfig)|Enfileira uma mensagem *string* na fila informada|
-|EnqueueSingleMessage(string, string, IMessagingConfig)|Enfileira uma mensagem de um *object* (serializado) na fila informada|
+|Dequeue(string)|Receives the next message from queue, as *string*.|
+|Dequeue(string, IMessagingConfig)|Receives the next message from queue, as *string*.|
+|Dequeue<T>(string)|Receives the next message from queue and deserializes it to a type ***T*** object. In case of a deserialization error the message is lost.|
+|Dequeue<T>(string, IMessagingConfig)|Receives the next message from queue and deserializes it to a type ***T*** object. In case of a deserialization error the message is lost.|
+|Enqueue(string, object)|Enqueues one *string* message in the passed queue.|
+|Enqueue(string, object, IMessagingConfig)|Enqueues one *string* message in the passed queue.|
+|Enqueue(string, string)|Enqueues one *object* message (serialized) in the passed queue.|
+|Enqueue(string, string, IMessagingConfig)|Enqueues one *object* message (serialized) in the passed queue.|
 
-Em todos estes métodos,  o parâmetro de configuração é opcional (default sendo o construtor padrão de *FileMessagingConfig*), todavia é recomendado informar a configuração.
+Some of these methods don't have a configuration parameter, because they use the default configuration (default *FileMessagingConfig*'s constructor). 
+That being said, it is recommended to use the overloads with configuration parameter.
