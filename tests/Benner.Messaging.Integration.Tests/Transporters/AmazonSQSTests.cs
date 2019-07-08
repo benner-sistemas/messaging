@@ -13,12 +13,10 @@ namespace Benner.Messaging.Tests.Transporters
             var guid = Guid.NewGuid().ToString();
             string queueName = $"fila-teste-amazonsqs-{guid}";
             string message = $"Mensagem que deve retornar {guid}";
-            var config = MessagingConfigFactory
-                .NewMessagingConfigFactory()
-                .WithAmazonSQSBroker(new Dictionary<string, string>()
-                    {
-                        {"InvisibilityTime", "15"}
-                    })
+            var config = new MessagingConfigBuilder("AmazonSQS", BrokerType.AmazonSQS, new Dictionary<string, string>()
+            {
+                {"InvisibilityTime", "15"}
+            })
             .Create();
 
             Messaging.Enqueue(queueName, message, config);

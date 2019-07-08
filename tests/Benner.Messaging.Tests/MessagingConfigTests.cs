@@ -145,9 +145,7 @@ namespace Benner.Messaging.Tests
             Assert.ThrowsException<ArgumentException>(() => new FileMessagingConfig(_testeConfigPath).GetConfigForQueue("teste"));
 
             // memória
-            var config = MessagingConfigFactory
-                .NewMessagingConfigFactory()
-                .WithRabbitMQBroker("",0,"","")
+            var config = new MessagingConfigBuilder("rabbit", BrokerType.RabbitMQ, new Dictionary<string, string>())
                 .WithMappedQueue("teste", "naoexiste")
                 .Create();
             Assert.ThrowsException<ArgumentException>(() => config.GetConfigForQueue("teste"));
@@ -203,8 +201,7 @@ namespace Benner.Messaging.Tests
             {
                 
                 Assert.ThrowsException<ArgumentException>(() =>
-                    MessagingConfigFactory
-                        .NewMessagingConfigFactory()
+                    new MessagingConfigBuilder("RabbitMQ", BrokerType.RabbitMQ, new Dictionary<string, string>())
                         .WithMappedQueue(queueName, "teste")
                         .Create(), 
                     $"Tag que falhou: {queueName}");

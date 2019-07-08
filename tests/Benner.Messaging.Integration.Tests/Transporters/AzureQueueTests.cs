@@ -13,9 +13,7 @@ namespace Benner.Messaging.Tests.Transporters
             var guid = Guid.NewGuid().ToString();
             string queueName = $"fila-teste-azure-{guid}";
             string message = $"Mensagem que deve retornar {guid}";
-            var config = MessagingConfigFactory
-                .NewMessagingConfigFactory()
-                .WithAzureQueueBroker(new Dictionary<string, string>()
+            var config = new MessagingConfigBuilder("AzureQueue", BrokerType.AzureQueue, new Dictionary<string, string>()
                 {
                     {"InvisibilityTime", "15"},
                     {"ConnectionString", AzureConnectionString},

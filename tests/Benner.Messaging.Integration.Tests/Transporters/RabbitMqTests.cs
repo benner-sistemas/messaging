@@ -13,9 +13,7 @@ namespace Benner.Messaging.Tests.Transporters
             var guid = Guid.NewGuid().ToString();
             string queueName = $"fila-teste-rabbitmq-{guid}";
             string message = $"Mensagem que deve retornar {guid}";
-            var config = MessagingConfigFactory
-                .NewMessagingConfigFactory()
-                .WithRabbitMQBroker(new Dictionary<string, string>()
+            var config = new MessagingConfigBuilder("RabbitMQ", BrokerType.RabbitMQ, new Dictionary<string, string>()
                 {
                     {"UserName", "guest"},
                     {"Password", "guest"},

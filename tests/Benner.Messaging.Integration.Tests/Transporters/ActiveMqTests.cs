@@ -14,12 +14,10 @@ namespace Benner.Messaging.Tests.Transporters
             var guid = Guid.NewGuid().ToString();
             string queueName = $"fila-teste-activemq-{guid}";
             string message = $"Mensagem que deve retornar {guid}";
-            var config  = MessagingConfigFactory
-                .NewMessagingConfigFactory()
-                .WithActiveMQBroker(new Dictionary<string, string>
-                {
-                    {"Hostname", ServerName}
-                })
+            var config = new MessagingConfigBuilder("ActiveMQ", BrokerType.ActiveMQ, new Dictionary<string, string>()
+            {
+                {"Hostname", "bnu-vtec012"}
+            })
                 .Create();
 
             Messaging.Enqueue(queueName, message, config);
