@@ -66,35 +66,35 @@ Well, you need a `messaging.config` file, like that (don't worry, we will get de
 
 	<?xml version="1.0" encoding="utf-8" ?>
 	<configuration>
-		<configSections>
-			<section name="MessagingConfigSection" type="Benner.Tecnologia.Messaging.MessagingFileConfigSection, Benner.Tecnologia.Messaging" />
-		</configSections>
-		<MessagingConfigSection>
-			<queues>
-				<queue name="queue-name" broker="broker-name" />
-			</queues>
-			<brokerList default="RabbitMQ">
-				<broker name="AzureMQ" type="Benner.Tecnologia.Messaging.AzureMQConfig, Benner.Tecnologia.Messaging">
-					<add key="ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=accountName;AccountKey=accountKey;EndpointSuffix=core.windows.net" />
-					<add key="InvisibilityTime" value="15" />
-				</broker>
-				<broker name="RabbitMQ" type="Benner.Tecnologia.Messaging.RabbitMQConfig, Benner.Tecnologia.Messaging">
-					<add key="Hostname" value="servername" />
-					<add key="Username" value="username" />
-					<add key="Password" value="password" />
-					<add key="Port" value="port" />
-				</broker>
-				<broker name="Amazon" type="Benner.Tecnologia.Messaging.AmazonSqsConfig, Benner.Tecnologia.Messaging">
-					<add key="InvisibilityTime" value="15" />
-				</broker>
-				<broker name="ActiveMQ" type="Benner.Tecnologia.Messaging.ActiveMQConfig, Benner.Tecnologia.Messaging">
-					<add key="Hostname" value="servername" />
-					<add key="Username" value="username" />
-					<add key="Password" value="password" />
-					<add key="Port" value="port" />
-				</broker>
-			</brokerList>
-		</MessagingConfigSection>
+	   <configSections>
+	   	<section name="MessagingConfigSection" type="Benner.Tecnologia.Messaging.MessagingFileConfigSection, Benner.Tecnologia.Messaging" />
+	   </configSections>
+	   <MessagingConfigSection>
+	      <queues>
+	         <queue name="queue-name" broker="broker-name" />
+	      </queues>
+	      <brokerList default="RabbitMQ">
+	         <broker name="AzureMQ" type="Benner.Tecnologia.Messaging.AzureMQConfig, Benner.Tecnologia.Messaging">
+	            <add key="ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=accountName;AccountKey=accountKey;EndpointSuffix=core.windows.net" />
+	            <add key="InvisibilityTime" value="15" />
+	         </broker>
+	         <broker name="RabbitMQ" type="Benner.Tecnologia.Messaging.RabbitMQConfig, Benner.Tecnologia.Messaging">
+	            <add key="Hostname" value="servername" />
+	            <add key="Username" value="username" />
+	            <add key="Password" value="password" />
+	            <add key="Port" value="port" />
+	         </broker>
+	         <broker name="Amazon" type="Benner.Tecnologia.Messaging.AmazonSqsConfig, Benner.Tecnologia.Messaging">
+	            <add key="InvisibilityTime" value="15" />
+	         </broker>
+	         <broker name="ActiveMQ" type="Benner.Tecnologia.Messaging.ActiveMQConfig, Benner.Tecnologia.Messaging">
+	            <add key="Hostname" value="servername" />
+	            <add key="Username" value="username" />
+	            <add key="Password" value="password" />
+	            <add key="Port" value="port" />
+	         </broker>
+	      </brokerList>
+	   </MessagingConfigSection>
 	</configuration>
 
 You can also inject config through code:
@@ -182,19 +182,19 @@ The configuration file for the API, according to 'messaging.config.model', prese
 
 	<?xml version="1.0" encoding="utf-8" ?>
 	<configuration>
-		<configSections>
-			<section name="MessagingConfigSection" type="Benner.Messaging.MessagingFileConfigSection, Benner.Messaging" />
-		</configSections>
-		<MessagingConfigSection>
-			<queues>
-				<queue name="nome_da_fila" broker="nome_do_broker" />
-			</queues>
-			<brokerList default="Name_do_broker_default">
-				<broker name="nome_do_broker" type="Benner.Messaging.Classname, Benner.Messaging">
-					<add key="Propriedade" value="Valor" />
-				</broker>
-			</brokerList>
-		</MessagingConfigSection>
+	   <configSections>
+	      <section name="MessagingConfigSection" type="Benner.Messaging.MessagingFileConfigSection, Benner.Messaging" />
+	   </configSections>
+	   <MessagingConfigSection>
+	      <queues>
+	         <queue name="nome_da_fila" broker="nome_do_broker" />
+	      </queues>
+	      <brokerList default="Name_do_broker_default">
+	         <broker name="nome_do_broker" type="Benner.Messaging.Classname, Benner.Messaging">
+	            <add key="Propriedade" value="Valor" />
+	         </broker>
+	      </brokerList>
+	   </MessagingConfigSection>
 	</configuration>
 
 To use this type of configuration, use the *Benner.Messaging.FileMessagingConfig* class.
