@@ -45,7 +45,7 @@ namespace Benner.Messaging
         public FileMessagingConfig(string fileName)
         {
             if (!File.Exists(fileName))
-                throw new FileNotFoundException($"Messaging config not found '{fileName}'", fileName);
+                throw new FileNotFoundException($"The messaging.config file with path '{fileName}' could not be found.", fileName);
 
             var map = new ExeConfigurationFileMap() { ExeConfigFilename = fileName };
             var configManager = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
@@ -61,7 +61,7 @@ namespace Benner.Messaging
         {
             // Checks if there are brokers
             if (_messagingConfig.BrokerList.Count == 0)
-                throw new XmlException("No broker was found inside brokerList.");
+                throw new XmlException("No broker could be found inside brokerList.");
 
             // Checks for 'add' tags inside all brokers
             foreach (var item in _messagingConfig.BrokerList.Brokers)
@@ -75,7 +75,7 @@ namespace Benner.Messaging
             // Checks default's existence
             var defaultName = _messagingConfig.BrokerList.Default;
             var defaultBroker = _messagingConfig.BrokerList.Brokers.FirstOrDefault(b => b.Name.Equals(defaultName, StringComparison.OrdinalIgnoreCase))
-                  ?? throw new XmlException("O broker definido como default não foi encontrado na configuração.");
+                  ?? throw new XmlException("The broker set as default could not be found in the configuration file.");
         }
 
         /// <summary>
@@ -87,16 +87,16 @@ namespace Benner.Messaging
             BrokerConfigCollection broker;
             var queue = _messagingConfig.QueueList[queueName];
 
-            // If queue doesn't exist, uses default 
             if (queue != null)
             {
                 brokerName = queue.Broker;
-                broker = brokerList[brokerName] ?? throw new ArgumentException($"The broker with name \"{brokerName}\" was not found.");
+                broker = brokerList[brokerName] ?? throw new ArgumentException($"The broker with name \"{brokerName}\" could not be found.");
             }
+            // If queue doesn't exist, uses default 
             else
             {
                 brokerName = brokerList.Default;
-                broker = brokerList[brokerName] ?? throw new ArgumentException($"The default broker's configuration with name \"{brokerName}\" was not found.");
+                broker = brokerList[brokerName] ?? throw new ArgumentException($"The default broker's configuration with name \"{brokerName}\" could not be found.");
                 _messagingConfig.QueueList.Add(new QueueConfigElement(queueName, brokerName));
             }
 
@@ -108,8 +108,6 @@ namespace Benner.Messaging
         /// Gets the instance of a <see cref="IBrokerConfig"/> related to the queue name.
         /// If the queue does not exist in the configuration, the broker set as default is used.
         /// </summary>
-        /// <param name="queueName">O nome da fila</param>
-        /// <returns>A instância de um <see cref="IBrokerConfig"/></returns>
         public IBrokerConfig GetConfigForQueue(string queueName)
         {
             if (_queues.ContainsKey(queueName))
