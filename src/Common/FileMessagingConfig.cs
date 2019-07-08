@@ -9,7 +9,7 @@ using System.Xml;
 namespace Benner.Messaging
 {
     /// <summary>
-    /// Classe responsável pela configuração das filas em formato de arquivo .config.
+    /// Class responsible for configuring queues from a .config file
     /// </summary>
     public class FileMessagingConfig : IMessagingConfig
     {
@@ -28,18 +28,18 @@ namespace Benner.Messaging
         private readonly MessagingFileConfigSection _messagingConfig;
 
         /// <summary>
-        /// Instancia a configuração de mensageria através de um arquivo 'messaging.config' 
-        /// presente no mesmo diretório do assembly em execução.
-        /// O arquivo é validado na inicialização da instância.
+        /// Instantiates the broker configurations through the 'messaging.config' file 
+        /// that exists in the same directory of the executing assembly.
+        /// The file structure is fully validated in the creation.
         /// </summary>
         public FileMessagingConfig() : this(Path.Combine(Directory.GetCurrentDirectory(), "messaging.config"))
         { }
 
         /// <summary>
-        /// Instancia a configuração de mensageria através de arquivo.
-        /// O arquivo é validado na inicialização da instância.
+        /// Instantiates the broker configurations through a file.
+        /// The file structure is fully validated in the creation.
         /// </summary>
-        /// <param name="fileName">O caminho completo do arquivo.</param>
+        /// <param name="fileName">The file's full path</param>
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="ConfigurationErrorsException"></exception>
         public FileMessagingConfig(string fileName)
@@ -57,52 +57,46 @@ namespace Benner.Messaging
             _configurations = new Dictionary<string, IBrokerConfig>(StringComparer.OrdinalIgnoreCase);
         }
 
-        /// <summary>
-        /// Faz validações extras específicas
-        /// </summary>
         private void ValidateConfigFile()
         {
-            // Validar se há brokers
+            // Checks if there are brokers
             if (_messagingConfig.BrokerList.Count == 0)
-                throw new XmlException("Nenhum broker encontrado na configuração.");
+                throw new XmlException("No broker was found inside brokerList.");
 
-            // Validar que existem 'add's nos brokers
+            // Checks for 'add' tags inside all brokers
             foreach (var item in _messagingConfig.BrokerList.Brokers)
                 if (item.Count == 0)
-                    throw new XmlException($"Nenhuma configuração para o broker \"{item.Name}\" encontrada");
+                    throw new XmlException($"No specific configurations found for broker \"{item.Name}\".");
 
-            // Validar nomes das queues no arquivo
+            // Checks pre configured queue names to see if they're valid according to the rules
             foreach (var queueName in _messagingConfig.QueueList.Queues.Select(n => n.Name))
                 Utils.ValidateQueueName(queueName, true);
 
-            // Validar se o default existe
+            // Checks default's existence
             var defaultName = _messagingConfig.BrokerList.Default;
             var defaultBroker = _messagingConfig.BrokerList.Brokers.FirstOrDefault(b => b.Name.Equals(defaultName, StringComparison.OrdinalIgnoreCase))
                   ?? throw new XmlException("O broker definido como default não foi encontrado na configuração.");
         }
 
         /// <summary>
-        /// Obtem uma instância para a configuração do broker da fila informada
+        /// Gets an instance for the informed queue's broker configuration
         /// </summary>
-        /// <param name="queueName">Nome da fila</param>
-        /// <param name="brokerName">Nome do broker</param>
-        /// <returns></returns>
         private IBrokerConfig GetTransporterConfigInstance(string queueName, out string brokerName)
         {
             var brokerList = _messagingConfig.BrokerList;
             BrokerConfigCollection broker;
             var queue = _messagingConfig.QueueList[queueName];
 
-            //Se não existe, usa o default e adiciona no arquivo
+            // If queue doesn't exist, uses default 
             if (queue != null)
             {
                 brokerName = queue.Broker;
-                broker = brokerList[brokerName] ?? throw new ArgumentException($"O broker de nome \"{brokerName}\" não foi encontrado.");
+                broker = brokerList[brokerName] ?? throw new ArgumentException($"The broker with name \"{brokerName}\" was not found.");
             }
             else
             {
                 brokerName = brokerList.Default;
-                broker = brokerList[brokerName] ?? throw new ArgumentException($"A configuração do broker default \"{brokerName}\" não foi encontrada.");
+                broker = brokerList[brokerName] ?? throw new ArgumentException($"The default broker's configuration with name \"{brokerName}\" was not found.");
                 _messagingConfig.QueueList.Add(new QueueConfigElement(queueName, brokerName));
             }
 
@@ -111,8 +105,8 @@ namespace Benner.Messaging
         }
 
         /// <summary>
-        /// Obtém a instância de um <see cref="IBrokerConfig"/> relativo ao nome da fila. 
-        /// Caso a fila não exista na configuração, o broker definido como default em 'brokerList' é utilizado.
+        /// Gets the instance of a <see cref="IBrokerConfig"/> related to the queue name.
+        /// If the queue does not exist in the configuration, the broker set as default is used.
         /// </summary>
         /// <param name="queueName">O nome da fila</param>
         /// <returns>A instância de um <see cref="IBrokerConfig"/></returns>
