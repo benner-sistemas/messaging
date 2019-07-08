@@ -42,89 +42,78 @@ That means that we pursuit _Publisher Confirms_ and _Consumer Acknoledgement_ ap
 ### Sending message
 
 Create a new project:
-```
-dotnet new console -n producer
-cd producer
-```
+
+	dotnet new console -n producer
+	cd producer
 
 Add Benner.Messaging and open the project on vscode:
-```
-dotnet add package benner.messaging
-code .
-```
+	
+	dotnet add package benner.messaging
+	code .
 
 Add _using_ and just send a message to some queue:
-```
-using Benner.Messaging;
-Messaging.Enqueue("queue-name", "hello world!");
-```
+
+	using Benner.Messaging;
+	Messaging.Enqueue("queue-name", "hello world!");
 
 That's it! `dotnet run` it and you will get:
-```
-Messaging config not found
-```
+
+	Messaging config not found
 
 ### Brokers configuration
 
 Well, you need a `messaging.config` file, like that (don't worry, we will get deeper on configuration ahead):
-```
-<?xml version="1.0" encoding="utf-8" ?>
-<configuration>
-	<configSections>
-		<section name="MessagingConfigSection" type="Benner.Tecnologia.Messaging.MessagingFileConfigSection, Benner.Tecnologia.Messaging" />
-	</configSections>
-	<MessagingConfigSection>
-		<queues>
-			<queue name="queue-name" broker="broker-name" />
-		</queues>
-		<brokerList default="RabbitMQ">
-			<broker name="AzureMQ" type="Benner.Tecnologia.Messaging.AzureMQConfig, Benner.Tecnologia.Messaging">
-				<add key="ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=accountName;AccountKey=accountKey;EndpointSuffix=core.windows.net" />
-				<add key="InvisibilityTime" value="15" />
-			</broker>
-			<broker name="RabbitMQ" type="Benner.Tecnologia.Messaging.RabbitMQConfig, Benner.Tecnologia.Messaging">
-				<add key="Username" value="username" />
-				<add key="Password" value="password" />
-				<add key="Hostname" value="servername" />
-				<add key="Port" value="port" />
-			</broker>
-			<broker name="Amazon" type="Benner.Tecnologia.Messaging.AmazonSqsConfig, Benner.Tecnologia.Messaging">
-				<add key="InvisibilityTime" value="15" />
-			</broker>
-			<broker name="ActiveMQ" type="Benner.Tecnologia.Messaging.ActiveMQConfig, Benner.Tecnologia.Messaging">
-				<add key="Hostname" value="servername" />
-				<add key="Password" value="password" />
-				<add key="Hostname" value="servername" />
-				<add key="Port" value="port" />
-			</broker>
-		</brokerList>
-	</MessagingConfigSection>
-</configuration>
-```
+
+	<?xml version="1.0" encoding="utf-8" ?>
+	<configuration>
+		<configSections>
+			<section name="MessagingConfigSection" type="Benner.Tecnologia.Messaging.MessagingFileConfigSection, Benner.Tecnologia.Messaging" />
+		</configSections>
+		<MessagingConfigSection>
+			<queues>
+				<queue name="queue-name" broker="broker-name" />
+			</queues>
+			<brokerList default="RabbitMQ">
+				<broker name="AzureMQ" type="Benner.Tecnologia.Messaging.AzureMQConfig, Benner.Tecnologia.Messaging">
+					<add key="ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=accountName;AccountKey=accountKey;EndpointSuffix=core.windows.net" />
+					<add key="InvisibilityTime" value="15" />
+				</broker>
+				<broker name="RabbitMQ" type="Benner.Tecnologia.Messaging.RabbitMQConfig, Benner.Tecnologia.Messaging">
+					<add key="Hostname" value="servername" />
+					<add key="Username" value="username" />
+					<add key="Password" value="password" />
+					<add key="Port" value="port" />
+				</broker>
+				<broker name="Amazon" type="Benner.Tecnologia.Messaging.AmazonSqsConfig, Benner.Tecnologia.Messaging">
+					<add key="InvisibilityTime" value="15" />
+				</broker>
+				<broker name="ActiveMQ" type="Benner.Tecnologia.Messaging.ActiveMQConfig, Benner.Tecnologia.Messaging">
+					<add key="Hostname" value="servername" />
+					<add key="Username" value="username" />
+					<add key="Password" value="password" />
+					<add key="Port" value="port" />
+				</broker>
+			</brokerList>
+		</MessagingConfigSection>
+	</configuration>
 
 You can also inject config through code:
-```
-var config = MessagingConfigFactory
-	.NewMessagingConfigFactory()
-	.WithRabbitMQBroker("hostname", 5672, "user", "password")
-	.Create();
 
-Messaging.Enqueue("queue-name", "hello world!", config);
-```
+	var rabbitConfig = new Dictionary<string, string> { { "Hostname", "servername" } };
+	var config = new MessagingConfigBuilder("rabbit", BrokerType.RabbitMQ , rabbitConfig).Create();
+
+	Messaging.Enqueue("nome-da-fila", "olá mundo!", config);
 
 That's it! `dotnet run` it and you will get:
-```
-Unable to connect to RabbitMQ server
-```
+	Unable to connect to RabbitMQ server
 
 ### Provisioning a broker
 
 Well... you need, in this case, a RabbitMQ runnig according to your configuration.
 
 Thankfully humanity evolved and we have Docker containers to help us out. So, let's just run it!
-```
-docker run -d -v path/to/rabbit/volume/folder:/var/lib/rabbitmq --hostname rabbit-management --name rabbit-management -p 15672:15672 -p 15671:15671 -p 5672:5672 -p 5671:5671 rabbitmq:3.7-management
-```
+
+	docker run -d -v path/to/rabbit/volume/folder:/var/lib/rabbitmq --hostname rabbit-management --name rabbit-management -p 15672:15672 -p 15671:15671 -p 5672:5672 -p 5671:5671 rabbitmq:3.7-management
 
 TODO:(more details) 
 Now we are good to go! `dotnet run` it. No error.. good.. so what?!
@@ -133,53 +122,43 @@ Now we are good to go! `dotnet run` it. No error.. good.. so what?!
 
 On your browser, access `http://hostname::15672` to manage rabbit and you'll be able to see your queue with your messages inside it.
 
-
 ### Receive message
 Create a new project:
-```
-dotnet new console -n consumer
-cd consumer
-```
+
+	dotnet new console -n consumer
+	cd consumer
 
 Add Benner.Messaging and open the project on vscode:
-```
-dotnet add package benner.messaging
-code .
-```
+
+	dotnet add package benner.messaging
+	code .
 
 Add _using_ and just receive a message from the queue, not forgeting configuration:
-```
-using Benner.Messaging;
 
-var config = MessagingConfigFactory
-	.NewMessagingConfigFactory()
-	.WithRabbitMQBroker("hostname", 5672, "user", "password")
-	.Create();
+	using Benner.Messaging;
 
-var message = Messaging.Dequeue("queue-name", config);
+	var rabbitConfig = new Dictionary<string, string>(){{"Hostname", "servername"}};
+	var config = new MessagingConfigBuilder("rabbit", BrokerType.RabbitMQ, rabbitConfig).Create();
 
-Console.Write(message);
+	var message = Messaging.Dequeue("queue-name", config);
 
-```
+	Console.Write(message);
 
 That's it! `dotnet run` it and you receive:
-```
-hello world! 
-```
+
+	hello world! 
 
 ### Now let's do it insanelly
 
 Change consumer code to:
-```
-TODO
-```
+	
+	TODO
 
 `dotnet run` it 3 times so you will have 3 consumers simultaneously
 
 Change producer code to:
-```
-TODO
-```
+
+	TODO
 
 `dotnet run` it and see what happen
 
@@ -237,24 +216,20 @@ This class does many validations about the file structure, thereby, if any struc
 
 ### In-memory configuration
 
-Besides the file configuration, it is also possible to configure the API through the *Benner.Messaging.MessagingConfig* class, obtained by *Benner.Messaging.MessagingConfigFactory* class.
+Besides the file configuration, it is also possible to configure the API through the *Benner.Messaging.MessagingConfig* class, obtained by *Benner.Messaging.MessagingConfigBuilder* class.
 As an example, let's make a configuration to use 2 brokers, ActiveMQ and RabbitMQ, setting RabbitMQ as default: (***MENTIRA***)
 
 	// RabbitMQ's configuration properties
 	var configRabbit = new Dictionary<string, string>() { { "Hostname", "server-name" } };
 
-	// ActiveMQ's configuration properties
-	var configActive = new Dictionary<string, string>() { { "Hostname", "server-name" } };
-
-	var config = MessagingConfigFactory.NewMessagingConfigFactory()
+	// Instanciando o builder com broker default
+	var config = new MessagingConfigBuilder("rabbit", BrokerType.RabbitMQ, rabbitConfig)
 		// Adding activemq broker and its configuration
-		.WithActiveMQBroker(configActive)
-		// Adding rabbitmq broker and its configuration
-		.WithRabbitMQBroker(configRabbit)
+		.WithActiveMQBroker("active", "servername")
 		// Adding some pre-configured queues
-		.WithMappedQueue("fila-notas", "rabbit")
-		.WithMappedQueue("fila-lancamentos", "rabbit")
-		.WithMappedQueue("fila-financeiro", "active")
+		.WithMappedQueue("queue-benefits", "rabbit")
+		.WithMappedQueue("queue-accounting", "rabbit")
+		.WithMappedQueue("queue-humanresources", "active")
 		// Creating the MessagingConfig instance
 		.Create();
 
