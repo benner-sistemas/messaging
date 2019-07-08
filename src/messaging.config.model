@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <configuration>
   <configSections>
-    <section name="MessagingConfigSection" type="Benner.Tecnologia.Messaging.MessagingFileConfigSection, Benner.Tecnologia.Messaging" />
+    <section name="MessagingConfigSection" type="Benner.Messaging.MessagingFileConfigSection, Benner.Messaging" />
   </configSections>
   <MessagingConfigSection>
     <!--specify only queues that should use other than default broker-->
@@ -10,20 +10,20 @@
     </queues>
     <!--Benner.Messaging is multi broker, chose the default-->
     <brokerList default="RabbitMQ">
-      <broker name="AzureQueue" type="Benner.Tecnologia.Messaging.AzureQueueConfig, Benner.Tecnologia.Messaging">
+      <broker name="AzureQueue" type="Benner.Messaging.AzureQueueConfig, Benner.Messaging">
         <add key="ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=accountName;AccountKey=accountKey;EndpointSuffix=core.windows.net" />
         <add key="InvisibilityTime" value="15" />
       </broker>
-      <broker name="RabbitMQ" type="Benner.Tecnologia.Messaging.RabbitMQConfig, Benner.Tecnologia.Messaging">
+      <broker name="RabbitMQ" type="Benner.Messaging.RabbitMQConfig, Benner.Messaging">
         <add key="Username" value="username" />
         <add key="Password" value="password" />
         <add key="Hostname" value="servername" />
         <add key="Port" value="port" />
       </broker>
-      <broker name="Amazon" type="Benner.Tecnologia.Messaging.AmazonSqsConfig, Benner.Tecnologia.Messaging">
+      <broker name="Amazon" type="Benner.Messaging.AmazonSqsConfig, Benner.Messaging">
         <add key="InvisibilityTime" value="15" />
       </broker>
-      <broker name="ActiveMQ" type="Benner.Tecnologia.Messaging.ActiveMQConfig, Benner.Tecnologia.Messaging">
+      <broker name="ActiveMQ" type="Benner.Messaging.ActiveMQConfig, Benner.Messaging">
         <add key="Hostname" value="servername" />
         <add key="Password" value="password" />
         <add key="Hostname" value="servername" />
