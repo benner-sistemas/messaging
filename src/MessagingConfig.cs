@@ -1,71 +1,95 @@
 ﻿using Benner.Messaging.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Benner.Messaging
 {
     public class MessagingConfig : IMessagingConfig
     {
-        public IBrokerConfig GetConfigForQueue(string queueName)
+        /// <summary>
+        /// {queueName, brokerName}
+        /// </summary>
+        private readonly Dictionary<string, string> _brokerNameByQueue;
+
+        /// <summary>
+        /// {brokerName, configurationType}
+        /// </summary>
+        private readonly Dictionary<string, Type> _brokerConfigTypesByBrokerName;
+
+        /// <summary>
+        /// {configurationType, settingsDictionary}
+        /// </summary>
+        private readonly Dictionary<Type, Dictionary<string, string>> _brokerSettingsByBrokerName;
+
+        /// <summary>
+        /// Default broker's name
+        /// </summary>
+        internal string Default { get; }
+
+        internal MessagingConfig(string defaultBrokerName, Type defaultBrokerConfigType, Dictionary<string, string> configurations)
         {
-            string brokerName;
-            if (!_brokerNameByQueue.TryGetValue(queueName, out brokerName))
-            {
-                if (_brokerConfigTypesByBrokerName.Count == 0)
-                    throw new ArgumentException($"Broker config not found");
+            if (string.IsNullOrWhiteSpace(defaultBrokerName))
+                throw new ArgumentException("Default broker name must be informed.", nameof(defaultBrokerName));
 
-                brokerName = _brokerConfigTypesByBrokerName.First().Key;
-            }
+            if (defaultBrokerConfigType == null)
+                throw new ArgumentNullException(nameof(defaultBrokerConfigType), "The default broker's type must be informed.");
 
-            Type brokerConfigType;
-            if (!_brokerConfigTypesByBrokerName.TryGetValue(brokerName, out brokerConfigType))
-                throw new ArgumentException($"Broker config type '{brokerName}' not found");
-
-            var brokerConfigSettings = _brokerSettingsByBrokerName[brokerName];
-
-            return (IBrokerConfig)Activator.CreateInstance(brokerConfigType, new object[] { brokerConfigSettings });
+            _brokerNameByQueue = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            _brokerConfigTypesByBrokerName = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+            _brokerSettingsByBrokerName = new Dictionary<Type, Dictionary<string, string>>();
+            Default = defaultBrokerName;
+            configurations = new Dictionary<string, string>(configurations, StringComparer.OrdinalIgnoreCase);
+            SetBroker(defaultBrokerName, defaultBrokerConfigType, configurations);
         }
-
-
-
-        /// <summary>
-        /// key: queueName, 
-        /// value: brokerName
-        /// </summary>
-        private readonly Dictionary<string, string> _brokerNameByQueue = new Dictionary<string, string>();
-
-        /// <summary>
-        /// key: brokerName, 
-        /// value: type da configuração
-        /// </summary>
-        private readonly Dictionary<string, Type> _brokerConfigTypesByBrokerName = new Dictionary<string, Type>();
-
-        /// <summary>
-        /// key: type da configuração, 
-        /// value: dicionario das configs
-        /// </summary>
-        private readonly Dictionary<string, Dictionary<string, string>> _brokerSettingsByBrokerName = new Dictionary<string, Dictionary<string, string>>();
 
         internal void SetBroker(string brokerName, Type brokerConfigType, Dictionary<string, string> brokerSettings)
         {
             if (string.IsNullOrWhiteSpace(brokerName))
-                throw new ArgumentException("Broker name must be informed", nameof(brokerName));
+                throw new ArgumentException("Broker name cannot be empty.", nameof(brokerName));
 
-            _brokerConfigTypesByBrokerName[brokerName] = brokerConfigType ?? throw new ArgumentNullException(nameof(brokerConfigType), "Broker config type must be informed");
-            _brokerSettingsByBrokerName[brokerName] = brokerSettings ?? throw new ArgumentNullException(nameof(brokerSettings), "Broker config settings must be informed");
+            brokerSettings = new Dictionary<string, string>(brokerSettings, StringComparer.OrdinalIgnoreCase);
+            _brokerConfigTypesByBrokerName[brokerName] = brokerConfigType ?? throw new ArgumentNullException(nameof(brokerConfigType), "Broker configuration type must be informed.");
+            _brokerSettingsByBrokerName[brokerConfigType] = brokerSettings ?? throw new ArgumentNullException(nameof(brokerSettings), "Broker configuration settings must be informed.");
         }
 
         internal void SetQueue(string queueName, string brokerName)
         {
             if (string.IsNullOrWhiteSpace(queueName))
-                throw new ArgumentException("Queue name must be informed", nameof(queueName));
+                throw new ArgumentException("Queue name must be informed.", nameof(queueName));
 
             if (string.IsNullOrWhiteSpace(brokerName))
-                throw new ArgumentException("Broker name must be informed", nameof(brokerName));
+                throw new ArgumentException("Broker name must be informed.", nameof(brokerName));
 
             Utils.ValidateQueueName(queueName, true);
             _brokerNameByQueue[queueName] = brokerName;
+        }
+
+        /// <summary>
+        /// Gets the instance of an <see cref="IBrokerConfig"/> related to the queue name.
+        /// If the queue doesn't exist in the configuration, the default broker will be used.
+        /// </summary>
+        public IBrokerConfig GetConfigForQueue(string queueName)
+        {
+            Type configType;
+            Dictionary<string, string> configs;
+            if (_brokerNameByQueue.ContainsKey(queueName))
+            {
+                string brokerName = _brokerNameByQueue[queueName];
+                if (!_brokerConfigTypesByBrokerName.ContainsKey(brokerName))
+                    throw new ArgumentException($"The broker with name \"{brokerName}\" could not be found.");
+
+                configType = _brokerConfigTypesByBrokerName[brokerName];
+                configs = _brokerSettingsByBrokerName[configType];
+            }
+            else
+            {
+                configType = _brokerConfigTypesByBrokerName[Default];
+                configs = _brokerSettingsByBrokerName[configType];
+                SetQueue(queueName, Default);
+                SetBroker(Default, configType, configs);
+            }
+
+            return (IBrokerConfig)Activator.CreateInstance(configType, new object[] { configs });
         }
     }
 }

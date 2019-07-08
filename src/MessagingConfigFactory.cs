@@ -4,77 +4,97 @@ using System.Collections.Generic;
 
 namespace Benner.Messaging
 {
-    public class MessagingConfigFactory
+    /// <summary>
+    /// Class used to build and create the instance of an in-memory <see cref="IMessagingConfig"/>.
+    /// </summary>
+    public class MessagingConfigBuilder
     {
-        private readonly MessagingConfig _config = new MessagingConfig();
+        private readonly MessagingConfig _config;
 
-        public static MessagingConfigFactory NewMessagingConfigFactory()
+        /// <summary>
+        /// Instantiates the builder with default configuration already
+        /// </summary>
+        /// <param name="defaultBrokerName">The broker name to set as default broker.</param>
+        /// <param name="defaultBrokerConfigType">The broker service to set as default.</param>
+        public MessagingConfigBuilder(string defaultBrokerName, BrokerType defaultBrokerConfigType, Dictionary<string, string> configurations)
         {
-            return new MessagingConfigFactory();
+            _config = new MessagingConfig(defaultBrokerName, GetBrokerConfigType(defaultBrokerConfigType), configurations);
         }
 
-        public MessagingConfigFactory WithRabbitMQBroker(string hostName, int port, string userName, string password)
+        /// <summary>
+        /// Sets an ActiveMQ broker in the in-memory configuration.
+        /// </summary>
+        public MessagingConfigBuilder WithActiveMQBroker(string brokerName, string hostName, int port = 61616, string userName = "admin", string password = "admin")
         {
-            return WithRabbitMQBroker(
-                new Dictionary<string, string> {
-                    { "HostName",   hostName },
-                    { "Port",       port.ToString() },
-                    { "UserName",   userName },
-                    { "Password",   password },
-                });
+            return WithBroker(brokerName, BrokerType.ActiveMQ,
+             new Dictionary<string, string>
+                 {
+                        {"HostName", hostName},
+                        {"UserName", userName},
+                        {"Password", password},
+                        {"Port", port.ToString()}
+                 });
         }
 
-        public MessagingConfigFactory WithRabbitMQBroker(Dictionary<string, string> brokerSettings)
+        /// <summary>
+        /// Sets an AmazonSQS broker in the in-memory configuration.
+        /// </summary>
+        public MessagingConfigBuilder WithAmazonSQSBroker(string brokerName, int invisibilityTime)
         {
-            _config.SetBroker(
-                BrokerType.RabbitMQ.ToString(),
-                GetBrokerConfigType(BrokerType.RabbitMQ),
-                brokerSettings);
+            return WithBroker(brokerName, BrokerType.AmazonSQS,
+             new Dictionary<string, string>
+                 {
+                        {"InvisibilityTime", invisibilityTime.ToString()}
+                 });
+        }
 
+        /// <summary>
+        /// Sets an Azure Queue broker in the in-memory configuration.
+        /// </summary>
+        public MessagingConfigBuilder WithAzureQueueBroker(string brokerName, string connectionString, int invisibilityTime)
+        {
+            return WithBroker(brokerName, BrokerType.AzureQueue,
+              new Dictionary<string, string>
+                  {
+                        {"InvisibilityTime", invisibilityTime.ToString()},
+                        {"ConnectionString", connectionString}
+                  });
+        }
+
+        /// <summary>
+        /// Sets an RabbitMQ broker in the in-memory configuration.
+        /// </summary>
+        public MessagingConfigBuilder WithRabbitMQBroker(string brokerName, string hostName, int port = 5672, string userName = "guest", string password = "guest")
+        {
+            return WithBroker(brokerName, BrokerType.RabbitMQ,
+                new Dictionary<string, string>
+                    {
+                        {"HostName", hostName},
+                        {"UserName", userName},
+                        {"Password", password},
+                        {"Port", port.ToString()}
+                    });
+        }
+
+        /// <summary>
+        /// Sets any broker in the in-memory configuration.
+        /// </summary>
+        public MessagingConfigBuilder WithBroker(string brokerName, BrokerType configType, Dictionary<string, string> configurations)
+        {
+            _config.SetBroker(brokerName, GetBrokerConfigType(configType), configurations);
             return this;
         }
 
-        public MessagingConfigFactory WithActiveMQBroker(Dictionary<string, string> brokerSettings)
-        {
-            _config.SetBroker(
-                BrokerType.ActiveMQ.ToString(),
-                GetBrokerConfigType(BrokerType.ActiveMQ),
-                brokerSettings);
-
-            return this;
-        }
-
-        public MessagingConfigFactory WithAmazonSQSBroker(Dictionary<string, string> brokerSettings)
-        {
-            _config.SetBroker(
-                BrokerType.AmazonSQS.ToString(),
-                GetBrokerConfigType(BrokerType.AmazonSQS),
-                brokerSettings);
-
-            return this;
-        }
-        public MessagingConfigFactory WithAzureQueueBroker(Dictionary<string, string> brokerSettings)
-        {
-            _config.SetBroker(
-                BrokerType.AzureQueue.ToString(),
-                GetBrokerConfigType(BrokerType.AzureQueue),
-                brokerSettings);
-
-            return this;
-        }
-        
-
-        public MessagingConfigFactory WithMappedQueue(string queueName, string brokerName)
+        /// <summary>
+        /// Sets a queue with a name and broker name that needs to be set.
+        /// </summary>
+        public MessagingConfigBuilder WithMappedQueue(string queueName, string brokerName)
         {
             _config.SetQueue(queueName, brokerName);
-
             return this;
         }
 
-        public IMessagingConfig Create()
-        {
-            return _config;
-        }
+        public MessagingConfig Create() => _config;
 
         private Type GetBrokerConfigType(BrokerType broker)
         {
