@@ -1,3 +1,5 @@
+[<img align="right" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/google/146/flag-for-brazil_1f1e7-1f1f7.png" width="35x"/>](https://github.com/benner-sistemas/messaging/blob/master/LEIAME.md)
+
 # Benner.Messaging
 
 Benner.Messaging is a .NET Standard lightweight messaging library to deal with any message broker with ease.

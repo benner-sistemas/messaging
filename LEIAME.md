@@ -1,3 +1,5 @@
+[<img align="right" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/160/google/146/flag-for-united-states_1f1fa-1f1f8.png" width="35x"/>](https://github.com/benner-sistemas/messaging/blob/master/README.md)
+
 # Benner.Messaging
 
 Benner.Messaging é uma biblioteca leve em .NET Standard para lidar com qualquer serviço de mensageria com facilidade.
