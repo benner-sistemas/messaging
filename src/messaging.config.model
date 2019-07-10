@@ -4,10 +4,6 @@
     <section name="MessagingConfigSection" type="Benner.Messaging.MessagingFileConfigSection, Benner.Messaging" />
   </configSections>
   <MessagingConfigSection>
-    <!--specify only queues that should use other than default broker-->
-    <queues>
-      <queue name="queue-name" broker="broker-name" />
-    </queues>
     <!--Benner.Messaging is multi broker, chose the default-->
     <brokerList default="RabbitMQ">
       <broker name="AzureQueue" type="Benner.Messaging.AzureQueueConfig, Benner.Messaging">
@@ -20,7 +16,7 @@
         <add key="Hostname" value="servername" />
         <add key="Port" value="port" />
       </broker>
-      <broker name="Amazon" type="Benner.Messaging.AmazonSqsConfig, Benner.Messaging">
+      <broker name="AmazonSQS" type="Benner.Messaging.AmazonSQSConfig, Benner.Messaging">
         <add key="InvisibilityTime" value="15" />
       </broker>
       <broker name="ActiveMQ" type="Benner.Messaging.ActiveMQConfig, Benner.Messaging">
@@ -29,6 +25,10 @@
         <add key="Hostname" value="servername" />
         <add key="Port" value="port" />
       </broker>
-    </brokerList>
+    </brokerList>    
+    <!--specify only queues that should use other than default broker-->
+    <queues>
+      <queue name="queue-name" broker="broker-name" />
+    </queues>
   </MessagingConfigSection>
 </configuration>
