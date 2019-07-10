@@ -20,7 +20,7 @@ namespace Benner.Messaging
             if (int.TryParse(configurations.GetValue("InvisibilityTime", true), out int invibilityTime))
                 InvisibilityTimeInMinutes = invibilityTime;
             else
-                throw new ArgumentException("O tempo de invisibilidade informado não é um valor inteiro válido");
+                throw new ArgumentException("The informed invisibility time is not a valid integer number.");
         }
 
         private void ValidateCredentialsFileExists()
@@ -29,15 +29,15 @@ namespace Benner.Messaging
             {
                 var userFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile, Environment.SpecialFolderOption.None);
                 if (string.IsNullOrWhiteSpace(userFolder))
-                    throw new DirectoryNotFoundException("Diretório de usuários não encontrado.");
+                    throw new DirectoryNotFoundException("The 'Users' directory could not be found.");
 
                 var awsFolder = Path.Combine(userFolder, ".aws");
                 if (!Directory.Exists(awsFolder))
-                    throw new DirectoryNotFoundException("Diretório '.aws' não encontrado.");
+                    throw new DirectoryNotFoundException("The '.aws' directory could not be found.");
 
                 var credentialsFile = Path.Combine(awsFolder, "credentials");
                 if (!File.Exists(credentialsFile))
-                    throw new FileNotFoundException("Arquivo 'credentials' não encontrado.");
+                    throw new FileNotFoundException("The 'credentials' file could not be found.");
             }
             catch (Exception e)
             {

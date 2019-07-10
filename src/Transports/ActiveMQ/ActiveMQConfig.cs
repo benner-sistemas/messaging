@@ -25,7 +25,7 @@ namespace Benner.Messaging
             if (!string.IsNullOrWhiteSpace(informedPort))
             {
                 if (!int.TryParse(informedPort, out int port))
-                    throw new ArgumentException("Porta informada não é válida");
+                    throw new ArgumentException("Informed port is not valid.");
                 Port = port;
             }
             else

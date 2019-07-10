@@ -73,7 +73,7 @@ namespace Benner.Messaging
                     _consumeConnection = GetConnectionFactory().CreateConnection();
                     return _consumeConnection;
                 default:
-                    throw new ArgumentException("O tipo de conexão deve ser informado");
+                    throw new ArgumentException("The connection type must be informed.");
             }
         }
 
@@ -94,7 +94,7 @@ namespace Benner.Messaging
                     _consumeChannel.BasicQos(0, 1, false);
                     return _consumeChannel;
                 default:
-                    throw new ArgumentException("O tipo de conexão deve ser informado");
+                    throw new ArgumentException("The connection type must be informed.");
             }
         }
 
@@ -112,7 +112,7 @@ namespace Benner.Messaging
         public override void StartListening(string queueName, Func<MessagingArgs, bool> func)
         {
             if (_isListening)
-                throw new InvalidOperationException("Escuta de fila neste contexto já está em uso");
+                throw new InvalidOperationException("There is already a listener being used in this context.");
 
             var channel = GetChannel(ConectionType.Consume);
             EnsureQueueDeclared(channel, queueName);

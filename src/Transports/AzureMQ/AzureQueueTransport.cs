@@ -50,7 +50,7 @@ namespace Benner.Messaging
         public override void StartListening(string queueName, Func<MessagingArgs, bool> func)
         {
             if (_listeningTask != null)
-                throw new InvalidOperationException("Escuta de fila neste contexto já está em uso");
+                throw new InvalidOperationException("There is already a listener being used in this context.");
 
             CloudQueue queue = GetQueue(queueName);
             _listeningTask = new Task(() => Listener(queue, func), TaskCreationOptions.LongRunning);

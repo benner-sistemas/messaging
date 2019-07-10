@@ -17,12 +17,12 @@ namespace Benner.Messaging
         {
             string connectionString = configurations.GetValue("ConnectionString", true);
             CloudStorageAccount.TryParse(connectionString, out CloudStorageAccount storageAccount);
-            StorageAccount = storageAccount ?? throw new ArgumentException("ConnectionString inválida.");
+            StorageAccount = storageAccount ?? throw new ArgumentException("Invalid ConnectionString.");
 
             if (int.TryParse(configurations.GetValue("InvisibilityTime", true), out int invibilityTime))
                 InvisibilityTimeInMinutes = invibilityTime;
             else
-                throw new ArgumentException("O tempo de invisibilidade informado não é um valor inteiro válido");
+                throw new ArgumentException("The informed invisibility time is not a valid integer number.");
         }
 
         public BrokerTransport CreateTransporterInstance() => new AzureQueueTransport(this);

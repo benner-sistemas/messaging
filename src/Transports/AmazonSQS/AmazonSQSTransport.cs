@@ -75,7 +75,7 @@ namespace Benner.Messaging
         public override void StartListening(string queueName, Func<MessagingArgs, bool> func)
         {
             if (_listeningTask != null)
-                throw new InvalidOperationException("Escuta de fila neste contexto já está em uso");
+                throw new InvalidOperationException("There is already a listener being used in this context.");
 
             string queueUrl = GetQueueUrl(queueName, GetClient());
             ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl)
@@ -133,7 +133,7 @@ namespace Benner.Messaging
                 WaitTimeSeconds = 1
             };
             var receivedMsgResponse = client.ReceiveMessageAsync(receiveMessageRequest)?.Result;
-            if (receivedMsgResponse == null)
+            if (receivedMsgResponse == null || receivedMsgResponse.Messages.Count == 0)
                 return null;
 
             var receivedMessage = receivedMsgResponse.Messages.FirstOrDefault();
@@ -142,7 +142,7 @@ namespace Benner.Messaging
 
             var deleteResponse = DeleteMessage(queueUrl, client, receivedMessage.ReceiptHandle);
             if (deleteResponse.HttpStatusCode != System.Net.HttpStatusCode.OK)
-                throw new InvalidOperationException("Falha ao remover mensagem da fila");
+                throw new InvalidOperationException("Failed to delete message from queue.");
 
             return receivedMessage.Body;
         }
