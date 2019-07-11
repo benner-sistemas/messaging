@@ -84,8 +84,10 @@ Você vai precisar de um arquivo `messaging.config` como a seguir:
          <add key="Password" value="senha" />
          <add key="Port" value="porta" />
       </broker>
-      <broker name="Amazon" type="Benner.Messaging.AmazonSQSConfig, Benner.Messaging">
+      <broker name="AmazonSQS" type="Benner.Messaging.AmazonSQSConfig, Benner.Messaging">
          <add key="InvisibilityTime" value="15" />
+		 <add key="AccessKeyId" value="idChaveDeAcesso" />
+         <add key="SecretAccessKey" value="chaveDeAcessoSecreta" />
       </broker>
       <broker name="ActiveMQ" type="Benner.Messaging.ActiveMQConfig, Benner.Messaging">
          <add key="Hostname" value="servername" />

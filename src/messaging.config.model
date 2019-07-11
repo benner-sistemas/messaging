@@ -18,6 +18,8 @@
       </broker>
       <broker name="AmazonSQS" type="Benner.Messaging.AmazonSQSConfig, Benner.Messaging">
         <add key="InvisibilityTime" value="15" />
+        <add key="AccessKeyId" value="accessKeyID" />
+        <add key="SecretAccessKey" value="secretAccessKey" />
       </broker>
       <broker name="ActiveMQ" type="Benner.Messaging.ActiveMQConfig, Benner.Messaging">
         <add key="Hostname" value="servername" />

@@ -95,11 +95,21 @@ var config = new MessagingConfigBuilder("rabbit", BrokerType.RabbitMQ, rabbitCon
 
 ### AmazonSQSConfig 
 
-Amazon's service has one particularity about conecting to their servers. For more information: [Configuring AWS Credentials](https://docs.aws.amazon.com/sdk-for-net/v2/developer-guide/net-dg-config-creds.html)
+It is possible to establish connection to Amazon servers in two simple ways.
+ - Through a credentials file. For more information: [Configuring AWS Credentials](https://docs.aws.amazon.com/sdk-for-net/v2/developer-guide/net-dg-config-creds.html#creds-file).
+ - Through properties in the API's configuration.
+
+When the file is detected it is used and the credentials from the API's configuration (file or in-memory) aren't required.
+If the file is not found, such properties are required. If invalid or not filled, an exception is thrown.
+There are a few more ways of establishing connection, but here we focus on the two simplest ones.
 
 |Name|Description|
 |--|--|
 |InvisibilityTime|The time, in minutes, in which the received message will stay invisible to other consumers until it is successfully consumed and deleted. In case of a processing taking longer to finish than the invisibility time, the message stays visible again in the queue, available to other consumers.|
+|AccessKeyId|The access key id provided by Amazon.|
+|SecretAccessKey|The secret access key provided by Amazon.|
+
+When using the AccessKeyId and SecretAccessKey properties it is recommended not to use them by in-memory configuration.
 
 ### AzureMQConfig 
 
