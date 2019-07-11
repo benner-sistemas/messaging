@@ -29,7 +29,18 @@ namespace Benner.Messaging
             if (_client != null)
                 return _client;
 
-            _client = new AmazonSQSClient(RegionEndpoint.SAEast1);
+            try
+            {
+                if (_config.CredentialFileExists)
+                    _client = new AmazonSQSClient(RegionEndpoint.SAEast1);
+                else
+                    _client = new AmazonSQSClient(_config.AccessKeyId, _config.SecretAccessKey, RegionEndpoint.SAEast1);
+            }
+            catch (Exception e)
+            {
+                throw new AmazonSQSException("Unable to connect to AmazonSQS server", e);
+            }
+
             return _client;
         }
 
