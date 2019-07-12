@@ -105,14 +105,9 @@ Você vai precisar de um arquivo `messaging.config` como a seguir:
 
 Você pode, como alternativa, injetar a configuração a partir de código:
 ```csharp
-var config = new MessagingConfigBuilder(
-	"RabbitMQ", 
-	BrokerType.RabbitMQ, 
-	new Dictionary<string, string> 
-	{ 
-		{ "Hostname", "nome-servidor" },
-	})
-	.Create();
+var config = new MessagingConfigBuilder()
+    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .Create();
 
 Messaging.Enqueue("nome-da-fila", "olá mundo!", config);
 ```
@@ -128,14 +123,14 @@ Você precisa, nesse caso, de um RabbitMQ em funcionamento.
 
 Vamos usar um contêiner Docker para nos ajudar. Podemos executar o seguinte comando:
 ```shell
-docker run -d -v path/to/rabbit/volume/folder:/var/lib/rabbitmq -p 15672:15672 -p 15671:15671 -p 5672:5672 -p 5671:5671 rabbitmq:3.7-management
+docker run -d -v rabbitmq_data:/var/lib/rabbitmq -p 15672:15672 -p 15671:15671 -p 5672:5672 -p 5671:5671 rabbitmq:3.7-management
 ```
 
 Tudo pronto! Execute `dotnet run` novamente. Sem erros? Ótimo, e agora?
 
 ### Acesse o gerenciador do seu RabbitMQ
 
-Em seu navegador, acesse `http://hostname::15672` (usuário guest, senha guest) para gerenciar o serviço. Aqui você pode ver suas filas com suas mensagens dentro.
+Em seu navegador, acesse `http://bnu-vtec011:15672/#/queues` (usuário guest, senha guest) para gerenciar o serviço. Aqui você pode ver suas filas com suas mensagens dentro.
 
 ### Recebendo uma mensagem
 Crie um novo projeto:
@@ -154,14 +149,9 @@ Adicione _using_ e receba uma mensagem da fila, sem esquecer da configuração:
 ```csharp
 using Benner.Messaging;
 
-var config = new MessagingConfigBuilder(
-	"RabbitMQ", 
-	BrokerType.RabbitMQ, 
-	new Dictionary<string, string> 
-	{ 
-		{ "Hostname", "nome-servidor" },
-	})
-	.Create();
+var config = new MessagingConfigBuilder()
+    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .Create();
 
 var mensagem = Messaging.Dequeue("nome-da-fila", config);
 Console.Write(mensagem);
@@ -178,27 +168,19 @@ Mude o código do consumidor para:
 ```csharp
 using Benner.Messaging;
 
-var config = new MessagingConfigBuilder(
-	"RabbitMQ", 
-	BrokerType.RabbitMQ, 
-	new Dictionary<string, string> 
-	{ 
-		{ "Hostname", "nome-servidor" },
-	})
-	.Create();
+var config = new MessagingConfigBuilder()
+    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .Create();
 
-// Criando nova instância de messaging
 using (var client = new Messaging(config))
 {
-    // Escutando "minha-fila"
-    client.StartListening("minha-fila", (args) =>
+    client.StartListening("queue-name", (e) =>
     {
-        string mensagem = args.AsString;
-        // Escrever a mensagem na tela
-        Console.WriteLine(mensagem);
+        // Print the message
+        Console.WriteLine(e.AsString);
         return true;
     });
-	// Manter a aplicação em espera para ela poder ficar escutando
+    // Stand-by the application so it can keep listening
     Console.ReadKey();
 }
 ```
@@ -209,22 +191,23 @@ Mude o código do produtor para:
 ```csharp
 using Benner.Messaging;
 
-var config = new MessagingConfigBuilder(
-	"RabbitMQ", 
-	BrokerType.RabbitMQ, 
-	new Dictionary<string, string> 
-	{ 
-		{ "Hostname", "nome-servidor" },
-	})
-	.Create();
+var config = new MessagingConfigBuilder()
+    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .Create();
 
-// Criando nova instância de messaging
+// Create new instance of messaging
 using (var client = new Messaging(config))
 {
-    // Enviando 1000 mensagens
+    // Sending 1000 messages
     for (int i = 1; i <= 1000; i++)
-        client.EnqueueMessage("minha-fila", "olá mundo #" + i);
+        client.EnqueueMessage("queue-name", "hello world #" + i);
 }
 ```
 
 Execute `dotnet run` e você verá o que acontece.
+
+### Próximos passos
+
+Veja os exemplos dos passos iniciais [aqui](samples).
+
+Ous, veja mais detalhes [aqui](DETALHES.md).
