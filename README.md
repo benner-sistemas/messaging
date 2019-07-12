@@ -105,14 +105,9 @@ Well, you need a `messaging.config` file, like that (don't worry, we will get de
 
 You can also inject config through code:
 ```csharp
-var config = new MessagingConfigBuilder(
-	"RabbitMQ", 
-	BrokerType.RabbitMQ, 
-	new Dictionary<string, string> 
-	{ 
-		{ "Hostname", "servername" },
-	})
-	.Create();
+var config = new MessagingConfigBuilder()
+    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .Create();
 
 Messaging.Enqueue("queue-name", "hello world!", config);
 ```
@@ -128,14 +123,14 @@ Well... you need, in this case, a RabbitMQ runnig according to your configuratio
 
 Thankfully humanity evolved and we have Docker containers to help us out. So, let's just run it!
 ```shell
-docker run -d -v path/to/rabbit/volume/folder:/var/lib/rabbitmq -p 15672:15672 -p 15671:15671 -p 5672:5672 -p 5671:5671 rabbitmq:3.7-management
+docker run -d -v rabbitmq_data:/var/lib/rabbitmq -p 15672:15672 -p 15671:15671 -p 5672:5672 -p 5671:5671 rabbitmq:3.7-management
 ```
 
 Now we are good to go! `dotnet run` it. No errors? Great! Now what?
 
 ### Check broker management console
 
-On your browser, access `http://hostname::15672` (user guest, password guest) to manage Rabbit and you'll be able to see your queue with your messages inside it.
+On your browser, access `http://bnu-vtec011:15672/#/queues` (user guest, password guest) to manage Rabbit and you'll be able to see your queue with your messages inside it.
 
 ### Receive message
 Create a new project:
@@ -154,14 +149,9 @@ Add _using_ and just receive a message from the queue, not forgeting configurati
 ```csharp
 using Benner.Messaging;
 
-var config = new MessagingConfigBuilder(
-	"RabbitMQ", 
-	BrokerType.RabbitMQ, 
-	new Dictionary<string, string> 
-	{ 
-		{ "Hostname", "servername" },
-	})
-	.Create();
+var config = new MessagingConfigBuilder()
+    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .Create();
 
 var message = Messaging.Dequeue("queue-name", config);
 Console.Write(message);
@@ -178,24 +168,16 @@ Change consumer code to:
 ```csharp
 using Benner.Messaging;
 
-var config = new MessagingConfigBuilder(
-	"RabbitMQ", 
-	BrokerType.RabbitMQ, 
-	new Dictionary<string, string> 
-	{ 
-		{ "Hostname", "servername" },
-	})
-	.Create();
+var config = new MessagingConfigBuilder()
+    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .Create();
 
-// Create new instance of messaging
 using (var client = new Messaging(config))
 {
-    // Listen to "my-queue"
-    client.StartListening("my-queue", (args) =>
+    client.StartListening("queue-name", (e) =>
     {
-        string message = args.AsString;
         // Print the message
-        Console.WriteLine(message);
+        Console.WriteLine(e.AsString);
         return true;
     });
     // Stand-by the application so it can keep listening
@@ -209,22 +191,23 @@ Change producer code to:
 ```csharp
 using Benner.Messaging;
 
-var config = new MessagingConfigBuilder(
-	"RabbitMQ", 
-	BrokerType.RabbitMQ, 
-	new Dictionary<string, string> 
-	{ 
-		{ "Hostname", "servername" },
-	})
-	.Create();
+var config = new MessagingConfigBuilder()
+    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .Create();
 
 // Create new instance of messaging
 using (var client = new Messaging(config))
 {
     // Sending 1000 messages
     for (int i = 1; i <= 1000; i++)
-        client.EnqueueMessage("my-queue", "hello world #" + i);
+        client.EnqueueMessage("queue-name", "hello world #" + i);
 }
 ```
 
 Done, `dotnet run` it and see what happens.
+
+### What's next
+
+Check out get started samples [here](samples).
+
+Or, read more details [here](DETAILS.md).

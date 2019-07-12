@@ -60,7 +60,7 @@ namespace Benner.Messaging.Tests
                             <broker name='AmazonSQS' type='Benner.Messaging.AmazonSQSConfig, Benner.Messaging'>
                               <add key='InvisibilityTime' value='15' />
                             </broker>
-                            <broker name='AzureQueue' type='Benner.Messaging.AzureMQConfig, Benner.Messaging'>
+                            <broker name='AzureQueue' type='Benner.Messaging.AzureQueueConfig, Benner.Messaging'>
                               <add key='ConnectionString' value='{AzureConnectionString}' />
                               <add key='InvisibilityTime' value='15' />
                             </broker>

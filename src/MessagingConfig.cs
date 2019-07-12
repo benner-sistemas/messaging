@@ -9,24 +9,28 @@ namespace Benner.Messaging
         /// <summary>
         /// {queueName, brokerName}
         /// </summary>
-        private readonly Dictionary<string, string> _brokerNameByQueue;
+        private readonly Dictionary<string, string> _brokerNameByQueue = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// {brokerName, configurationType}
         /// </summary>
-        private readonly Dictionary<string, Type> _brokerConfigTypesByBrokerName;
+        private readonly Dictionary<string, Type> _brokerConfigTypesByBrokerName = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// {configurationType, settingsDictionary}
         /// </summary>
-        private readonly Dictionary<Type, Dictionary<string, string>> _brokerSettingsByBrokerName;
+        private readonly Dictionary<string, Dictionary<string, string>> _brokerSettingsByBrokerName = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Default broker's name
         /// </summary>
-        internal string Default { get; }
+        internal string DefaultBrokerName { get; set; }
 
-        internal MessagingConfig(string defaultBrokerName, Type defaultBrokerConfigType, Dictionary<string, string> configurations)
+        internal MessagingConfig()
+        {
+        }
+
+        internal MessagingConfig(string defaultBrokerName, Type defaultBrokerConfigType, Dictionary<string, string> defaultBrokerSettings)
         {
             if (string.IsNullOrWhiteSpace(defaultBrokerName))
                 throw new ArgumentException("Default broker name must be informed.", nameof(defaultBrokerName));
@@ -34,12 +38,8 @@ namespace Benner.Messaging
             if (defaultBrokerConfigType == null)
                 throw new ArgumentNullException(nameof(defaultBrokerConfigType), "The default broker's type must be informed.");
 
-            _brokerNameByQueue = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            _brokerConfigTypesByBrokerName = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
-            _brokerSettingsByBrokerName = new Dictionary<Type, Dictionary<string, string>>();
-            Default = defaultBrokerName;
-            configurations = new Dictionary<string, string>(configurations, StringComparer.OrdinalIgnoreCase);
-            SetBroker(defaultBrokerName, defaultBrokerConfigType, configurations);
+            DefaultBrokerName = defaultBrokerName;
+            SetBroker(defaultBrokerName, defaultBrokerConfigType, defaultBrokerSettings);
         }
 
         internal void SetBroker(string brokerName, Type brokerConfigType, Dictionary<string, string> brokerSettings)
@@ -47,9 +47,8 @@ namespace Benner.Messaging
             if (string.IsNullOrWhiteSpace(brokerName))
                 throw new ArgumentException("Broker name cannot be empty.", nameof(brokerName));
 
-            brokerSettings = new Dictionary<string, string>(brokerSettings, StringComparer.OrdinalIgnoreCase);
             _brokerConfigTypesByBrokerName[brokerName] = brokerConfigType ?? throw new ArgumentNullException(nameof(brokerConfigType), "Broker configuration type must be informed.");
-            _brokerSettingsByBrokerName[brokerConfigType] = brokerSettings ?? throw new ArgumentNullException(nameof(brokerSettings), "Broker configuration settings must be informed.");
+            _brokerSettingsByBrokerName[brokerName] = brokerSettings ?? throw new ArgumentNullException(nameof(brokerSettings), "Broker configuration settings must be informed.");
         }
 
         internal void SetQueue(string queueName, string brokerName)
@@ -70,26 +69,16 @@ namespace Benner.Messaging
         /// </summary>
         public IBrokerConfig GetConfigForQueue(string queueName)
         {
-            Type configType;
-            Dictionary<string, string> configs;
-            if (_brokerNameByQueue.ContainsKey(queueName))
-            {
-                string brokerName = _brokerNameByQueue[queueName];
-                if (!_brokerConfigTypesByBrokerName.ContainsKey(brokerName))
-                    throw new ArgumentException($"The broker with name \"{brokerName}\" could not be found.");
+            string brokerName;
+            if (!_brokerNameByQueue.TryGetValue(queueName, out brokerName))
+                brokerName = DefaultBrokerName;
 
-                configType = _brokerConfigTypesByBrokerName[brokerName];
-                configs = _brokerSettingsByBrokerName[configType];
-            }
-            else
-            {
-                configType = _brokerConfigTypesByBrokerName[Default];
-                configs = _brokerSettingsByBrokerName[configType];
-                SetQueue(queueName, Default);
-                SetBroker(Default, configType, configs);
-            }
+            Type brokerConfigType;
+            if (!_brokerConfigTypesByBrokerName.TryGetValue(brokerName, out brokerConfigType))
+                throw new ArgumentException($"The broker with name \"{brokerName}\" could not be found.");
 
-            return (IBrokerConfig)Activator.CreateInstance(configType, new object[] { configs });
+            var brokerSettings = _brokerSettingsByBrokerName[brokerName];
+            return (IBrokerConfig)Activator.CreateInstance(brokerConfigType, new object[] { brokerSettings });
         }
     }
 }
