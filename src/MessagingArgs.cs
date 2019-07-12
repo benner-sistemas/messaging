@@ -16,7 +16,7 @@ namespace Benner.Messaging
         {
             get
             {
-                if (_bytesMessage == null && _stringMessage == null)
+                if (_bytesMessage == null)
                     _bytesMessage = Encoding.UTF8.GetBytes(_stringMessage);
                 return _bytesMessage;
             }
@@ -29,7 +29,7 @@ namespace Benner.Messaging
         {
             get
             {
-                if (_stringMessage == null && _bytesMessage == null)
+                if (_stringMessage == null)
                     _stringMessage = Encoding.UTF8.GetString(_bytesMessage);
                 return _stringMessage;
             }
