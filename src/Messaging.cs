@@ -12,6 +12,11 @@ namespace Benner.Messaging
     {
         private readonly IMessagingConfig _config;
         private readonly Dictionary<string, IBrokerTransport> _brokers;
+        private static readonly JsonSerializerSettings _jsSettings = new JsonSerializerSettings()
+        {
+            ObjectCreationHandling = ObjectCreationHandling.Replace,
+            TypeNameHandling = TypeNameHandling.All
+        };
 
         /// <summary>
         /// Instantiates a new <see cref="Messaging"/> object with <see cref="FileMessagingConfig"/>'s default constructor.
@@ -42,7 +47,6 @@ namespace Benner.Messaging
         /// <summary>
         /// Gets the next informed queue's message and deserializes it to an object.
         /// Once the message is dequeued, it is deleted from the queue.
-        /// In case of deserialization errors (e.g. different types objects), the message is lost.
         /// Depending on the service, this method may take a few seconds to return, waiting for new messages before completion.
         /// If no message is found, returns null.
         /// Uses <see cref="FileMessagingConfig"/>'s default constructor.
@@ -57,7 +61,6 @@ namespace Benner.Messaging
         /// <summary>
         /// Gets the next informed queue's message and deserializes it to an object.
         /// Once the message is dequeued, it is deleted from the queue.
-        /// In case of deserialization errors (e.g. different types objects), the message is lost.
         /// Depending on the service, this method may take a few seconds to return, waiting for new messages before completion.
         /// If no message is found, returns null.
         /// </summary>
@@ -66,15 +69,38 @@ namespace Benner.Messaging
         /// <exception cref="InvalidOperationException">Occurs when the connection to the server fails.</exception>
         public static T Dequeue<T>(string queueName, IMessagingConfig config)
         {
-            var rawMessage = Dequeue(queueName, config);
-            var jsSettings = new JsonSerializerSettings
-            {
-                ObjectCreationHandling = ObjectCreationHandling.Replace
-            };
-            if (rawMessage == null)
-                return default(T);
+            queueName = queueName.ToLower();
+            Utils.ValidateQueueName(queueName, true);
 
-            return JsonConvert.DeserializeObject<T>(rawMessage, jsSettings);
+            object deserialized = null;
+            Exception exToThrow = null;
+            using (var client = new Messaging(config))
+            {
+                var transporter = client.GetTransporter(queueName);
+                transporter.DequeueSingleMessage(queueName, (msg) =>
+                {
+                    if (msg == null)
+                    {
+                        deserialized = null;
+                        return true;
+                    }
+
+                    try
+                    {
+                        deserialized = JsonConvert.DeserializeObject<T>(msg, _jsSettings);
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        exToThrow = e;
+                        return false;
+                    }
+                });
+            }
+            if (exToThrow != null)
+                throw new InvalidCastException("Error parsing the object. Message requeued.", exToThrow);
+
+            return (T)deserialized;
         }
 
         /// <summary>
@@ -102,12 +128,17 @@ namespace Benner.Messaging
         {
             queueName = queueName.ToLower();
             Utils.ValidateQueueName(queueName, true);
-
+            string message = null;
             using (var client = new Messaging(config))
             {
                 var transporter = client.GetTransporter(queueName);
-                return transporter.DequeueSingleMessage(queueName);
+                transporter.DequeueSingleMessage(queueName, (msg) =>
+                {
+                    message = msg;
+                    return true;
+                });
             }
+            return message;
         }
 
         /// <summary>
@@ -129,7 +160,7 @@ namespace Benner.Messaging
         /// <exception cref="InvalidOperationException">Occurs when the connection to the server fails.</exception>
         public static void Enqueue(string queueName, object objMessage, IMessagingConfig config)
         {
-            Enqueue(queueName, JsonConvert.SerializeObject(objMessage), config);
+            Enqueue(queueName, JsonConvert.SerializeObject(objMessage, _jsSettings), config);
         }
 
         /// <summary>
@@ -165,8 +196,7 @@ namespace Benner.Messaging
         /// <exception cref="InvalidOperationException">Occurs when the connection to the server fails.</exception>
         public void EnqueueMessage(string queueName, object objMessage)
         {
-            var messageString = JsonConvert.SerializeObject(objMessage);
-            EnqueueMessage(queueName, messageString);
+            EnqueueMessage(queueName, JsonConvert.SerializeObject(objMessage, _jsSettings));
         }
 
         /// <summary>

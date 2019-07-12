@@ -65,8 +65,6 @@ namespace Benner.Messaging.Tests
                               <add key='InvisibilityTime' value='15' />
                             </broker>
                             <broker name='RabbitMQ' type='Benner.Messaging.RabbitMQConfig, Benner.Messaging'>
-                              <add key='UserName' value='guest' />
-                              <add key='Password' value='guest' />
                               <add key='HostName' value='{ServerName}' />
                             </broker>
                         </brokerList>

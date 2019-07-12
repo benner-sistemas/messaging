@@ -129,5 +129,31 @@ namespace Benner.Messaging.Tests.Transporters
             var single = Messaging.Dequeue($"fila-teste-azurequeue-{Guid.NewGuid()}", new FileMessagingConfig(LoadFileConfig(Broker.AzureQueue)));
             Assert.IsNull(single);
         }
+
+        [TestMethod]
+        public void AzureQueue_deve_lancar_erro_ao_deserializar_messagem_de_tipos_diferentes()
+        {
+            var guid = Guid.NewGuid().ToString();
+            string queueName = $"fila-teste-azurequeue-{guid}";
+            var config = new MessagingConfigBuilder("AzuereQueue", BrokerType.AzureQueue, new Dictionary<string, string>()
+                {
+                    {"InvisibilityTime", "15"},
+                    {"ConnectionString", AzureConnectionString}
+                }).Create();
+
+            // garantir que a fila tem 0 mensagens
+            var vazia = Messaging.Dequeue(queueName, config);
+            Assert.IsNull(vazia);
+
+            // enviar um objeto Invoice
+            Messaging.Enqueue(queueName, _invoiceMessage, config);
+
+            // receber objeto convertendo pra AnotherClass
+            Assert.ThrowsException<InvalidCastException>(() => Messaging.Dequeue<AnotherClass>(queueName, config));
+
+            // garantir que ainda está na fila recebendo uma mensagem
+            var recebida = Messaging.Dequeue(queueName, config);
+            Assert.IsNotNull(recebida);
+        }
     }
 }

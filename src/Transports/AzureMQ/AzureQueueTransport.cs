@@ -95,16 +95,23 @@ namespace Benner.Messaging
             _listeningTask?.Wait();
         }
 
-        public override string DequeueSingleMessage(string queueName)
+        public override void DequeueSingleMessage(string queueName, Func<string, bool> func)
         {
             var queue = GetQueue(queueName);
 
             var message = queue.GetMessage(TimeSpan.FromMinutes(_config.InvisibilityTimeInMinutes));
             if (message == null)
-                return null;
+            {
+                func(null);
+                return;
+            }
 
-            queue.DeleteMessage(message);
-            return message.AsString;
+            bool succeeded = func(message.AsString);
+
+            if (succeeded)
+                queue.DeleteMessage(message);
+            else
+                queue.UpdateMessage(message, TimeSpan.Zero, MessageUpdateFields.Visibility);
         }
 
         ~AzureQueueTransport()
