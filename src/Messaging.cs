@@ -12,11 +12,6 @@ namespace Benner.Messaging
     {
         private readonly IMessagingConfig _config;
         private readonly Dictionary<string, IBrokerTransport> _brokers;
-        private static readonly JsonSerializerSettings _jsSettings = new JsonSerializerSettings()
-        {
-            ObjectCreationHandling = ObjectCreationHandling.Replace,
-            TypeNameHandling = TypeNameHandling.All
-        };
 
         /// <summary>
         /// Instantiates a new <see cref="Messaging"/> object with <see cref="FileMessagingConfig"/>'s default constructor.
@@ -87,7 +82,7 @@ namespace Benner.Messaging
 
                     try
                     {
-                        deserialized = JsonConvert.DeserializeObject<T>(msg, _jsSettings);
+                        deserialized = Utils.DeserializeObject<T>(msg);
                         return true;
                     }
                     catch (Exception e)
@@ -160,7 +155,7 @@ namespace Benner.Messaging
         /// <exception cref="InvalidOperationException">Occurs when the connection to the server fails.</exception>
         public static void Enqueue(string queueName, object objMessage, IMessagingConfig config)
         {
-            Enqueue(queueName, JsonConvert.SerializeObject(objMessage, _jsSettings), config);
+            Enqueue(queueName, Utils.SerializeObject(objMessage), config);
         }
 
         /// <summary>
@@ -196,7 +191,7 @@ namespace Benner.Messaging
         /// <exception cref="InvalidOperationException">Occurs when the connection to the server fails.</exception>
         public void EnqueueMessage(string queueName, object objMessage)
         {
-            EnqueueMessage(queueName, JsonConvert.SerializeObject(objMessage, _jsSettings));
+            EnqueueMessage(queueName, Utils.SerializeObject(objMessage));
         }
 
         /// <summary>

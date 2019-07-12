@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Text;
 
 namespace Benner.Messaging
@@ -42,12 +43,10 @@ namespace Benner.Messaging
         /// </summary>
         /// <typeparam name="T">O tipo do objeto.</typeparam>
         /// <returns>Uma nova instancia do objeto desserializado.</returns>
+        /// <exception cref="InvalidCastException">Ocorre quando há algum tipo de erro na desserialização.</exception>
         public T GetMessage<T>()
         {
-            return JsonConvert.DeserializeObject<T>(AsString, new JsonSerializerSettings
-            {
-                ObjectCreationHandling = ObjectCreationHandling.Replace
-            });
+            return Utils.DeserializeObject<T>(AsString);
         }
     }
 }
