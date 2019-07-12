@@ -7,15 +7,19 @@ namespace producer
     {
         static void Main(string[] args)
         {
-            var config = MessagingConfigFactory
-                .NewMessagingConfigFactory()
-                .WithRabbitMQBroker("hostname", 5672, "user", "password")
+            var config = new MessagingConfigBuilder()
+                .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
                 .Create();
 
-            Messaging.Enqueue("queue-name", "hello world!", config);
+            // sample 01: enqueue single message
+            // Messaging.Enqueue("queue-name", "hello world!", config);
 
-            Console.WriteLine("press any key to exit");
-            Console.ReadKey();
+            // sample 02: enqueue many messages
+            using (var client = new Messaging(config))
+            {
+                for (int i = 1; i <= 1000; i++)
+                    client.EnqueueMessage("my-queue", "hello world #" + i);
+            }
         }
     }
 }
