@@ -12,30 +12,41 @@ namespace Benner.Messaging
         /// <summary>
         /// A mensagem em um <see cref="byte[]"/>.
         /// </summary>
-        public byte[] AsBytes { get; set; }
+        public byte[] AsBytes
+        {
+            get
+            {
+                if (_bytesMessage == null && _stringMessage == null)
+                    _bytesMessage = Encoding.UTF8.GetBytes(_stringMessage);
+                return _bytesMessage;
+            }
+        }
 
         /// <summary>
         /// A mensagem em <see cref="string"/>.
         /// </summary>
-        public string AsString { get; set; }
-
-        private MessagingArgs(byte[] rawMessage, string stringMessage)
+        public string AsString
         {
-            AsBytes = rawMessage;
-            AsString = stringMessage;
+            get
+            {
+                if (_stringMessage == null && _bytesMessage == null)
+                    _stringMessage = Encoding.UTF8.GetString(_bytesMessage);
+                return _stringMessage;
+            }
         }
+
+        private byte[] _bytesMessage;
+        private string _stringMessage;
 
         /// <summary>
         /// </summary>
         /// <param name="rawMessage">A mensagem em formato de <see cref="byte[]"/>.</param>
-        public MessagingArgs(byte[] rawMessage) : this(rawMessage, Encoding.UTF8.GetString(rawMessage))
-        { }
+        public MessagingArgs(byte[] rawMessage) => _bytesMessage = rawMessage;
 
         /// <summary>
         /// </summary>
-        /// <param name="stringMessage">A mensagem em <see cref="string"/>.</param>
-        public MessagingArgs(string stringMessage) : this(Encoding.UTF8.GetBytes(stringMessage), stringMessage)
-        { }
+        /// <param name="rawMessage">A mensagem em <see cref="string"/>.</param>
+        public MessagingArgs(string rawMessage) => _stringMessage = rawMessage;
 
         /// <summary>
         /// Desserializa a mensagem para o objeto do tipo informado.

@@ -5,13 +5,13 @@
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject></StartupObject>
-    <Version>0.0.2</Version>
+    <Version>0.0.4</Version>
     <AssemblyName>Benner.Messaging</AssemblyName>
     <Authors>Benner Sistemas</Authors>
     <Company>Benner Sistemas</Company>
     <Product>Benner Tecnologia</Product>
     <Copyright>Benner Sistemas</Copyright>
-    <Description>A lightweight messaging library for easily deal with any message broker, like RabbitMQ, ActiveMQ, AmazonSQS, AzureMQ, ...</Description>
+    <Description>A lightweight messaging library for easily deal with any message broker, like RabbitMQ, ActiveMQ, AmazonSQS, AzureQueue, ...</Description>
     <PackageProjectUrl>https://github.com/benner-sistemas/messaging</PackageProjectUrl>
     <RepositoryUrl>https://github.com/benner-sistemas/messaging</RepositoryUrl>
     <NeutralLanguage>en</NeutralLanguage>
@@ -22,25 +22,9 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>messaging
-messaging-library
-messaging-api
-message-queue
-message-broker
-message-broker-client
-queues
-rabbitmq
-rabbit-mq
-rabbitmq-producer
-rabbitmq-consumer
-activemq
-activemq-client
-activemq-server
-amazon-sqs
-azure-mq
-aws-sqs
-fifo-queue
-publisher-subscriber</PackageReleaseNotes>
+    <PackageReleaseNotes>Benner.Messaging is a .NET Standard lightweight messaging library to deal with any message broker with ease. Benner.Messaging supports RabbitMQ, ActiveMQ, Amazon SQS and Azure Queue. It is free and open-source under MIT License.
+
+Visit https://github.com/benner-sistemas/messaging for details</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
