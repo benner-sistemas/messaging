@@ -1,4 +1,5 @@
-﻿using Benner.Messaging.Interfaces;
+﻿using Benner.Messaging.Common;
+using Benner.Messaging.Interfaces;
 using System;
 using System.Collections.Generic;
 
@@ -25,7 +26,7 @@ namespace Benner.Messaging
             if (!string.IsNullOrWhiteSpace(informedPort))
             {
                 if (!int.TryParse(informedPort, out int port))
-                    throw new ArgumentException("Informed port is not valid.");
+                    throw new ArgumentException(string.Format(ErrorMessages.InvalidInformed, "port"));
                 Port = port;
             }
             else

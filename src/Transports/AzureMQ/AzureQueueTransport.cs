@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Storage;
+﻿using Benner.Messaging.Common;
+using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
 using System;
 using System.Collections.Generic;
@@ -26,8 +27,19 @@ namespace Benner.Messaging
         public override void EnqueueMessage(string queueName, string message)
         {
             CloudQueue queue = GetQueue(queueName);
-            var messageToSend = new CloudQueueMessage(message);
-            queue.AddMessage(messageToSend);
+            var msgToSend = new CloudQueueMessage(message);
+            try
+            {
+                queue.AddMessage(msgToSend);
+
+                //The CloudQueueMessage message passed in will be populated with the pop receipt, message ID, and the insertion/expiration time.
+                if (msgToSend.Id == null || msgToSend.InsertionTime == null || msgToSend.ExpirationTime == null || msgToSend.PopReceipt == null)
+                    throw new InvalidOperationException(ErrorMessages.EnqueueFailed);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException(ErrorMessages.EnqueueFailed, e);
+            }
         }
 
         private CloudQueue GetQueue(string queueName)
@@ -43,14 +55,14 @@ namespace Benner.Messaging
             }
             catch (StorageException e)
             {
-                throw new InvalidOperationException("Unable to connect to AzureQueue server", e);
+                throw new InvalidOperationException(string.Format(ErrorMessages.UnableToConnect, "AzureQueue"), e);
             }
         }
 
         public override void StartListening(string queueName, Func<MessagingArgs, bool> func)
         {
             if (_listeningTask != null)
-                throw new InvalidOperationException("There is already a listener being used in this context.");
+                throw new InvalidOperationException(ErrorMessages.AlreadyListening);
 
             CloudQueue queue = GetQueue(queueName);
             _listeningTask = new Task(() => Listener(queue, func), TaskCreationOptions.LongRunning);

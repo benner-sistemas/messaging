@@ -1,4 +1,5 @@
-﻿using Benner.Messaging.Interfaces;
+﻿using Benner.Messaging.Common;
+using Benner.Messaging.Interfaces;
 using System;
 using System.Collections.Generic;
 
@@ -33,10 +34,10 @@ namespace Benner.Messaging
         internal MessagingConfig(string defaultBrokerName, Type defaultBrokerConfigType, Dictionary<string, string> defaultBrokerSettings)
         {
             if (string.IsNullOrWhiteSpace(defaultBrokerName))
-                throw new ArgumentException("Default broker name must be informed.", nameof(defaultBrokerName));
+                throw new ArgumentException(string.Format(ErrorMessages.MustBeInformed, "Default broker name"), nameof(defaultBrokerName));
 
             if (defaultBrokerConfigType == null)
-                throw new ArgumentNullException(nameof(defaultBrokerConfigType), "The default broker's type must be informed.");
+                throw new ArgumentNullException(nameof(defaultBrokerConfigType), string.Format(ErrorMessages.MustBeInformed, "The default broker's type"));
 
             DefaultBrokerName = defaultBrokerName;
             SetBroker(defaultBrokerName, defaultBrokerConfigType, defaultBrokerSettings);
@@ -47,17 +48,17 @@ namespace Benner.Messaging
             if (string.IsNullOrWhiteSpace(brokerName))
                 throw new ArgumentException("Broker name cannot be empty.", nameof(brokerName));
 
-            _brokerConfigTypesByBrokerName[brokerName] = brokerConfigType ?? throw new ArgumentNullException(nameof(brokerConfigType), "Broker configuration type must be informed.");
-            _brokerSettingsByBrokerName[brokerName] = brokerSettings ?? throw new ArgumentNullException(nameof(brokerSettings), "Broker configuration settings must be informed.");
+            _brokerConfigTypesByBrokerName[brokerName] = brokerConfigType ?? throw new ArgumentNullException(nameof(brokerConfigType), string.Format(ErrorMessages.MustBeInformed, "Broker configuration type"));
+            _brokerSettingsByBrokerName[brokerName] = brokerSettings ?? throw new ArgumentNullException(nameof(brokerSettings), string.Format(ErrorMessages.MustBeInformed, "Broker configuration settings"));
         }
 
         internal void SetQueue(string queueName, string brokerName)
         {
             if (string.IsNullOrWhiteSpace(queueName))
-                throw new ArgumentException("Queue name must be informed.", nameof(queueName));
+                throw new ArgumentException(string.Format(ErrorMessages.MustBeInformed, "Queue name"), nameof(queueName));
 
             if (string.IsNullOrWhiteSpace(brokerName))
-                throw new ArgumentException("Broker name must be informed.", nameof(brokerName));
+                throw new ArgumentException(string.Format(ErrorMessages.MustBeInformed, "Broker name"), nameof(brokerName));
 
             Utils.ValidateQueueName(queueName, true);
             _brokerNameByQueue[queueName] = brokerName;
