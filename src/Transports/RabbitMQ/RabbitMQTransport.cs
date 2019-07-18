@@ -93,7 +93,6 @@ namespace Benner.Messaging
                     if (_publishChannel != null && _publishChannel.IsOpen)
                         return _publishChannel;
                     _publishChannel = GetConnection(type).CreateModel();
-                    _publishChannel.BasicQos(0, 1, false);
                     _publishChannel.ConfirmSelect();
                     return _publishChannel;
                 case ConectionType.Consume:

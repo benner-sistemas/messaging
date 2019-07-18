@@ -10,7 +10,7 @@ Até o momento a API possibilita o uso de 4 serviços diferentes, com as respectiv
 |--|--|
 |**ActiveMQ**|ActiveMQConfig|
 |**Amazon SQS**|AmazonSQSConfig|
-|**Azure Queue**|AzureMQConfig|
+|**Azure Queue**|AzureQueueConfig|
 |**RabbitMQ**|RabbitMQConfig|
 
 O atributo "type" do broker deve ser um nome de assembly completo, por exemplo *Benner.Messaging.ActiveMQConfig, Benner.Messaging*.
@@ -111,7 +111,7 @@ Existem algumas outras formas de estabelecer conexão, mas aqui visamos as duas f
 
 Quando usar as propriedades AccessKeyId e SecretAccessKey, é recomendado não utilizá-las por configuração em memória.
 
-### AzureMQConfig
+### AzureQueueConfig
 
 |Nome|Descrição|
 |--|--|

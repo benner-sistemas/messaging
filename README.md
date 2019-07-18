@@ -74,7 +74,7 @@ Well, you need a `messaging.config` file, like that (don't worry, we will get de
 <MessagingConfigSection>
    <!-- Benner.Messaging is multi broker, chose the default -->
    <brokerList default="RabbitMQ">
-      <broker name="AzureMQ" type="Benner.Messaging.AzureMQConfig, Benner.Messaging">
+      <broker name="AzureQueue" type="Benner.Messaging.AzureQueueConfig, Benner.Messaging">
          <add key="ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=accountName;AccountKey=accountKey;EndpointSuffix=core.windows.net" />
          <add key="InvisibilityTime" value="15" />
       </broker>

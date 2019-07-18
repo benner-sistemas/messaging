@@ -5,7 +5,7 @@
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject></StartupObject>
-    <Version>0.0.4</Version>
+    <Version>0.0.5</Version>
     <AssemblyName>Benner.Messaging</AssemblyName>
     <Authors>Benner Sistemas</Authors>
     <Company>Benner Sistemas</Company>
@@ -16,7 +16,7 @@
     <RepositoryUrl>https://github.com/benner-sistemas/messaging</RepositoryUrl>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageTags>messaging; message broker; broker; message; queue; topics; rabbit; rabbitmq; azuremq; activemq; amazonsqs; amazon sqs; aws sqs;</PackageTags>
+    <PackageTags>messaging; message broker; broker; message; queue; topics; rabbit; rabbitmq; azuremq; azurequeue; activemq; amazonsqs; amazon sqs; aws sqs;</PackageTags>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\key.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
