@@ -106,7 +106,7 @@ Well, you need a `messaging.config` file, like that (don't worry, we will get de
 You can also inject config through code:
 ```csharp
 var config = new MessagingConfigBuilder()
-    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .WithRabbitMQBroker("RabbitMQ", "servername", setAsDefault: true)
     .Create();
 
 Messaging.Enqueue("queue-name", "hello world!", config);
@@ -130,7 +130,7 @@ Now we are good to go! `dotnet run` it. No errors? Great! Now what?
 
 ### Check broker management console
 
-On your browser, access `http://bnu-vtec011:15672/#/queues` (user guest, password guest) to manage Rabbit and you'll be able to see your queue with your messages inside it.
+On your browser, access `http://servername:15672/#/queues` (user guest, password guest) to manage Rabbit and you'll be able to see your queue with your messages inside it.
 
 ### Receive message
 Create a new project:
@@ -150,7 +150,7 @@ Add _using_ and just receive a message from the queue, not forgeting configurati
 using Benner.Messaging;
 
 var config = new MessagingConfigBuilder()
-    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .WithRabbitMQBroker("RabbitMQ", "servername", setAsDefault: true)
     .Create();
 
 var message = Messaging.Dequeue("queue-name", config);
@@ -169,7 +169,7 @@ Change consumer code to:
 using Benner.Messaging;
 
 var config = new MessagingConfigBuilder()
-    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .WithRabbitMQBroker("RabbitMQ", "servername", setAsDefault: true)
     .Create();
 
 using (var client = new Messaging(config))
@@ -192,7 +192,7 @@ Change producer code to:
 using Benner.Messaging;
 
 var config = new MessagingConfigBuilder()
-    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .WithRabbitMQBroker("RabbitMQ", "servername", setAsDefault: true)
     .Create();
 
 // Create new instance of messaging

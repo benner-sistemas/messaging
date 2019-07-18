@@ -9,7 +9,7 @@ namespace consumer
         {
 
             var config = new MessagingConfigBuilder()
-                .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+                .WithRabbitMQBroker("RabbitMQ", "servername", setAsDefault: true)
                 .Create();
 
             // sample 01: dequeue single message

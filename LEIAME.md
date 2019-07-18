@@ -106,7 +106,7 @@ Você vai precisar de um arquivo `messaging.config` como a seguir:
 Você pode, como alternativa, injetar a configuração a partir de código:
 ```csharp
 var config = new MessagingConfigBuilder()
-    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .WithRabbitMQBroker("RabbitMQ", "servername", setAsDefault: true)
     .Create();
 
 Messaging.Enqueue("nome-da-fila", "olá mundo!", config);
@@ -130,7 +130,7 @@ Tudo pronto! Execute `dotnet run` novamente. Sem erros? Ótimo, e agora?
 
 ### Acesse o gerenciador do seu RabbitMQ
 
-Em seu navegador, acesse `http://bnu-vtec011:15672/#/queues` (usuário guest, senha guest) para gerenciar o serviço. Aqui você pode ver suas filas com suas mensagens dentro.
+Em seu navegador, acesse `http://servername:15672/#/queues` (usuário guest, senha guest) para gerenciar o serviço. Aqui você pode ver suas filas com suas mensagens dentro.
 
 ### Recebendo uma mensagem
 Crie um novo projeto:
@@ -150,7 +150,7 @@ Adicione _using_ e receba uma mensagem da fila, sem esquecer da configuração:
 using Benner.Messaging;
 
 var config = new MessagingConfigBuilder()
-    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .WithRabbitMQBroker("RabbitMQ", "servername", setAsDefault: true)
     .Create();
 
 var mensagem = Messaging.Dequeue("nome-da-fila", config);
@@ -169,7 +169,7 @@ Mude o código do consumidor para:
 using Benner.Messaging;
 
 var config = new MessagingConfigBuilder()
-    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .WithRabbitMQBroker("RabbitMQ", "servername", setAsDefault: true)
     .Create();
 
 using (var client = new Messaging(config))
@@ -192,7 +192,7 @@ Mude o código do produtor para:
 using Benner.Messaging;
 
 var config = new MessagingConfigBuilder()
-    .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+    .WithRabbitMQBroker("RabbitMQ", "servername", setAsDefault: true)
     .Create();
 
 // Create new instance of messaging

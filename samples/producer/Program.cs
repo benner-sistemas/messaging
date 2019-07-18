@@ -8,7 +8,7 @@ namespace producer
         static void Main(string[] args)
         {
             var config = new MessagingConfigBuilder()
-                .WithRabbitMQBroker("RabbitMQ", "bnu-vtec011", setAsDefault: true)
+                .WithRabbitMQBroker("RabbitMQ", "servername", setAsDefault: true)
                 .Create();
 
             // sample 01: enqueue single message
