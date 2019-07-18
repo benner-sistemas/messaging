@@ -1,5 +1,4 @@
-﻿using Benner.Messaging.Common;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using System;

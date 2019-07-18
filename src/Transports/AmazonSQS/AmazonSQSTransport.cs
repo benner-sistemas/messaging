@@ -1,7 +1,6 @@
 ﻿using Amazon;
 using Amazon.SQS;
 using Amazon.SQS.Model;
-using Benner.Messaging.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;

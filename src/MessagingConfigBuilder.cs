@@ -103,7 +103,13 @@ namespace Benner.Messaging
             return this;
         }
 
-        public MessagingConfig Create() => _config;
+        public MessagingConfig Create()
+        {
+            if (string.IsNullOrEmpty(_config.DefaultBrokerName))
+                throw new InvalidOperationException(ErrorMessages.DefaultBrokerNotFound);
+
+            return this._config;
+        }
 
         private Type GetBrokerConfigType(BrokerType brokerType)
         {

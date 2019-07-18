@@ -1,5 +1,4 @@
-﻿using Benner.Messaging.Common;
-using Microsoft.Azure.Storage;
+﻿using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
 using System;
 using System.Collections.Generic;

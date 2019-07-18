@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Benner.Messaging.Interfaces;
+using System;
 using System.Collections.Generic;
-using Benner.Messaging.Common;
-using Benner.Messaging.Interfaces;
 
 namespace Benner.Messaging
 {
