@@ -158,17 +158,24 @@ namespace Benner.Messaging
             _consumeConnection?.Dispose();
         }
 
-        public override string DequeueSingleMessage(string queueName)
+        public override void DequeueSingleMessage(string queueName, Func<string, bool> func)
         {
             var channel = GetChannel(ConectionType.Consume);
             EnsureQueueDeclared(channel, queueName);
 
-            var result = channel.BasicGet(queueName, true);
+            var result = channel.BasicGet(queueName, false);
             if (result == null)
-                return null;
+            {
+                func(null);
+                return;
+            }
 
-            channel.BasicAck(result.DeliveryTag, false);
-            return Encoding.UTF8.GetString(result.Body);
+            bool succeeded = func(Encoding.UTF8.GetString(result.Body));
+
+            if (succeeded)
+                channel.BasicAck(result.DeliveryTag, false);
+            else
+                channel.BasicNack(result.DeliveryTag, false, true);
         }
 
         ~RabbitMQTransport()

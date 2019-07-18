@@ -32,7 +32,7 @@ namespace Benner.Messaging
         /// Caso não existam mensagens na fila retorna <see cref="null"/>.
         /// Cada transporter espera um tempo configurado ou pré-determinado antes de retornar null.
         /// </returns>
-        public abstract string DequeueSingleMessage(string queueName);
+        public abstract void DequeueSingleMessage(string queueName, Func<string, bool> func);
 
         ~BrokerTransport()
         {

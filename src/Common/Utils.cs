@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -76,6 +77,38 @@ namespace Benner.Messaging
         {
             var value = GetValue(dictionary, key, isRequired);
             return string.IsNullOrWhiteSpace(value) ? defaultValue : value;
+        }
+
+        internal static T DeserializeObject<T>(string content)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(content, new JsonSerializerSettings
+                {
+                    ObjectCreationHandling = ObjectCreationHandling.Replace,
+                    TypeNameHandling = TypeNameHandling.All
+                });
+            }
+            catch (Exception e)
+            {
+                throw new InvalidCastException("Error parsing the object.", e);
+            }
+        }
+
+        internal static string SerializeObject(object obj)
+        {
+            try
+            {
+                return JsonConvert.SerializeObject(obj, new JsonSerializerSettings
+                {
+                    ObjectCreationHandling = ObjectCreationHandling.Replace,
+                    TypeNameHandling = TypeNameHandling.All
+                });
+            }
+            catch (Exception e)
+            {
+                throw new InvalidCastException("Error parsing the object.", e);
+            }
         }
     }
 }

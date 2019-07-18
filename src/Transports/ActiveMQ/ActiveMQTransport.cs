@@ -134,7 +134,7 @@ namespace Benner.Messaging
                 destino?.Dispose();
         }
 
-        public override string DequeueSingleMessage(string queueName)
+        public override void DequeueSingleMessage(string queueName, Func<string, bool> func)
         {
             var destination = GetDestinationForQueue(queueName);
 
@@ -142,9 +142,17 @@ namespace Benner.Messaging
             {
                 var message = consumer.Receive(TimeSpan.FromSeconds(1)) as ITextMessage;
                 if (message == null)
-                    return null;
-                message.Acknowledge();
-                return message.Text;
+                {
+                    func(null);
+                    return;
+                }
+
+                bool succeeded = func(message.Text);
+
+                if (succeeded)
+                    message.Acknowledge();
+                else
+                    _session.Recover();
             }
         }
 

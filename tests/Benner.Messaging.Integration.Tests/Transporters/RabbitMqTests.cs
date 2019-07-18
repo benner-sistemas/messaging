@@ -144,5 +144,30 @@ namespace Benner.Messaging.Tests.Transporters
             var single = Messaging.Dequeue($"fila-teste-rabbitmq-{Guid.NewGuid()}", new FileMessagingConfig(LoadFileConfig(Broker.RabbitMQ)));
             Assert.IsNull(single);
         }
+
+        [TestMethod]
+        public void RabbitMQ_deve_lancar_erro_ao_deserializar_messagem_de_tipos_diferentes()
+        {
+            var guid = Guid.NewGuid().ToString();
+            string queueName = $"fila-teste-rabbitmq-{guid}";
+            var config = new MessagingConfigBuilder("RabbitMQ", BrokerType.RabbitMQ, new Dictionary<string, string>()
+                {
+                    { "HostName", ServerName }
+                }).Create();
+
+            // garantir que a fila tem 0 mensagens
+            var vazia = Messaging.Dequeue(queueName, config);
+            Assert.IsNull(vazia);
+
+            // enviar um objeto Invoice
+            Messaging.Enqueue(queueName, _invoiceMessage, config);
+
+            // receber objeto convertendo pra AnotherClass
+            Assert.ThrowsException<InvalidCastException>(() => Messaging.Dequeue<AnotherClass>(queueName, config));
+
+            // garantir que ainda está na fila recebendo uma mensagem
+            var recebida = Messaging.Dequeue(queueName, config);
+            Assert.IsNotNull(recebida);
+        }
     }
 }

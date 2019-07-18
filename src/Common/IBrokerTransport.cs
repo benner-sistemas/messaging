@@ -29,6 +29,6 @@ namespace Benner.Messaging.Interfaces
         /// Caso não existam mensagens na fila retorna <see cref="null"/>.
         /// Cada transporter espera um tempo configurado ou pré-determinado antes de retornar null.
         /// </returns>
-        string DequeueSingleMessage(string queueName);
+        void DequeueSingleMessage(string queueName, Func<string, bool> func);
     }
 }

@@ -32,17 +32,21 @@ namespace Benner.Messaging.Tests
 
             NotifyConsumers();
         }
-        public override string DequeueSingleMessage(string queueName)
+
+        public override void DequeueSingleMessage(string queueName, Func<string, bool> func)
         {
             if (!QueueMock.Queues.ContainsKey(queueName))
-                return null;
+                func(null);
 
             if (QueueMock.Queues[queueName].Count == 0)
-                return null;
+                func(null);
 
             var messageValue = QueueMock.Queues[queueName].Dequeue();
 
-            return messageValue;
+            bool succeeded = func(messageValue);
+
+            if (!succeeded)
+                QueueMock.Queues[queueName].Enqueue(messageValue);
         }
 
         private void NotifyConsumers()

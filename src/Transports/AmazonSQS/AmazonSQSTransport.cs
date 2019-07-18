@@ -134,7 +134,7 @@ namespace Benner.Messaging
             return client.DeleteMessageAsync(deleteRequest).Result;
         }
 
-        public override string DequeueSingleMessage(string queueName)
+        public override void DequeueSingleMessage(string queueName, Func<string, bool> func)
         {
             var client = GetClient();
             var queueUrl = GetQueueUrl(queueName, client);
@@ -145,17 +145,28 @@ namespace Benner.Messaging
             };
             var receivedMsgResponse = client.ReceiveMessageAsync(receiveMessageRequest)?.Result;
             if (receivedMsgResponse == null || receivedMsgResponse.Messages.Count == 0)
-                return null;
+            {
+                func(null);
+                return;
+            }
 
             var receivedMessage = receivedMsgResponse.Messages.FirstOrDefault();
             if (receivedMessage == null)
-                return null;
+            {
+                func(null);
+                return;
+            }
 
-            var deleteResponse = DeleteMessage(queueUrl, client, receivedMessage.ReceiptHandle);
-            if (deleteResponse.HttpStatusCode != System.Net.HttpStatusCode.OK)
-                throw new InvalidOperationException("Failed to delete message from queue.");
+            bool succeeded = func(receivedMessage.Body);
 
-            return receivedMessage.Body;
+            if (succeeded)
+            {
+                var deleteResponse = DeleteMessage(queueUrl, client, receivedMessage.ReceiptHandle);
+                if (deleteResponse.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                    throw new InvalidOperationException("Failed to delete message from queue.");
+            }
+            else
+                client.ChangeMessageVisibilityAsync(queueUrl, receivedMessage.ReceiptHandle, 0).Wait();
         }
 
         public override void Dispose()
