@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Benner.Messaging.Common;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using System;
@@ -65,15 +66,22 @@ namespace Benner.Messaging
                     }
                     catch (BrokerUnreachableException e)
                     {
-                        throw new InvalidOperationException("Unable to connect to RabbitMQ server.", e);
+                        throw new InvalidOperationException(string.Format(ErrorMessages.UnableToConnect, "RabbitMQ"), e);
                     }
                 case ConectionType.Consume:
                     if (_consumeConnection != null && _consumeConnection.IsOpen)
                         return _consumeConnection;
-                    _consumeConnection = GetConnectionFactory().CreateConnection();
-                    return _consumeConnection;
+                    try
+                    {
+                        _consumeConnection = GetConnectionFactory().CreateConnection();
+                        return _consumeConnection;
+                    }
+                    catch (BrokerUnreachableException e)
+                    {
+                        throw new InvalidOperationException(string.Format(ErrorMessages.UnableToConnect, "RabbitMQ"), e);
+                    }
                 default:
-                    throw new ArgumentException("The connection type must be informed.");
+                    throw new ArgumentException(string.Format(ErrorMessages.MustBeInformed, "The connection type"));
             }
         }
 
@@ -86,6 +94,7 @@ namespace Benner.Messaging
                         return _publishChannel;
                     _publishChannel = GetConnection(type).CreateModel();
                     _publishChannel.BasicQos(0, 1, false);
+                    _publishChannel.ConfirmSelect();
                     return _publishChannel;
                 case ConectionType.Consume:
                     if (_consumeChannel != null && _consumeChannel.IsOpen)
@@ -94,7 +103,7 @@ namespace Benner.Messaging
                     _consumeChannel.BasicQos(0, 1, false);
                     return _consumeChannel;
                 default:
-                    throw new ArgumentException("The connection type must be informed.");
+                    throw new ArgumentException(string.Format(ErrorMessages.MustBeInformed, "The connection type"));
             }
         }
 
@@ -106,13 +115,25 @@ namespace Benner.Messaging
             var properties = channel.CreateBasicProperties();
             properties.Persistent = true;
 
-            channel.BasicPublish("", queueName, properties, Encoding.UTF8.GetBytes(message));
+            try
+            {
+                channel.BasicPublish("", queueName, properties, Encoding.UTF8.GetBytes(message));
+                channel.WaitForConfirmsOrDie();
+            }
+            catch (AlreadyClosedException e)
+            {
+                throw new InvalidOperationException(string.Format(ErrorMessages.UnableToConnect, "RabbitMQ") + "The connection to server closed in the process of sending the message.", e);
+            }
+            catch (OperationInterruptedException e)
+            {
+                throw new InvalidOperationException(ErrorMessages.EnqueueFailed, e);
+            }
         }
 
         public override void StartListening(string queueName, Func<MessagingArgs, bool> func)
         {
             if (_isListening)
-                throw new InvalidOperationException("There is already a listener being used in this context.");
+                throw new InvalidOperationException(ErrorMessages.AlreadyListening);
 
             var channel = GetChannel(ConectionType.Consume);
             EnsureQueueDeclared(channel, queueName);

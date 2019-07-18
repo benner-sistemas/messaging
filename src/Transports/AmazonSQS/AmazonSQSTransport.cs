@@ -1,6 +1,7 @@
 ﻿using Amazon;
 using Amazon.SQS;
 using Amazon.SQS.Model;
+using Benner.Messaging.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace Benner.Messaging
             }
             catch (Exception e)
             {
-                throw new AmazonSQSException("Unable to connect to AmazonSQS server", e);
+                throw new InvalidOperationException(string.Format(ErrorMessages.UnableToConnect, "AmazonSQS"), e);
             }
 
             return _client;
@@ -49,7 +50,17 @@ namespace Benner.Messaging
             IAmazonSQS client = GetClient();
             string queueUrl = GetQueueUrl(queueName, client);
             var sqsMessageRequest = new SendMessageRequest(queueUrl, message);
-            client.SendMessageAsync(sqsMessageRequest).Wait();
+            try
+            {
+                var messageResult = client.SendMessageAsync(sqsMessageRequest).Result;
+
+                if (messageResult.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                    throw new InvalidOperationException(ErrorMessages.EnqueueFailed);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException(ErrorMessages.EnqueueFailed, e);
+            }
         }
 
         /// <summary>
@@ -79,14 +90,14 @@ namespace Benner.Messaging
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Unable to connect to AmazonSQS server", e);
+                throw new InvalidOperationException(string.Format(ErrorMessages.UnableToConnect, "AmazonSQS"), e);
             }
         }
 
         public override void StartListening(string queueName, Func<MessagingArgs, bool> func)
         {
             if (_listeningTask != null)
-                throw new InvalidOperationException("There is already a listener being used in this context.");
+                throw new InvalidOperationException(ErrorMessages.AlreadyListening);
 
             string queueUrl = GetQueueUrl(queueName, GetClient());
             ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl)

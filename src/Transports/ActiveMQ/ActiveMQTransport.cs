@@ -1,4 +1,6 @@
 ﻿using Apache.NMS;
+using Apache.NMS.ActiveMQ.Commands;
+using Benner.Messaging.Common;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -33,14 +35,25 @@ namespace Benner.Messaging
             {
                 producer.DeliveryMode = MsgDeliveryMode.Persistent;
                 var request = session.CreateTextMessage(message);
-                producer.Send(request);
+
+                try
+                {
+                    producer.Send(request);
+                    var requestObj = request as ActiveMQMessage;
+                    if (requestObj.ProducerId == null && requestObj.Destination == null)
+                        throw new InvalidOperationException(ErrorMessages.EnqueueFailed);
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidOperationException(ErrorMessages.EnqueueFailed, e);
+                }
             }
         }
 
         public override void StartListening(string queueName, Func<MessagingArgs, bool> func)
         {
             if (_listeningTask != null)
-                throw new InvalidOperationException("There is already a listener being used in this context.");
+                throw new InvalidOperationException(ErrorMessages.AlreadyListening);
 
             var destination = GetDestinationForQueue(queueName);
             var consumer = GetSession().CreateConsumer(destination);
@@ -102,7 +115,7 @@ namespace Benner.Messaging
             }
             catch (NMSConnectionException e)
             {
-                throw new InvalidOperationException("Unable to connect to ActiveMQ server", e);
+                throw new InvalidOperationException(string.Format(ErrorMessages.UnableToConnect, "ActiveMQ"), e);
             }
         }
 
