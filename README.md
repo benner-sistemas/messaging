@@ -34,11 +34,11 @@ It's important to notice that Messaging API was born to work on a specific way:
 * First in, first out 
 * One producer sends
 * Only one consumer receives
-* If consumer fails at receiving or processing, the message returns to queue (***Work In Progress***)
-* The message will not be lost (***Work In Progress***)
+* If consumer fails at receiving or processing, the message returns to queue
+* The message will not be lost
 
 Enqueue and Dequeue operations were designed to ensure that a sent message by the _sender_ successfully arrives on the _receiver_. 
-That means that we pursuit _Publisher Confirms_ and _Consumer Acknoledgement_ approach across any supported broker. (***Work In Progress***)
+That means that we pursuit _Publisher Confirms_ and _Consumer Acknoledgement_ approach across any supported broker.
 
 ## Get Started
 

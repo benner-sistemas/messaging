@@ -34,11 +34,11 @@ Toda magia se baseia em configuração (de arquivo ou em código).
 * Primeiro a entrar, primeiro a sair
 * Um produtor envia
 * Apenas um consumidor recebe
-* Se o consumo falhar no recebimento ou processamento, a mensagem retorna para a fila (Em progresso)
-* A mensagem não será perdida (Em progresso)
+* Se o consumo falhar no recebimento ou processamento, a mensagem retorna para a fila
+* A mensagem não será perdida
 
 As operações de enfileirar e desenfileirar foram desenhadas para assegurar que uma mensagem enviada pelo _produtor_ chegue no _receptor_. 
-Isso significa que seguimos a abordagem "_Publicador confirma_" e "_Consumidor reconhece_" em todos os serviços suportados. (***MENTIRA?***)
+Isso significa que seguimos a abordagem "_Publicador confirma_" e "_Consumidor reconhece_" em todos os serviços suportados.
 
 ## Como começar
 
