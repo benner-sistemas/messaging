@@ -71,36 +71,24 @@ Messaging config not found
 
 Well, you need a `messaging.config` file, like that (don't worry, we will get deeper on configuration ahead):
 ```xml
-<MessagingConfigSection>
-   <!-- Benner.Messaging is multi broker, chose the default -->
-   <brokerList default="RabbitMQ">
-      <broker name="AzureQueue" type="Benner.Messaging.AzureQueueConfig, Benner.Messaging">
-         <add key="ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=accountName;AccountKey=accountKey;EndpointSuffix=core.windows.net" />
-         <add key="InvisibilityTime" value="15" />
-      </broker>
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <configSections>
+    <section name="MessagingConfigSection" type="Benner.Messaging.MessagingFileConfigSection, Benner.Messaging" />
+  </configSections>
+  <MessagingConfigSection>
+    <queues>
+      <queue name="teste" broker="RabbitMQ" />
+    </queues>
+    <brokerList default="RabbitMQ">
       <broker name="RabbitMQ" type="Benner.Messaging.RabbitMQConfig, Benner.Messaging">
-         <add key="Hostname" value="servername" />
-         <add key="Username" value="username" />
-         <add key="Password" value="password" />
-         <add key="Port" value="port" />
+        <add key="HostName" value="Servidor" />
+        <add key="UserName" value="Usuario" />
+        <add key="Password" value="Senha" />
       </broker>
-      <broker name="AmazonSQS" type="Benner.Messaging.AmazonSQSConfig, Benner.Messaging">
-         <add key="InvisibilityTime" value="15" />
-		 <add key="AccessKeyId" value="idChaveDeAcesso" />
-		 <add key="SecretAccessKey" value="chaveDeAcessoSecreta" />
-      </broker>
-      <broker name="ActiveMQ" type="Benner.Messaging.ActiveMQConfig, Benner.Messaging">
-         <add key="Hostname" value="servername" />
-         <add key="Username" value="username" />
-         <add key="Password" value="password" />
-         <add key="Port" value="port" />
-      </broker>
-   </brokerList>
-   <!-- specify only queues that should use other than default broker -->
-   <queues>
-      <queue name="queue-name" broker="broker-name" />
-   </queues>
-</MessagingConfigSection>
+    </brokerList>
+  </MessagingConfigSection>
+</configuration>
 ```
 
 You can also inject config through code:
