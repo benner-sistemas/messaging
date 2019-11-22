@@ -1,6 +1,6 @@
 ﻿using Benner.Messaging;
 
-namespace BennerProducer.Configuration
+namespace Benner.Messaging.Configuration
 {
     public class ConfigurationAzureQueue : IConfiguration
     {
@@ -11,13 +11,13 @@ namespace BennerProducer.Configuration
         {
             foreach (var arg in args)
             {
-                if (arg.ToLower().Contains("invisibilitytime"))
+                if (arg.ToLower().Contains("-invisibilitytime:"))
                 {
                     var parameter = arg.Split(':')[1];
 
                     int.TryParse(parameter, out invisibilityTime);
                 }
-                if (arg.ToLower().Contains("connectionstring"))
+                if (arg.ToLower().Contains("-connectionstring:"))
                 {
                     connectionString = arg.Split(':')[1];
                 }

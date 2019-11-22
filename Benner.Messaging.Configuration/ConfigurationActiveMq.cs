@@ -1,7 +1,7 @@
 ﻿using Benner.Messaging;
 using System;
 
-namespace BennerProducer.Configuration
+namespace Benner.Messaging.Configuration
 {
     public class ConfigurationActiveMq : IConfiguration
     {
@@ -14,20 +14,20 @@ namespace BennerProducer.Configuration
         {
             foreach (var arg in args)
             {
-                if (arg.ToLower().Contains("host") ||
-                    arg.ToLower().Contains("server"))
+                if (arg.ToLower().Contains("-host:") ||
+                    arg.ToLower().Contains("-server:"))
                 {
                     host = arg.Split(':')[1];
                 }
-                if (arg.ToLower().Contains("user"))
+                if (arg.ToLower().Contains("-user:"))
                 {
                     user = arg.Split(':')[1];
                 }
-                if (arg.ToLower().Contains("password"))
+                if (arg.ToLower().Contains("-password:"))
                 {
                     password = arg.Split(':')[1];
                 }
-                if (arg.ToLower().Contains("port"))
+                if (arg.ToLower().Contains("-port:"))
                 {
                     port = Convert.ToInt32(arg.Split(':')[1]);
                 }

@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Consumer.Full", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BennerProducer", "samples\BennerProducer\BennerProducer.csproj", "{C12D80F9-1E24-4EB4-AD73-843D73064BAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Messaging.Configuration", "Benner.Messaging.Configuration\Benner.Messaging.Configuration.csproj", "{01D5F7AF-470E-425B-88DA-B264B562F524}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{C12D80F9-1E24-4EB4-AD73-843D73064BAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C12D80F9-1E24-4EB4-AD73-843D73064BAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C12D80F9-1E24-4EB4-AD73-843D73064BAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01D5F7AF-470E-425B-88DA-B264B562F524}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01D5F7AF-470E-425B-88DA-B264B562F524}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01D5F7AF-470E-425B-88DA-B264B562F524}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01D5F7AF-470E-425B-88DA-B264B562F524}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

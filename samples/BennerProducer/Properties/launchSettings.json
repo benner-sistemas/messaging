@@ -19,7 +19,7 @@
     },
     "BennerProducer": {
       "commandName": "Project",
-      "commandLineArgs": "-server:bnu-vtec012 -port:5672 -broker:RabbitMQ",
+      "commandLineArgs": "-server:bnu-vtec012 -port:5672 -broker:RabbitMQ --urls=https://localhost:500",
       "launchUrl": "producer",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

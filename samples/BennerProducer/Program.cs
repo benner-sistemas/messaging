@@ -1,5 +1,5 @@
 ﻿using Benner.Messaging;
-using BennerProducer.Configuration;
+using Benner.Messaging.Configuration;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
@@ -15,9 +15,7 @@ namespace BennerProducer
 
         public static void Main(string[] args)
         {
-            IConfiguration brokerConfiguration = new ConfigurationFactory().GetConfiguration(args);
-            brokerConfiguration.Validation();
-            BrokerConnection = brokerConfiguration.Configuration();
+            BrokerConnection = BrokerConfiguration.SetConfiguration(args);
 
             CreateWebHostBuilder(args).Build().Run();
         }

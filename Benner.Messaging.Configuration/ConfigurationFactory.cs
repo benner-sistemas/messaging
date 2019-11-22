@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace BennerProducer.Configuration
+namespace Benner.Messaging.Configuration
 {
     public class ConfigurationFactory
     {
@@ -27,7 +27,7 @@ namespace BennerProducer.Configuration
 
         private BrokerType GetBrokerType(string[] args)
         {
-            var parameterBroker = args.FirstOrDefault(x => x.ToLower().Contains("broker"))?.Split(':');
+            var parameterBroker = args.FirstOrDefault(x => x.ToLower().Contains("-broker:"))?.Split(':');
 
             if (parameterBroker == null ||
                 parameterBroker.Count() < 2)
