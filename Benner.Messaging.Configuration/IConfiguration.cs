@@ -1,6 +1,6 @@
 ﻿using Benner.Messaging;
 
-namespace BennerProducer.Configuration
+namespace Benner.Messaging.Configuration
 {
     public interface IConfiguration
     {
