@@ -9,25 +9,28 @@ namespace Benner.Consumer.Core
         static int Main(string[] args)
         {
             var cliConfig = new CliConfiguration(args);
-            if (cliConfig.Exception != null)
+            try
             {
-                Console.WriteLine(cliConfig.Exception.Message);
-                return 1;
-            }
-            if (!string.IsNullOrWhiteSpace(cliConfig.Consumer) && cliConfig.Configuration != null)
-            {
-                var consumer = ConsumerUtil.CreateConsumerByName(cliConfig.Consumer);
-                if (consumer == null)
+                cliConfig.Execute();
+                if (!string.IsNullOrWhiteSpace(cliConfig.Consumer) && cliConfig.Configuration != null)
                 {
-                    Console.WriteLine($"Não foi encontrado uma classe '{cliConfig.Consumer}' em nenhum assembly.\n");
-                    return 1;
+                    var consumer = ConsumerUtil.CreateConsumerByName(cliConfig.Consumer);
+                    if (consumer == null)
+                    {
+                        Console.WriteLine($"Não foi encontrado uma classe '{cliConfig.Consumer}' em nenhum assembly.\r\n");
+                        return 1;
+                    }
+                    Console.WriteLine($"Classe '{cliConfig.Consumer}' encontrada. Criando um listener...\r\n");
+                    var listener = new EnterpriseIntegrationListener(cliConfig.Configuration, consumer);
+                    listener.Start();
+                    return 0;
                 }
-                Console.WriteLine($"Classe '{cliConfig.Consumer}' encontrada. Criando um listener...\n");
-                var listener = new EnterpriseIntegrationListener(cliConfig.Configuration, consumer);
-                listener.Start();
             }
-
-            return Convert.ToInt32(cliConfig.IsError);
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine("ERROR(S):\r\n " + e.Message);
+            }
+            return 1;
         }
     }
 }

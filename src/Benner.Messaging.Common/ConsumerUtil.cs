@@ -1,13 +1,12 @@
-﻿using Benner.Messaging.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Benner.Consumer.Core
+namespace Benner.Messaging.Common
 {
-    internal class ConsumerUtil
+    public class ConsumerUtil
     {
         private static string GetExecutingDirectoryName()
         {
@@ -21,7 +20,7 @@ namespace Benner.Consumer.Core
         /// </summary>
         /// <param name="fullName">O nome da classe completo. Ex: "Namespace.Namespace.NomeClasse".</param>
         /// <returns></returns>
-        internal static IEnterpriseIntegrationConsumer CreateConsumerByName(string fullName)
+        public static IEnterpriseIntegrationConsumer CreateConsumerByName(string fullName)
         {
             if (fullName == null)
                 return null;

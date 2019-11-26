@@ -1,5 +1,5 @@
-﻿using Benner.Messaging;
-using Benner.Messaging.Configuration;
+﻿using Benner.Messaging.Common;
+using Benner.Messaging.Interfaces;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
@@ -7,16 +7,14 @@ namespace BennerProducer
 {
     public class Program
     {
-        public static MessagingConfig BrokerConnection
-        {
-            get;
-            private set;
-        }
+        public static IMessagingConfig BrokerConnection { get; private set; }
 
         public static void Main(string[] args)
         {
-            BrokerConnection = BrokerConfiguration.SetConfiguration(args);
-
+            //BrokerConnection = BrokerConfiguration.SetConfiguration(args);
+            var cliConfig = new CliConfiguration(args);
+            cliConfig.Execute();
+            BrokerConnection = cliConfig.Configuration;
             CreateWebHostBuilder(args).Build().Run();
         }
 

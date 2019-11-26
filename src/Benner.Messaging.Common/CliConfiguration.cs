@@ -2,6 +2,7 @@
 using Benner.Messaging.Common.Verbs;
 using Benner.Messaging.Interfaces;
 using CommandLine;
+using CommandLine.Text;
 using System;
 using System.Collections.Generic;
 
@@ -10,29 +11,40 @@ namespace Benner.Messaging.Common
     public class CliConfiguration
     {
         public string Consumer { get; private set; }
-        public IMessagingConfig Configuration { get; private set; }
-        public bool IsError { get; private set; }
-        public Exception Exception { get; private set; }
 
-        public CliConfiguration(string[] args)
+        public IMessagingConfig Configuration { get; private set; }
+
+        private readonly string[] _args;
+
+        public CliConfiguration(string[] args) => _args = args;
+
+        public void Execute()
         {
-            Parser.Default.ParseVerbs(args, typeof(ListenVerb)).WithParsed(OnCommandExecute).WithNotParsed(OnError);
+            var parsed = Parser.Default.ParseVerbs(_args, typeof(ListenVerb));
+            parsed.WithParsed(OnCommandExecute);
+            parsed.WithNotParsed(errors => ThrowOnParseError(parsed, errors));
         }
 
-        private void OnError(IEnumerable<Error> obj) => IsError = true;
+        private void ThrowOnParseError<T>(ParserResult<T> result, IEnumerable<Error> errors)
+        {
+            var builder = SentenceBuilder.Create();
+            var errorMessages = HelpText.RenderParsingErrorsTextAsLines(result, builder.FormatError, builder.FormatMutuallyExclusiveSetErrors, 1);
+
+            throw new ArgumentException("Ocorreu um erro na conversão da linha de comando em configuração.\r\n" 
+                + string.Join("\r\n", errorMessages));
+        }
 
         private void OnCommandExecute(object arg)
         {
             try
             {
                 var result = (ListenVerb)arg;
-                Configuration = result.GetConfiguration();
                 Consumer = result.Consumer;
+                Configuration = result.GetConfiguration();
             }
-            catch (Exception e)
+            catch (ArgumentException e)
             {
-                IsError = true;
-                Exception = e;
+                throw new InvalidOperationException("Falha na validação de parâmetros", e);
             }
         }
     }
