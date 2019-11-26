@@ -1,4 +1,4 @@
-﻿namespace Benner.Listener
+﻿namespace Benner.Messaging.Common
 {
     public class EnterpriseIntegrationSettings : IEnterpriseIntegrationSettings
     {
@@ -8,5 +8,4 @@
 
         public long RetryIntervalInMilliseconds { get; set; }
     }
-
 }

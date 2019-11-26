@@ -1,4 +1,5 @@
 ﻿using Benner.Messaging;
+using Benner.Messaging.Common;
 using Benner.Messaging.Interfaces;
 using System;
 using System.Threading;
