@@ -12,6 +12,16 @@ namespace Benner.Consumer.Core
             try
             {
                 cliConfig.Execute();
+                if (!cliConfig.HasValidationError && cliConfig.Exception != null)
+                {
+                    Console.WriteLine("ERROR(S):\r\n " + cliConfig.Exception);
+                    return 1;
+                }
+                if (cliConfig.HasValidationError)
+                {
+                    Console.WriteLine("ERROR(S):\r\n " + cliConfig.Exception.Message);
+                    return 1;
+                }
                 if (!string.IsNullOrWhiteSpace(cliConfig.Consumer) && cliConfig.Configuration != null)
                 {
                     var consumer = ConsumerUtil.CreateConsumerByName(cliConfig.Consumer);
@@ -26,7 +36,7 @@ namespace Benner.Consumer.Core
                     return 0;
                 }
             }
-            catch (InvalidOperationException e)
+            catch (Exception e)
             {
                 Console.WriteLine("ERROR(S):\r\n " + e.Message);
             }

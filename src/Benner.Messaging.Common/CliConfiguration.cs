@@ -5,6 +5,7 @@ using CommandLine;
 using CommandLine.Text;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Benner.Messaging.Common
 {
@@ -14,6 +15,14 @@ namespace Benner.Messaging.Common
 
         public IMessagingConfig Configuration { get; private set; }
 
+        public bool HasValidationError { get; private set; }
+
+        public bool HasParseError { get; private set; }
+
+        public Exception Exception { get; private set; }
+
+        public AggregateException ParsingErrors { get; private set; }
+
         private readonly string[] _args;
 
         public CliConfiguration(string[] args) => _args = args;
@@ -21,20 +30,23 @@ namespace Benner.Messaging.Common
         public void Execute()
         {
             var parsed = Parser.Default.ParseVerbs(_args, typeof(ListenVerb));
-            parsed.WithParsed(OnCommandExecute);
-            parsed.WithNotParsed(errors => ThrowOnParseError(parsed, errors));
+            parsed.WithParsed(OnParseSuccess);
+            parsed.WithNotParsed(errors => OnParseError(parsed, errors));
         }
 
-        private void ThrowOnParseError<T>(ParserResult<T> result, IEnumerable<Error> errors)
+        private void OnParseError<T>(ParserResult<T> result, IEnumerable<Error> errors)
         {
             var builder = SentenceBuilder.Create();
             var errorMessages = HelpText.RenderParsingErrorsTextAsLines(result, builder.FormatError, builder.FormatMutuallyExclusiveSetErrors, 1);
 
-            throw new ArgumentException("Ocorreu um erro na conversão da linha de comando em configuração.\r\n" 
-                + string.Join("\r\n", errorMessages));
+            HasValidationError = false;
+            HasParseError = true;
+
+            var exceptions = errorMessages.Select(msg => new ArgumentException(msg));
+            ParsingErrors = new AggregateException("Ocorreu um erro na conversão da linha de comando em configuração.", exceptions);
         }
 
-        private void OnCommandExecute(object arg)
+        private void OnParseSuccess(object arg)
         {
             try
             {
@@ -44,7 +56,15 @@ namespace Benner.Messaging.Common
             }
             catch (ArgumentException e)
             {
-                throw new InvalidOperationException("Falha na validação de parâmetros", e);
+                HasValidationError = true;
+                HasParseError = false;
+                Exception = e;
+            }
+            catch (Exception e)
+            {
+                HasValidationError = false;
+                HasParseError = false;
+                Exception = e;
             }
         }
     }
