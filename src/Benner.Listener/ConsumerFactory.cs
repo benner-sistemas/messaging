@@ -4,9 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Benner.Messaging.Common
+namespace Benner.Listener
 {
-    public class ConsumerUtil
+    /// <summary>
+    /// Classe responsável por criar uma instância de <see cref="IEnterpriseIntegrationConsumer"/>
+    /// </summary>
+    public static class ConsumerFactory
     {
         private static string GetExecutingDirectoryName()
         {
@@ -19,8 +22,11 @@ namespace Benner.Messaging.Common
         /// Retorna null caso não seja encontrada uma classe.
         /// </summary>
         /// <param name="fullName">O nome da classe completo. Ex: "Namespace.Namespace.NomeClasse".</param>
-        /// <returns></returns>
-        public static IEnterpriseIntegrationConsumer CreateConsumerByName(string fullName)
+        /// <example>
+        /// Nome completo de classe = Entidades.Pessoa
+        /// Nome estilo assembly qualified = Entidades.Pessoa, Entidades
+        /// </example>
+        public static IEnterpriseIntegrationConsumer CreateConsumer(string fullName)
         {
             if (fullName == null)
                 return null;

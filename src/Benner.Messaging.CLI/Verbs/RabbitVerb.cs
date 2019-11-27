@@ -1,10 +1,10 @@
 ﻿using Benner.Messaging.Interfaces;
 using CommandLine;
 
-namespace Benner.Messaging.Common.Verbs
+namespace Benner.Messaging.CLI.Verbs
 {
-    [Verb("active", HelpText = "Iniciar um listener para ActiveMQ")]
-    public class ActiveVerb : ListenVerb
+    [Verb("rabbit", HelpText = "Iniciar um listener para RabbitMQ")]
+    public class RabbitVerb : ListenVerb
     {
         [Option('h', "hostName", HelpText = "O nome do host.", Required = true)]
         public string Host { get; set; }
@@ -26,7 +26,7 @@ namespace Benner.Messaging.Common.Verbs
             ValidateOption(nameof(Password), Password);
 
             return new MessagingConfigBuilder()
-                .WithActiveMQBroker("active", Host, port: Port, userName: User, password: Password, setAsDefault: true)
+                .WithRabbitMQBroker("rabbit", Host, port: Port, userName: User, password: Password, setAsDefault: true)
                 .Create();
         }
     }

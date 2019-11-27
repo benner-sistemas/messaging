@@ -1,7 +1,7 @@
 ﻿using Benner.Messaging.Interfaces;
 using CommandLine;
 
-namespace Benner.Messaging.Common.Verbs
+namespace Benner.Messaging.CLI.Verbs
 {
     [Verb("amazon", HelpText = "Iniciar um listener para Amazon SQS")]
     public class AmazonVerb : ListenVerb

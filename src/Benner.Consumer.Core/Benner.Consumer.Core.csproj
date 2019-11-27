@@ -10,8 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benner.Messaging.Common\Benner.Messaging.Common.csproj" />
     <ProjectReference Include="..\Benner.Listener\Benner.Listener.csproj" />
+    <ProjectReference Include="..\Benner.Messaging.CLI\Benner.Messaging.CLI.csproj" />
+    <ProjectReference Include="..\Benner.Messaging\Benner.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

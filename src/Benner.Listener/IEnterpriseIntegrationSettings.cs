@@ -1,4 +1,4 @@
-﻿namespace Benner.Messaging.Common
+﻿namespace Benner.Listener
 {
     public interface IEnterpriseIntegrationSettings
     {

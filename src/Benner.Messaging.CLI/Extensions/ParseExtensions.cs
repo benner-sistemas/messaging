@@ -1,11 +1,11 @@
-﻿using Benner.Messaging.Common.Attributes;
+﻿using Benner.Messaging.CLI.Attributes;
 using CommandLine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Benner.Messaging.Common.Extensions
+namespace Benner.Messaging.CLI.Extensions
 {
     public static class ParseExtensions
     {

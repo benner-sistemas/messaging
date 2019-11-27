@@ -1,9 +1,9 @@
-﻿using Benner.Messaging.Common.Attributes;
+﻿using Benner.Messaging.CLI.Attributes;
 using Benner.Messaging.Interfaces;
 using CommandLine;
 using System;
 
-namespace Benner.Messaging.Common.Verbs
+namespace Benner.Messaging.CLI.Verbs
 {
     [Verb("listen", HelpText = "Começa a escutar uma fila")]
     [SubVerbs(typeof(RabbitVerb), typeof(ActiveVerb), typeof(AmazonVerb), typeof(AzureVerb))]

@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benner.Messaging.Common\Benner.Messaging.Common.csproj" />
     <ProjectReference Include="..\Benner.Messaging\Benner.Messaging.csproj" />
   </ItemGroup>
 

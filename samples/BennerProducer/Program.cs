@@ -1,4 +1,4 @@
-﻿using Benner.Messaging.Common;
+﻿using Benner.Messaging.CLI;
 using Benner.Messaging.Interfaces;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;

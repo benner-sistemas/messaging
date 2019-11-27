@@ -1,7 +1,7 @@
 ﻿using Benner.Messaging.Interfaces;
 using CommandLine;
 
-namespace Benner.Messaging.Common.Verbs
+namespace Benner.Messaging.CLI.Verbs
 {
     [Verb("azure", HelpText = "Iniciar um listener para Azuere Queue")]
     public class AzureVerb : ListenVerb

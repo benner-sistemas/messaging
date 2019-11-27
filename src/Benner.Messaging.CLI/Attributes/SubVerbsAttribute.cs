@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Benner.Messaging.Common.Attributes
+namespace Benner.Messaging.CLI.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class SubVerbsAttribute : Attribute

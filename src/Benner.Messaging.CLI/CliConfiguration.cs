@@ -1,5 +1,5 @@
-﻿using Benner.Messaging.Common.Extensions;
-using Benner.Messaging.Common.Verbs;
+﻿using Benner.Messaging.CLI.Extensions;
+using Benner.Messaging.CLI.Verbs;
 using Benner.Messaging.Interfaces;
 using CommandLine;
 using CommandLine.Text;
@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Benner.Messaging.Common
+namespace Benner.Messaging.CLI
 {
     public class CliConfiguration
     {
