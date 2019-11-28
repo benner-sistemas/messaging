@@ -11,7 +11,8 @@ namespace Benner.Messaging.CLI.Verbs
 
         public override IMessagingConfig GetConfiguration()
         {
-            ValidateOption(nameof(InvisibilityTime), InvisibilityTime);
+            ValidateOption("-n/--consumerName", Consumer);
+            ValidateOption("-i/--invisibilityTime", InvisibilityTime);
 
             return new MessagingConfigBuilder()
                 .WithAmazonSQSBroker("amazon", invisibilityTime: InvisibilityTime, setAsDefault: true)

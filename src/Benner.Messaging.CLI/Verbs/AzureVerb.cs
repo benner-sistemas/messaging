@@ -14,8 +14,9 @@ namespace Benner.Messaging.CLI.Verbs
 
         public override IMessagingConfig GetConfiguration()
         {
-            ValidateOption(nameof(ConnectionString), ConnectionString);
-            ValidateOption(nameof(InvisibilityTime), InvisibilityTime);
+            ValidateOption("-n/--consumerName", Consumer);
+            ValidateOption("-i/--invisibilityTime", InvisibilityTime);
+            ValidateOption("-c/--connectionString", ConnectionString);
 
             return new MessagingConfigBuilder()
                 .WithAzureQueueBroker("azure", ConnectionString, InvisibilityTime, setAsDefault: true)
