@@ -6,7 +6,7 @@ using System;
 namespace Benner.Messaging.CLI.Verbs
 {
     [Verb("listen", HelpText = "Começa a escutar uma fila")]
-    [SubVerbs(typeof(RabbitVerb), typeof(ActiveVerb), typeof(AmazonVerb), typeof(AzureVerb))]
+    [SubVerbs(typeof(ActiveVerb), typeof(AmazonVerb), typeof(AzureVerb), typeof(RabbitVerb))]
     public abstract class ListenVerb
     {
         [Option('n', "consumerName", HelpText = "O nome completo da classe Consumer que será utilizada. 'Namespace1.Namespace2.Classe'.", Required = true)]

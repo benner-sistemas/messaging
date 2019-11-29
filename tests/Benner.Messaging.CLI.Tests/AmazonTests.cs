@@ -47,12 +47,15 @@ namespace Benner.Messaging.CLI.Tests
             {
                new string[] { "listen", "amazon", "-i", "666", "-n", " " },
                new string[] { "listen", "amazon", "-i", "-1", "-n", "consumer" },
+               new string[] { "listen", "amazon", "-i", "666", "-n", "consumer", "-a", "accessKeyId" },
+               new string[] { "listen", "amazon", "-i", "666", "-n", "consumer", "-s", "secretAccessKey"},
             };
 
             string[] expectedMsgs =
             {
                 "O parâmetro '-n/--consumerName' deve ser informado.",
-                "O parâmetro '-i/--invisibilityTime' deve ser maior que 0."
+                "O parâmetro '-i/--invisibilityTime' deve ser maior que 0.",
+                "O parâmetro 'accessKeyId' ou 'secretAccessKey' são obrigatórios caso um deles seja informado."
             };
 
             foreach (string[] args in argsList)
@@ -60,7 +63,7 @@ namespace Benner.Messaging.CLI.Tests
         }
 
         [TestMethod]
-        public void ListenAmazonDeveRetornarConfiguracaoValida()
+        public void ListenAmazonDeveRetornarConfiguracaoValida_Sem_ParametrosOpcionais()
         {
             var originalInvTime = 666;
             var args = new string[] { "listen", "amazon", "-i", originalInvTime.ToString(), "-n", "Namespace.Classe" };
@@ -69,19 +72,35 @@ namespace Benner.Messaging.CLI.Tests
             cliConfig.Execute();
 
             var config = cliConfig.Configuration;
-            // O amazon precisa de configurações que só são suportadas por arquivo e não pela classe builder
-            // Aqui será injetado o necessário via reflection para finalizar o teste de Assert
-            var configType = typeof(MessagingConfig);
-            FieldInfo settingsField = configType.GetField("_brokerSettingsByBrokerName", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.IgnoreCase);
-            var settingsDic = (Dictionary<string, Dictionary<string, string>>)settingsField.GetValue(config);
-            settingsDic["amazon"].Add("AccessKeyId", "AccessKeyIdValue");
-            settingsDic["amazon"].Add("SecretAccessKey", "SecretAccessKeyValue");
-            //
 
             var brokerConfig = config.GetConfigForQueue("amazon");
             int invisibilityTime = GetPropertyFromType<int>("InvisibilityTimeInMinutes", brokerConfig);
 
             Assert.AreEqual(originalInvTime, invisibilityTime);
+        }
+
+        [TestMethod]
+        public void ListenAmazonDeveRetornarConfiguracaoValida_Com_ParametrosOpcionais()
+        {
+            var originalInvTime = 666;
+            var originalAccessKeyId = "AccessKeyIdValue";
+            var originalSecretAccessKey = "SecretAccessKeyValue";
+            var args = new string[] { "listen", "amazon", "-i", originalInvTime.ToString(), "-n", "Namespace.Classe",
+                "-a", originalAccessKeyId, "-s", originalSecretAccessKey };
+
+            var cliConfig = new CliConfiguration(args);
+            cliConfig.Execute();
+
+            var config = cliConfig.Configuration;
+
+            var brokerConfig = config.GetConfigForQueue("amazon");
+            int invisibilityTime = GetPropertyFromType<int>("InvisibilityTimeInMinutes", brokerConfig);
+            string accessKeyId = GetPropertyFromType<string>("AccessKeyId", brokerConfig);
+            string secretAccessKey = GetPropertyFromType<string>("SecretAccessKey", brokerConfig);
+
+            Assert.AreEqual(originalInvTime, invisibilityTime);
+            Assert.AreEqual(originalAccessKeyId, accessKeyId);
+            Assert.AreEqual(originalSecretAccessKey, secretAccessKey);
         }
     }
 }

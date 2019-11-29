@@ -9,7 +9,7 @@ namespace Benner.Messaging.CLI.Verbs
         [Option('c', "connectionString", HelpText = "A string de conexão com o serviço Azure.", Required = true)]
         public string ConnectionString { get; set; }
 
-        [Option('i', "invisibilityTime", HelpText = "O tempo que a mensagem permanecerá invisível para outras filas.", Required = true)]
+        [Option('i', "invisibilityTime", HelpText = "O tempo que a mensagem permanecerá invisível para outras filas, em segundos.", Required = true)]
         public int InvisibilityTime { get; set; }
 
         public override IMessagingConfig GetConfiguration()
