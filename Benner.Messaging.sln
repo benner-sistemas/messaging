@@ -33,9 +33,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BennerProducer", "samples\B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Consumer.Core", "src\Benner.Consumer.Core\Benner.Consumer.Core.csproj", "{4D3F0540-E5F6-4AB1-AA52-2A672A153FEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Messaging.CLI", "src\Benner.Messaging.CLI\Benner.Messaging.CLI.csproj", "{3F46B7FB-9DBC-4F1F-B61C-C25D734757CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.CLI", "src\Benner.Messaging.CLI\Benner.Messaging.CLI.csproj", "{3F46B7FB-9DBC-4F1F-B61C-C25D734757CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Messaging.CLI.Tests", "tests\Benner.Messaging.CLI.Tests\Benner.Messaging.CLI.Tests.csproj", "{BE64DE19-9DC3-4449-90C1-C0C50D051225}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.CLI.Tests", "tests\Benner.Messaging.CLI.Tests\Benner.Messaging.CLI.Tests.csproj", "{BE64DE19-9DC3-4449-90C1-C0C50D051225}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Producer", "Benner.Producer\Benner.Producer.csproj", "{2CC30128-CE9B-47ED-959C-746FB4F02117}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Producer.Integration.Tests", "tests\Benner.Producer.Integration.Tests\Benner.Producer.Integration.Tests.csproj", "{1B762F53-0BD3-4787-9BAA-B8377A26F666}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.ERP.API", "Benner.ERP.API\Benner.ERP.API.csproj", "{30695CE3-134F-41AD-8AAB-A247D151B04D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +91,18 @@ Global
 		{BE64DE19-9DC3-4449-90C1-C0C50D051225}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE64DE19-9DC3-4449-90C1-C0C50D051225}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE64DE19-9DC3-4449-90C1-C0C50D051225}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CC30128-CE9B-47ED-959C-746FB4F02117}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CC30128-CE9B-47ED-959C-746FB4F02117}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CC30128-CE9B-47ED-959C-746FB4F02117}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CC30128-CE9B-47ED-959C-746FB4F02117}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B762F53-0BD3-4787-9BAA-B8377A26F666}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B762F53-0BD3-4787-9BAA-B8377A26F666}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B762F53-0BD3-4787-9BAA-B8377A26F666}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B762F53-0BD3-4787-9BAA-B8377A26F666}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30695CE3-134F-41AD-8AAB-A247D151B04D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30695CE3-134F-41AD-8AAB-A247D151B04D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30695CE3-134F-41AD-8AAB-A247D151B04D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30695CE3-134F-41AD-8AAB-A247D151B04D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,6 +114,7 @@ Global
 		{F5A1B602-02CE-4047-986F-74A633FA1751} = {97839F13-D676-4324-941A-16FD5151B2F2}
 		{C12D80F9-1E24-4EB4-AD73-843D73064BAB} = {97839F13-D676-4324-941A-16FD5151B2F2}
 		{BE64DE19-9DC3-4449-90C1-C0C50D051225} = {E7BA2632-92C4-423D-83A1-E65694FD082B}
+		{1B762F53-0BD3-4787-9BAA-B8377A26F666} = {E7BA2632-92C4-423D-83A1-E65694FD082B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E33B176C-4421-406A-A00A-0FCB277089B1}
