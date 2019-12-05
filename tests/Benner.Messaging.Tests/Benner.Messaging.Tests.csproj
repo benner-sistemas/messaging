@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Benner.Listener\Benner.Listener.csproj" />
     <ProjectReference Include="..\..\src\Benner.Messaging\Benner.Messaging.csproj" />
   </ItemGroup>
 

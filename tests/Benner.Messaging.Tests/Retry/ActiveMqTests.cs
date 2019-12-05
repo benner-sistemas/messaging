@@ -2,11 +2,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Benner.Messaging;
 using System.Collections.Generic;
-using Benner.Retry.Tests.MockMQ;
 using System.Threading;
 using Apache.NMS;
 using System.Collections;
 using Apache.NMS.ActiveMQ;
+using Benner.Retry.Tests.MockMQ;
 
 namespace Benner.Messaging.Retry.Tests
 {
