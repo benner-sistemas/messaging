@@ -41,5 +41,5 @@ steps:
     command: test
     projects: |
       '**/*Tests.csproj' 
-      '!**/*.Integration.Tests.csproj'
+      '**/!*.Integration.Tests.csproj'
     arguments: '--configuration Release'
