@@ -35,13 +35,11 @@ steps:
 #    platform: '$(buildPlatform)'
 #    configuration: '$(buildConfiguration)'
 
-- pwsh: 'gci -Recurse'
-
 - task: DotNetCoreCLI@2
   displayName: Running unit tests
   inputs:
     command: test
     projects: |
-      '**/Benner.Messaging.CLI.Tests.csproj' 
-      '**/Benner.Messaging.Tests.csproj'
+      '**/tests/*/Benner.Messaging.CLI.Tests.csproj' 
+      '**/tests/*/Benner.Messaging.Tests.csproj'
     arguments: '--configuration Release'
