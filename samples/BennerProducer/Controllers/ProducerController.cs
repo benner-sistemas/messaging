@@ -13,7 +13,7 @@ namespace BennerProducer.Controllers
         [Route("adicionarMensagemFerias")]
         public void AdicionarMensagemFerias(string mensagem)
         {
-            var teste = EnterpriseIntegrationMessage.Create(mensagem);
+            var teste = EnterpriseIntegrationMessage.Create(null);
 
             Messaging.Enqueue("mensagemFerias", teste, Program.BrokerConnection);
         }

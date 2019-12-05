@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Benner.Messaging
@@ -17,12 +18,12 @@ namespace Benner.Messaging
 
         public List<Exception> ExceptionList { get; set; }
 
-        public static EnterpriseIntegrationMessage Create(string message)
+        public static EnterpriseIntegrationMessage Create(IEnterpriseIntegrationResquest resquest)
         {
             return new EnterpriseIntegrationMessage()
             {
-                Body = message,
-                MessageID = Guid.NewGuid().ToString()
+                Body = JsonConvert.SerializeObject(resquest),
+                MessageID = resquest.RequestID.ToString(),
             };
         }
     }
