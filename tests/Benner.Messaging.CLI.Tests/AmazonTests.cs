@@ -63,24 +63,7 @@ namespace Benner.Messaging.CLI.Tests
         }
 
         [TestMethod]
-        public void ListenAmazonDeveRetornarConfiguracaoValida_Sem_ParametrosOpcionais()
-        {
-            var originalInvTime = 666;
-            var args = new string[] { "listen", "amazon", "-i", originalInvTime.ToString(), "-n", "Namespace.Classe" };
-
-            var cliConfig = new CliConfiguration(args);
-            cliConfig.Execute();
-
-            var config = cliConfig.Configuration;
-
-            var brokerConfig = config.GetConfigForQueue("amazon");
-            int invisibilityTime = GetPropertyFromType<int>("InvisibilityTimeInMinutes", brokerConfig);
-
-            Assert.AreEqual(originalInvTime, invisibilityTime);
-        }
-
-        [TestMethod]
-        public void ListenAmazonDeveRetornarConfiguracaoValida_Com_ParametrosOpcionais()
+        public void ListenAmazonDeveRetornarConfiguracaoValida()
         {
             var originalInvTime = 666;
             var originalAccessKeyId = "AccessKeyIdValue";
