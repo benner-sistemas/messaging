@@ -30,16 +30,15 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-#- task: VSTest@2
-#  inputs:
-#    platform: '$(buildPlatform)'
-#    configuration: '$(buildConfiguration)'
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: Running unit tests
   inputs:
     command: test
     projects: |
-      '**/tests/*/Benner*Tests.csproj' 
-      '!**/tests/*/Benner*Integration.Tests.csproj'
+      '**/*Tests.csproj'
     arguments: '--configuration Release'
