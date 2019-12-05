@@ -1,21 +1,19 @@
 ﻿using Benner.ERP.API.Models;
+using Benner.Messaging;
+using Benner.Messaging.Core;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Diagnostics;
 
 namespace Benner.ERP.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PessoasController : ControllerBase
+    public class PessoasController : MessagingController
     {
         // POST api/pessoas
         [HttpPost]
-        public void Post([FromBody] PessoaRequest value)
+        public ActionResult<IEnterpriseIntegrationResponse> Post([FromBody] PessoaRequest request)
         {
-            Debugger.Launch();
-            Debugger.Break();
-            Console.WriteLine(value);
+            return base.Enqueue(request as IEnterpriseIntegrationResquest);
         }
     }
 }

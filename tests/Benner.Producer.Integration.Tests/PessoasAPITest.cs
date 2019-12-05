@@ -58,16 +58,6 @@ namespace Benner.Producer.Integration.Tests
 
             // Assert
             response.EnsureSuccessStatusCode();
-
-            //// Arrange
-            //var request = new HttpRequestMessage(new HttpMethod(method), "/api/pessoas/");
-            //
-            //// Act
-            //var response = await _client.SendAsync(request);
-            //
-            //// Assert
-            //response.EnsureSuccessStatusCode();
-            //Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
     }
 }

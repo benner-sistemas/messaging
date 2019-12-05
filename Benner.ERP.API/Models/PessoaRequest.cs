@@ -3,14 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using Benner.Messaging;
 
 namespace Benner.ERP.API.Models
 {
-    public interface IEnterpriseIntegrationResquest
-    {
-        Guid? RequestID { get; set; }
-    }
-
     public class PessoaRequest : IEnterpriseIntegrationResquest
     {
         [Key]
