@@ -37,7 +37,7 @@ namespace Benner.Messaging.Core
 
             var response = new EnterpriseIntegrationResponse
             {
-                MessgeID = new Guid(message.MessageID),
+                MessageID = new Guid(message.MessageID),
                 QueueName = QueueName,
                 CreatedAt = DateTime.Now,
             };

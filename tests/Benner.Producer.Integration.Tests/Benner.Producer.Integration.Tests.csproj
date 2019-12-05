@@ -21,4 +21,10 @@
     <ProjectReference Include="..\..\Benner.Producer\Benner.Producer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="messaging.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
