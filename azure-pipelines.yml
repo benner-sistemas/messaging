@@ -40,6 +40,6 @@ steps:
   inputs:
     command: test
     projects: |
-      '**/tests/*/Benner.Messaging.CLI.Tests.csproj' 
-      '**/tests/*/Benner.Messaging.Tests.csproj'
+      '**/tests/*/Benner*Tests.csproj' 
+      '!**/tests/*/Benner*Integration.Tests.csproj'
     arguments: '--configuration Release'
