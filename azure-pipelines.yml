@@ -39,7 +39,5 @@ steps:
   displayName: Running unit tests
   inputs:
     command: test
-    projects: 
-      '**\Benner.Messaging.CLI.Tests.csproj'
-      '**\Benner.Messaging.Tests.csproj'
+    projects: '**/*Tests.csproj'
     arguments: '--configuration Release'
