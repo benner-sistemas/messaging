@@ -48,7 +48,10 @@ namespace Benner.Messaging
                 throw new ArgumentException("Broker name cannot be empty.", nameof(brokerName));
 
             _brokerConfigTypesByBrokerName[brokerName] = brokerConfigType ?? throw new ArgumentNullException(nameof(brokerConfigType), string.Format(ErrorMessages.MustBeInformed, "Broker configuration type"));
-            _brokerSettingsByBrokerName[brokerName] = brokerSettings ?? throw new ArgumentNullException(nameof(brokerSettings), string.Format(ErrorMessages.MustBeInformed, "Broker configuration settings"));
+            if (brokerSettings == null)
+                throw new ArgumentNullException(nameof(brokerSettings), string.Format(ErrorMessages.MustBeInformed, "Broker configuration settings"));
+
+            _brokerSettingsByBrokerName[brokerName] = new Dictionary<string, string>(brokerSettings, StringComparer.OrdinalIgnoreCase);
         }
 
         internal void SetQueue(string queueName, string brokerName)

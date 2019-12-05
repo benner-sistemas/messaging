@@ -29,12 +29,21 @@ namespace Benner.Messaging.CLI
 
         public void Execute()
         {
-            var parsed = Parser.Default.ParseVerbs(_args, typeof(ListenVerb));
-            parsed.WithParsed(OnParseSuccess);
-            parsed.WithNotParsed(errors => OnParseError(parsed, errors));
+            try
+            {
+                var parsed = Parser.Default.ParseVerbs(_args, typeof(ListenVerb));
+                parsed.WithParsed(OnParseSuccess);
+                parsed.WithNotParsed(errors => OnParseError(parsed));
+            }
+            catch (Exception e)
+            {
+                HasParseError = true;
+                HasValidationError = false;
+                ParsingErrors = new AggregateException("Comando não encontrado.", e);
+            }
         }
 
-        private void OnParseError<T>(ParserResult<T> result, IEnumerable<Error> errors)
+        private void OnParseError<T>(ParserResult<T> result)
         {
             var builder = SentenceBuilder.Create();
             var errorMessages = HelpText.RenderParsingErrorsTextAsLines(result, builder.FormatError, builder.FormatMutuallyExclusiveSetErrors, 1);

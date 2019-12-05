@@ -20,10 +20,11 @@ namespace Benner.Messaging.CLI.Verbs
 
         public override IMessagingConfig GetConfiguration()
         {
-            ValidateOption(nameof(Host), Host);
-            ValidateOption(nameof(Port), Port);
-            ValidateOption(nameof(User), User);
-            ValidateOption(nameof(Password), Password);
+            ValidateOption("-n/--consumerName", Consumer);
+            ValidateOption("-h/--hostName", Host);
+            ValidateOption("--port", Port);
+            ValidateOption("-u/--user", User);
+            ValidateOption("-p/--password", Password);
 
             return new MessagingConfigBuilder()
                 .WithActiveMQBroker("active", Host, port: Port, userName: User, password: Password, setAsDefault: true)

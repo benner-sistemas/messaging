@@ -6,7 +6,7 @@ using System;
 namespace Benner.Messaging.CLI.Verbs
 {
     [Verb("listen", HelpText = "Começa a escutar uma fila")]
-    [SubVerbs(typeof(RabbitVerb), typeof(ActiveVerb), typeof(AmazonVerb), typeof(AzureVerb))]
+    [SubVerbs(typeof(ActiveVerb), typeof(AmazonVerb), typeof(AzureVerb), typeof(RabbitVerb))]
     public abstract class ListenVerb
     {
         [Option('n', "consumerName", HelpText = "O nome completo da classe Consumer que será utilizada. 'Namespace1.Namespace2.Classe'.", Required = true)]
@@ -17,10 +17,10 @@ namespace Benner.Messaging.CLI.Verbs
         protected void ValidateOption(string parName, object value)
         {
             if (value is string valor && string.IsNullOrWhiteSpace(valor))
-                throw new ArgumentException($"O parâmetro {parName} deve ser informado.");
+                throw new ArgumentException($"O parâmetro '{parName}' deve ser informado.");
 
             if (value is int num && num <= 0)
-                throw new ArgumentException($"O parâmetro {parName} deve ser maior que 0.");
+                throw new ArgumentException($"O parâmetro '{parName}' deve ser maior que 0.");
         }
     }
 }

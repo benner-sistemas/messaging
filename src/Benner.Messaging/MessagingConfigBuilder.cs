@@ -48,9 +48,24 @@ namespace Benner.Messaging
             return WithBroker(brokerName, BrokerType.AmazonSQS,
                 new Dictionary<string, string>
                 {
-                    { "InvisibilityTime", invisibilityTime.ToString()}
+                    { "InvisibilityTime", invisibilityTime.ToString() }
                 },
                 setAsDefault);
+        }
+
+        /// <summary>
+        /// Sets an AmazonSQS broker in the in-memory configuration.
+        /// </summary>
+        public MessagingConfigBuilder WithAmazonSQSBroker(string brokerName, int invisibilityTime, string accessKeyId, string secretAccessKey, bool setAsDefault = false)
+        {
+            return WithBroker(brokerName, BrokerType.AmazonSQS,
+              new Dictionary<string, string>
+              {
+                    { "InvisibilityTime", invisibilityTime.ToString() },
+                    { "AccessKeyId", accessKeyId },
+                    { "SecretAccessKey", secretAccessKey }
+              },
+              setAsDefault);
         }
 
         /// <summary>

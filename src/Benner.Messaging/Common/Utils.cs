@@ -57,7 +57,7 @@ namespace Benner.Messaging
             {
                 if (containsKey)
                     return value;
-                throw new ArgumentException($"Valor de {key} é obrigatório para a configuração do RabbitMQ");
+                throw new ArgumentException($"The parameter '{key}' is mandatory for the broker configuration.");
             }
             else
                 return value ?? "";

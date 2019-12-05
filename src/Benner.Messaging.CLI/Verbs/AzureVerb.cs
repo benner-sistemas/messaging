@@ -9,13 +9,14 @@ namespace Benner.Messaging.CLI.Verbs
         [Option('c', "connectionString", HelpText = "A string de conexão com o serviço Azure.", Required = true)]
         public string ConnectionString { get; set; }
 
-        [Option('i', "invisibilityTime", HelpText = "O tempo que a mensagem permanecerá invisível para outras filas.", Required = true)]
+        [Option('i', "invisibilityTime", HelpText = "O tempo que a mensagem permanecerá invisível para outras filas, em segundos.", Required = true)]
         public int InvisibilityTime { get; set; }
 
         public override IMessagingConfig GetConfiguration()
         {
-            ValidateOption(nameof(ConnectionString), ConnectionString);
-            ValidateOption(nameof(InvisibilityTime), InvisibilityTime);
+            ValidateOption("-n/--consumerName", Consumer);
+            ValidateOption("-i/--invisibilityTime", InvisibilityTime);
+            ValidateOption("-c/--connectionString", ConnectionString);
 
             return new MessagingConfigBuilder()
                 .WithAzureQueueBroker("azure", ConnectionString, InvisibilityTime, setAsDefault: true)
