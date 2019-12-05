@@ -77,7 +77,7 @@ namespace Benner.Messaging
                 new Dictionary<string, string>
                 {
                     { "InvisibilityTime", invisibilityTime.ToString()},
-                    {"ConnectionString", connectionString}
+                    { "ConnectionString", connectionString}
                 },
                 setAsDefault);
         }
