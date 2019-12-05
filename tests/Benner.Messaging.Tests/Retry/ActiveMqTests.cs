@@ -20,36 +20,53 @@ namespace Benner.Messaging.Retry.Tests
                 {"Password", "admin"},
                 {"Hostname", "bnu-vtec001" }
             }).Create();
-        private readonly string queueName = "fila-teste-nathank";
+        private readonly string queueName = "nathank-teste";
 
         [TestMethod]
         public void Testa_retentativa_activemq()
         {
-            var guid = Guid.NewGuid().ToString();
-
-            var message = new EnterpriseIntegrationMessage()
+            try
             {
-                Body = "emitir-excecao",
-                MessageID = Guid.NewGuid().ToString()
-            };
+                var guid = Guid.NewGuid().ToString();
 
-            var listener = new EnterpriseIntegrationListenerMock(config, consumer);
-            var producer = new Messaging(config);
+                var message = new EnterpriseIntegrationMessage()
+                {
+                    Body = "emitir-excecao",
+                    MessageID = Guid.NewGuid().ToString()
+                };
 
+                var listener = new EnterpriseIntegrationListenerMock(config, consumer);
+                var producer = new Messaging(config);
 
-            producer.EnqueueMessage(queueName, message);
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            listener.Start();
-            Thread.Sleep(1000);
-            Assert.AreEqual(1, GetQueueSize(queueName + "-dead"));
-            Assert.AreEqual(0, GetQueueSize(queueName));
-            Assert.AreEqual(1, listener.GetCountRetry());
+                producer.EnqueueMessage(queueName, message);
 
-            var received = Messaging.Dequeue<EnterpriseIntegrationMessage>(queueName + "-dead", config);
+                Assert.AreEqual(1, GetQueueSize(queueName));
 
-            Assert.AreEqual(0, GetQueueSize(queueName + "-dead"));
-            Assert.AreEqual(message.MessageID, received.MessageID);
-            Assert.AreEqual(0, GetQueueSize(queueName));
+                listener.Start();
+
+                Thread.Sleep(1000);
+
+                var received = Messaging.Dequeue<EnterpriseIntegrationMessage>(queueName + "-dead", config);
+
+                Assert.AreEqual(0, GetQueueSize(queueName + "-dead"));
+                Assert.AreEqual(message.MessageID, received.MessageID);
+                Assert.AreEqual(0, GetQueueSize(queueName));
+                Assert.AreEqual(1, listener.GetCountRetry());
+            }
+            catch (Exception e)
+            {
+                using (Connection conn = factory.CreateConnection() as Connection)
+                {
+                    using (ISession session = conn.CreateSession())
+                    {
+                        session.DeleteQueue(queueName);
+                        session.DeleteQueue(queueName + "-dead");
+                        session.DeleteQueue(queueName + "-retry");
+                        session.DeleteQueue(queueName + "-error");
+                    }
+                }
+                throw new Exception(e.InnerException.ToString());
+            }
         }
 
         public int GetQueueSize(string fila)
