@@ -43,9 +43,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Producer.Integration
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.ERP.API", "Benner.ERP.API\Benner.ERP.API.csproj", "{30695CE3-134F-41AD-8AAB-A247D151B04D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Messaging.Retry.Tests", "..\..\..\Users\nathan.kruger\Desktop\K\tests\Benner.Messaging.Retry.Tests\Benner.Messaging.Retry.Tests.csproj", "{73888DE3-6CBF-4CF6-A2F3-9A71DE2AE821}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.Core", "Benner.Messaging.Core\Benner.Messaging.Core.csproj", "{86ADDE7A-94AC-4FD9-B45D-CFE41465467F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Messaging.Core", "Benner.Messaging.Core\Benner.Messaging.Core.csproj", "{86ADDE7A-94AC-4FD9-B45D-CFE41465467F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Messaging.Retry.Tests", "tests\Benner.Messaging.Retry.Tests\Benner.Messaging.Retry.Tests.csproj", "{73888DE3-6CBF-4CF6-A2F3-9A71DE2AE821}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,14 +107,14 @@ Global
 		{30695CE3-134F-41AD-8AAB-A247D151B04D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30695CE3-134F-41AD-8AAB-A247D151B04D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30695CE3-134F-41AD-8AAB-A247D151B04D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{73888DE3-6CBF-4CF6-A2F3-9A71DE2AE821}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{73888DE3-6CBF-4CF6-A2F3-9A71DE2AE821}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{73888DE3-6CBF-4CF6-A2F3-9A71DE2AE821}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{73888DE3-6CBF-4CF6-A2F3-9A71DE2AE821}.Release|Any CPU.Build.0 = Release|Any CPU
 		{86ADDE7A-94AC-4FD9-B45D-CFE41465467F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{86ADDE7A-94AC-4FD9-B45D-CFE41465467F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86ADDE7A-94AC-4FD9-B45D-CFE41465467F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86ADDE7A-94AC-4FD9-B45D-CFE41465467F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73888DE3-6CBF-4CF6-A2F3-9A71DE2AE821}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73888DE3-6CBF-4CF6-A2F3-9A71DE2AE821}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73888DE3-6CBF-4CF6-A2F3-9A71DE2AE821}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73888DE3-6CBF-4CF6-A2F3-9A71DE2AE821}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
