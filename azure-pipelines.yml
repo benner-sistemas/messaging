@@ -5,6 +5,8 @@
 
 trigger:
 - master
+- master-enterprise-integration-model
+- master-testeazurepipelines
 
 pool:
   vmImage: 'windows-latest'
@@ -32,3 +34,10 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Running unit tests
+  inputs:
+    command: test
+    projects: '**/*CLI.Tests.csproj'
+    arguments: '--configuration Release'
