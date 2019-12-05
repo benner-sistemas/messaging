@@ -39,5 +39,7 @@ steps:
   displayName: Running unit tests
   inputs:
     command: test
-    projects: '**/*Tests.csproj'
+    projects: |
+      '**/*Tests.csproj' 
+      '!**/*.Integration.Tests.csproj'
     arguments: '--configuration Release'
