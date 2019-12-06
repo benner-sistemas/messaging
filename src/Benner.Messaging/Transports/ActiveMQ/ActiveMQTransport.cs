@@ -84,8 +84,8 @@ namespace Benner.Messaging
                     {
                         if (acknowledge)
                             message.Acknowledge();
-                        else
-                            _session.Recover();
+                        //else
+                        //    _session.Recover();
                     }
                 }
             }
