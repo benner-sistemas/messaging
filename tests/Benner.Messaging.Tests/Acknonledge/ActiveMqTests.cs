@@ -20,8 +20,8 @@ namespace Benner.Messaging.Tests.Acknonledge
                 {"Hostname", "bnu-vtec001" }
             }).Create();
 
-        private readonly string queueName = $"{Environment.MachineName}-teste-ack";
-        private readonly string errorQueueName = $"{Environment.MachineName}-teste-ack-error";
+        private readonly string queueName = $"{Environment.MachineName}-teste-ack".ToLower();
+        private readonly string errorQueueName = $"{Environment.MachineName}-teste-ack-error".ToLower();
 
         [TestMethod]
         public void Testa_garantia_de_recebimento_da_fila_no_activeMq()
@@ -55,6 +55,7 @@ namespace Benner.Messaging.Tests.Acknonledge
                         // simulando um erro aleatorio durante o consumo da mensagem
                         throw new Exception(message);
                     });
+                    Thread.Sleep(1_000);
                 }
             }
             catch (Exception exception)
@@ -123,10 +124,8 @@ namespace Benner.Messaging.Tests.Acknonledge
                 }
             }
 
-            var guid = Guid.NewGuid().ToString();
-            var message = new Messaging();
-            var producer = new Messaging(config);
-            producer.EnqueueMessage(queueName, message);
+            var message = Guid.NewGuid().ToString();
+            Messaging.Enqueue(queueName, message, config);
 
             Assert.AreEqual(1, GetQueueSize(queueName));
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
@@ -137,7 +136,7 @@ namespace Benner.Messaging.Tests.Acknonledge
                 {
                     consumerFired = true;
 
-                    Assert.AreEqual(message.ToString(), guid);
+                    Assert.AreEqual(message, e.AsString);
 
                     // retornando false, para não disparar o acknowledge
                     return false;
@@ -178,7 +177,7 @@ namespace Benner.Messaging.Tests.Acknonledge
                     // retornando false, para não disparar o acknowledge
                     return false;
                 });
-                Thread.Sleep(5_000);
+                Thread.Sleep(1_000);
             }
 
             Assert.IsTrue(consumerFired);
