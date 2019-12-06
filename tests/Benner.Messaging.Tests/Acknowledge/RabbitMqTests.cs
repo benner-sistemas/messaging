@@ -1,32 +1,41 @@
-﻿using Apache.NMS;
-using Apache.NMS.ActiveMQ;
-using Benner.Retry.Tests.MockMQ;
+﻿using Benner.Retry.Tests.MockMQ;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RabbitMQ.Client;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Benner.Messaging.Tests.Acknonledge
+namespace Benner.Messaging.Tests.Acknowledge
 {
 
     [TestClass]
-    public class ActiveMqTests
+    public class RabbitMqTests
     {
-        private readonly ConnectionFactory factory = new ConnectionFactory("tcp://bnu-vtec001:61616");
-        private readonly MessagingConfig config = new MessagingConfigBuilder("ActiveMQ", BrokerType.ActiveMQ, new Dictionary<string, string>()
-            {   {"UserName", "admin"},
-                {"Password", "admin"},
-                {"Hostname", "bnu-vtec001" }
-            }).Create();
-
         private readonly string queueName = $"{Environment.MachineName}-teste-ack".ToLower();
         private readonly string errorQueueName = $"{Environment.MachineName}-teste-ack-error".ToLower();
+        private readonly ConnectionFactory factory = new ConnectionFactory
+        {
+            HostName = "bnu-vtec012",
+            UserName = "guest",
+            Port = 5672
+        };
+
+        private readonly MessagingConfig config = new MessagingConfigBuilder("RabbitMQ", BrokerType.RabbitMQ, new Dictionary<string, string>()
+                {
+                    {"UserName", "guest"},
+                    {"Password", "guest"},
+                    {"HostName", "bnu-vtec012"}
+                })
+                .Create();
+
+        private readonly EnterpriseIntegrationConsumerMock consumer = new EnterpriseIntegrationConsumerMock();
 
         [TestMethod]
-        public void Testa_garantia_de_recebimento_da_fila_no_activeMq()
+        public void Testa_garantia_de_recebimento_da_fila_no_rabbitMq()
         {
-            DeleteQueues();
+            PurgeQueue(queueName);
+            PurgeQueue(errorQueueName);
+
             var message = Guid.NewGuid().ToString();
             Messaging.Enqueue(queueName, message, config);
 
@@ -61,9 +70,11 @@ namespace Benner.Messaging.Tests.Acknonledge
         }
 
         [TestMethod]
-        public void Testa_o_acknowledge_no_metodo_de_recebimento_da_fila_no_activeMq()
+        public void Testa_o_acknowledge_no_metodo_de_recebimento_da_fila_no_rabbitMq()
         {
-            DeleteQueues();
+            PurgeQueue(queueName);
+            PurgeQueue(errorQueueName);
+
             var message = Guid.NewGuid().ToString();
             Messaging.Enqueue(queueName, message, config);
 
@@ -88,9 +99,11 @@ namespace Benner.Messaging.Tests.Acknonledge
         }
 
         [TestMethod]
-        public void Testa_o_not_acknowledge_no_metodo_de_recebimento_sem_executar_o_consume_da_fila_no_activeMq()
+        public void Testa_o_not_acknowledge_no_metodo_de_recebimento_sem_executar_o_consume_da_fila_no_rabbitMq()
         {
-            DeleteQueues();
+            PurgeQueue(queueName);
+            PurgeQueue(errorQueueName);
+
             var message = Guid.NewGuid().ToString();
             Messaging.Enqueue(queueName, message, config);
 
@@ -115,9 +128,10 @@ namespace Benner.Messaging.Tests.Acknonledge
         }
 
         [TestMethod]
-        public void Testa_o_not_acknowledge_no_metodo_de_recebimento_com_duas_mensagens_sem_executar_o_consume_da_fila_no_activeMq()
+        public void Testa_o_not_acknowledge_no_metodo_de_recebimento_com_duas_mensagens_sem_executar_o_consume_da_fila_no_rabbitMq()
         {
-            DeleteQueues();
+            PurgeQueue(queueName);
+            PurgeQueue(errorQueueName);
 
             Messaging.Enqueue(queueName, "Message_A", config);
             Messaging.Enqueue(queueName, "Message_B", config);
@@ -149,9 +163,11 @@ namespace Benner.Messaging.Tests.Acknonledge
         }
 
         [TestMethod]
-        public void Testa_o_not_acknowledge_no_metodo_de_recebimento_executanso_o_consume_da_fila_no_activeMq()
+        public void Testa_o_not_acknowledge_no_metodo_de_recebimento_executanso_o_consume_da_fila_no_rabbitMq()
         {
-            DeleteQueues();
+            PurgeQueue(queueName);
+            PurgeQueue(errorQueueName);
+
             var message = Guid.NewGuid().ToString();
             Messaging.Enqueue(queueName, message, config);
 
@@ -178,9 +194,11 @@ namespace Benner.Messaging.Tests.Acknonledge
         }
 
         [TestMethod]
-        public void Testa_garantia_de_recebimento_da_fila_no_activeMq_sem_using()
+        public void Testa_garantia_de_recebimento_da_fila_no_rabbitMq_sem_using()
         {
-            DeleteQueues();
+            PurgeQueue(queueName);
+            PurgeQueue(errorQueueName);
+
             var message = Guid.NewGuid().ToString();
 
 
@@ -197,9 +215,11 @@ namespace Benner.Messaging.Tests.Acknonledge
         }
 
         [TestMethod]
-        public void Testa_garantia_de_envio_para_fila_no_activeMq()
+        public void Testa_garantia_de_envio_para_fila_no_rabbitMq()
         {
-            DeleteQueues();
+            PurgeQueue(queueName);
+            PurgeQueue(errorQueueName);
+
             var message = Guid.NewGuid().ToString();
 
             try
@@ -230,9 +250,11 @@ namespace Benner.Messaging.Tests.Acknonledge
         }
 
         [TestMethod]
-        public void Testa_garantia_de_envio_para_fila_no_activeMq_sem_using()
+        public void Testa_garantia_de_envio_para_fila_no_rabbitMq_sem_using()
         {
-            DeleteQueues();
+            PurgeQueue(queueName);
+            PurgeQueue(errorQueueName);
+
             var guid = Guid.NewGuid().ToString();
             try
             {
@@ -258,39 +280,41 @@ namespace Benner.Messaging.Tests.Acknonledge
             Assert.IsTrue(received.Contains(guid));
         }
 
-        private void DeleteQueues()
+        private int GetQueueSize(string fila)
         {
-            using (Connection conn = factory.CreateConnection() as Connection)
+            uint result = 0;
+            try
             {
-                using (ISession session = conn.CreateSession())
+                using (var conn = factory.CreateConnection())
                 {
-                    session.DeleteQueue(queueName);
-                    session.DeleteQueue(errorQueueName);
-                }
-            }
-        }
-
-        public int GetQueueSize(string fila)
-        {
-            int count = 0;
-            using (Connection conn = factory.CreateConnection() as Connection)
-            {
-                conn.Start();
-                using (ISession session = conn.CreateSession())
-                {
-                    IQueue queue = session.GetQueue(fila);
-                    using (IQueueBrowser queueBrowser = session.CreateBrowser(queue))
+                    using (var channel = conn.CreateModel())
                     {
-                        IEnumerator messages = queueBrowser.GetEnumerator();
-                        while (messages.MoveNext())
-                        {
-                            IMessage message = (IMessage)messages.Current;
-                            count++;
-                        }
+                        result = channel.MessageCount(fila);
                     }
                 }
             }
-            return count;
+            catch
+            { }
+            return Convert.ToInt32(result);
+        }
+
+        private void PurgeQueue(string queueName)
+        {
+
+            using (var conn = factory.CreateConnection())
+            {
+                using (var channel = conn.CreateModel())
+                {
+                    try
+                    {
+                        channel.QueuePurge(queueName);
+                        channel.QueuePurge(queueName + "-retry");
+                        channel.QueuePurge(queueName + "-dead");
+                    }
+                    catch
+                    { }
+                }
+            }
         }
     }
 }
