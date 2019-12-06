@@ -18,6 +18,8 @@ namespace Benner.Messaging.CLI.Verbs
         [Option('p', "password", HelpText = "A senha de login do broker.", Required = true)]
         public string Password { get; set; }
 
+        public override string BrokerName => "RabbitMQ";
+
         public override IMessagingConfig GetConfiguration()
         {
             ValidateOption("-n/--consumerName", Consumer);

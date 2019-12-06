@@ -1,12 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\key.snk</AssemblyOriginatorKeyFile>
-    <ApplicationIcon />
-    <OutputType>Exe</OutputType>
-    <StartupObject>Benner.Consumer.Core.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

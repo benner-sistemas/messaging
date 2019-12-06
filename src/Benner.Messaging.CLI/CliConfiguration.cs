@@ -13,6 +13,8 @@ namespace Benner.Messaging.CLI
     {
         public string Consumer { get; private set; }
 
+        public string BrokerName { get; private set; }
+
         public IMessagingConfig Configuration { get; private set; }
 
         public bool HasValidationError { get; private set; }
@@ -62,6 +64,7 @@ namespace Benner.Messaging.CLI
                 var result = (ListenVerb)arg;
                 Consumer = result.Consumer;
                 Configuration = result.GetConfiguration();
+                BrokerName = result.BrokerName;
             }
             catch (ArgumentException e)
             {

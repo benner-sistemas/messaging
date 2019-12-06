@@ -16,6 +16,8 @@ namespace Benner.Messaging.CLI.Verbs
         [Option('s', "secretAccessKey", HelpText = "O 'Secret Access Key' de acesso ao servidor Amazon. Se informado, 'accessKeyId' também deve ser informado.", Required = false)]
         public string SecretAccessKey { get; set; }
 
+        public override string BrokerName => "AmazonSQS";
+
         public override IMessagingConfig GetConfiguration()
         {
             ValidateOption("-n/--consumerName", Consumer);

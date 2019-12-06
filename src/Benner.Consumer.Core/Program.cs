@@ -33,6 +33,10 @@ namespace Benner.Consumer.Core
                     Console.WriteLine($"Classe '{cliConfig.Consumer}' encontrada. Criando um listener...\r\n");
                     var listener = new EnterpriseIntegrationListener(cliConfig.Configuration, consumer);
                     listener.Start();
+                    Console.WriteLine($"Escutando fila '{consumer.Settings.QueueName}' em broker '{cliConfig.BrokerName}'...");
+                    Console.WriteLine("Pressione qualquer tecla para cancelar...");
+                    Console.ReadKey();
+                    Console.WriteLine("Ação cancelada pelo usuário.");
                     return 0;
                 }
             }
