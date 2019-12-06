@@ -2,11 +2,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Benner.Messaging;
 using System.Collections.Generic;
-using Benner.Retry.Tests.MockMQ;
 using System.Threading;
 using Apache.NMS;
 using System.Collections;
 using Apache.NMS.ActiveMQ;
+using Benner.Retry.Tests.MockMQ;
 
 namespace Benner.Messaging.Retry.Tests
 {
@@ -38,27 +38,25 @@ namespace Benner.Messaging.Retry.Tests
                 var listener = new EnterpriseIntegrationListenerMock(config, consumer);
                 var producer = new Messaging(config);
 
-
                 producer.EnqueueMessage(queueName, message);
-                Assert.AreEqual(1, GetQueueSize(queueName));
-                listener.Start();
-                Thread.Sleep(1000);
-                Assert.AreEqual(1, GetQueueSize(queueName + "-dead"));
-                Assert.AreEqual(0, GetQueueSize(queueName));
-                Assert.AreEqual(1, listener.GetCountRetry());
 
+                Assert.AreEqual(1, GetQueueSize(queueName));
+
+                listener.Start();
+
+                Thread.Sleep(1000);
 
                 var received = Messaging.Dequeue<EnterpriseIntegrationMessage>(queueName + "-dead", config);
 
                 Assert.AreEqual(0, GetQueueSize(queueName + "-dead"));
                 Assert.AreEqual(message.MessageID, received.MessageID);
                 Assert.AreEqual(0, GetQueueSize(queueName));
+                Assert.AreEqual(1, listener.GetCountRetry());
             }
             catch (Exception e)
             {
                 using (Connection conn = factory.CreateConnection() as Connection)
                 {
-                    conn.Start();
                     using (ISession session = conn.CreateSession())
                     {
                         session.DeleteQueue(queueName);
@@ -67,13 +65,12 @@ namespace Benner.Messaging.Retry.Tests
                         session.DeleteQueue(queueName + "-error");
                     }
                 }
-                throw new Exception(e.StackTrace);
+                throw new Exception(e.InnerException.ToString());
             }
         }
 
         public int GetQueueSize(string fila)
         {
-
             int count = 0;
             using (Connection conn = factory.CreateConnection() as Connection)
             {

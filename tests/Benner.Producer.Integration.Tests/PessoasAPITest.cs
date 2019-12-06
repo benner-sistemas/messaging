@@ -53,11 +53,21 @@ namespace Benner.Producer.Integration.Tests
             };
 
             // Act
-            var response = await _client.PostAsync(request.Url, ContentHelper.GetStringContent(request.Body));
-            var value = await response.Content.ReadAsStringAsync();
+            var httpResponse = await _client.PostAsync(request.Url, ContentHelper.GetStringContent(request.Body));
 
             // Assert
-            response.EnsureSuccessStatusCode();
+            httpResponse.EnsureSuccessStatusCode();
+            Assert.True(httpResponse.StatusCode == System.Net.HttpStatusCode.OK);
+            var value = await httpResponse.Content.ReadAsStringAsync();
+            dynamic response = JsonConvert.DeserializeObject<dynamic>(value);
+
+            Assert.Equal(request.Body.RequestID, new Guid(response.messageID.ToString()));
+            Assert.Equal("pessoas", response.queueName.ToString());
+
+
+            var createdAt = Convert.ToDateTime(response.createdAt);
+            TimeSpan diff = DateTime.Now.Subtract(createdAt);
+            Assert.True(diff.TotalSeconds < 20);
         }
     }
 }
