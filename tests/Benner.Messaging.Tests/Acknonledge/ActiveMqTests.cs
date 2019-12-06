@@ -118,26 +118,32 @@ namespace Benner.Messaging.Tests.Acknonledge
         public void Testa_o_not_acknowledge_no_metodo_de_recebimento_com_duas_mensagens_sem_executar_o_consume_da_fila_no_activeMq()
         {
             DeleteQueues();
-            var message = Guid.NewGuid().ToString();
-            Messaging.Enqueue(queueName, message, config);
-            Messaging.Enqueue(queueName, message, config);
+
+            Messaging.Enqueue(queueName, "Message_A", config);
+            Messaging.Enqueue(queueName, "Message_B", config);
 
             Assert.AreEqual(2, GetQueueSize(queueName));
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
-            var consumerFired = false;
+            var consumerFired_A = false;
+            var consumerFired_B = false;
             using (var client = new Messaging(config))
             {
                 client.StartListening(queueName, (e) =>
                 {
-                    consumerFired = true;
+                    if (e.AsString == "Message_A")
+                        consumerFired_A = true;
 
-                    Assert.AreEqual(message, e.AsString);
+                    if (e.AsString == "Message_B")
+                        consumerFired_B = true;
 
                     return false;
                 });
+                for (int index = 0; index < 20 && !(consumerFired_A && consumerFired_B); ++index)
+                    Thread.Sleep(1000);
             }
 
-            Assert.IsFalse(consumerFired);
+            Assert.IsTrue(consumerFired_A);
+            Assert.IsTrue(consumerFired_B);
             Assert.AreEqual(2, GetQueueSize(queueName));
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
         }
