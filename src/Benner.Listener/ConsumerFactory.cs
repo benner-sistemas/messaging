@@ -32,38 +32,28 @@ namespace Benner.Listener
                 return null;
 
             string folder = GetExecutingDirectoryName();
-            IEnumerable<string> assembliesPathes = Directory.EnumerateFiles(folder, "*.dll", SearchOption.TopDirectoryOnly)
-                .Where(a =>
-                {
-                    var fileName = Path.GetFileName(a);
-                    return !fileName.StartsWith("System") && !fileName.StartsWith("Microsoft");
-                });
+            string[] assembliesPathes = Directory.EnumerateFiles(folder, "*.Consumer.dll", SearchOption.TopDirectoryOnly).ToArray();
+
+            if (assembliesPathes.Length == 0)
+                throw new FileNotFoundException("Não foi encontrado qualquer assembly com pattern '*.Consumer.dll' no diretório de trabalho.");
 
             foreach (string assemblyPath in assembliesPathes)
             {
-                AppDomain tempDomain = AppDomain.CreateDomain("Temp Domain");
-                try
-                {
-                    Assembly assembly = tempDomain.Load(File.ReadAllBytes(assemblyPath));
-                    Type found = assembly.GetType(fullName, false, true);
-                    if (found == null)
-                        found = assembly.GetExportedTypes().FirstOrDefault(x => x.AssemblyQualifiedName.StartsWith(fullName, StringComparison.OrdinalIgnoreCase));
+                Assembly assembly = Assembly.Load(File.ReadAllBytes(assemblyPath));
+                Type found = assembly.GetType(fullName, false, true);
+                if (found == null)
+                    found = assembly.GetExportedTypes().FirstOrDefault(x => x.AssemblyQualifiedName.StartsWith(fullName, StringComparison.OrdinalIgnoreCase));
 
-                    if (found != null)
-                    {
-                        var isConsumer = typeof(IEnterpriseIntegrationConsumer).IsAssignableFrom(found);
-                        var hasDefaultCtor = found.GetConstructor(Type.EmptyTypes) != null;
-                        var isPubClass = found.IsClass && found.IsPublic;
-                        if (isConsumer && hasDefaultCtor && isPubClass)
-                            return Activator.CreateInstance(found) as IEnterpriseIntegrationConsumer;
-                    }
-                }
-                finally
+                if (found != null)
                 {
-                    AppDomain.Unload(tempDomain);
+                    var isConsumer = typeof(IEnterpriseIntegrationConsumer).IsAssignableFrom(found);
+                    var hasDefaultCtor = found.GetConstructor(Type.EmptyTypes) != null;
+                    var isPubClass = found.IsClass && found.IsPublic;
+                    if (isConsumer && hasDefaultCtor && isPubClass)
+                        return Activator.CreateInstance(found) as IEnterpriseIntegrationConsumer;
                 }
             }
-            return null;
+            throw new FileNotFoundException($"Não foi encontrado a classe '{fullName}' em todos os assemblies Consumer encontrados.");
         }
     }
 }

@@ -12,6 +12,8 @@ namespace Benner.Messaging.CLI.Verbs
         [Option('i', "invisibilityTime", HelpText = "O tempo que a mensagem permanecerá invisível para outras filas, em segundos.", Required = true)]
         public int InvisibilityTime { get; set; }
 
+        public override string BrokerName => "AzureQueue";
+
         public override IMessagingConfig GetConfiguration()
         {
             ValidateOption("-n/--consumerName", Consumer);

@@ -10,7 +10,9 @@ namespace Benner.Messaging.CLI.Verbs
     public abstract class ListenVerb
     {
         [Option('n', "consumerName", HelpText = "O nome completo da classe Consumer que será utilizada. 'Namespace1.Namespace2.Classe'.", Required = true)]
-        public string Consumer { get; set; }
+        public string Consumer { get; protected set; }
+
+        public virtual string BrokerName { get; }
 
         public abstract IMessagingConfig GetConfiguration();
 
