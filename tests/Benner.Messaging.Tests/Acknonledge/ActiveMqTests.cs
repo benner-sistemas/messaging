@@ -26,15 +26,7 @@ namespace Benner.Messaging.Tests.Acknonledge
         [TestMethod]
         public void Testa_garantia_de_recebimento_da_fila_no_activeMq()
         {
-            using (Connection conn = factory.CreateConnection() as Connection)
-            {
-                using (ISession session = conn.CreateSession())
-                {
-                    session.DeleteQueue(queueName);
-                    session.DeleteQueue(errorQueueName);
-                }
-            }
-
+            DeleteQueues();
             var message = Guid.NewGuid().ToString();
             Messaging.Enqueue(queueName, message, config);
 
@@ -49,13 +41,10 @@ namespace Benner.Messaging.Tests.Acknonledge
                     {
                         consumerFired = true;
 
-                        // garantir que a mensagem lida, é a mensagem enviada
                         Assert.AreEqual(message, e.AsString);
 
-                        // simulando um erro aleatorio durante o consumo da mensagem
                         throw new Exception(message);
                     });
-                    Thread.Sleep(1_000);
                 }
             }
             catch (Exception exception)
@@ -71,24 +60,11 @@ namespace Benner.Messaging.Tests.Acknonledge
         [TestMethod]
         public void Testa_o_acknowledge_no_metodo_de_recebimento_da_fila_no_activeMq()
         {
-            var guid = Guid.NewGuid().ToString();
-            var message = new Messaging();
-            var producer = new Messaging(config);
-            producer.EnqueueMessage(queueName, message);
+            DeleteQueues();
+            var message = Guid.NewGuid().ToString();
+            Messaging.Enqueue(queueName, message, config);
 
-            // antes de consumir, garantir que o tamanho da fila é 1
             Assert.AreEqual(1, GetQueueSize(queueName));
-
-            // limpar a fila de erro
-            using (Connection conn = factory.CreateConnection() as Connection)
-            {
-                using (ISession session = conn.CreateSession())
-                {
-                    session.DeleteQueue(errorQueueName);
-                    session.DeleteQueue(queueName);
-                }
-            }
-            //  garantir que a fila de erro está zerada
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
             try
             {
@@ -96,34 +72,20 @@ namespace Benner.Messaging.Tests.Acknonledge
                 {
                     client.StartListening(queueName, (e) =>
                     {
-                        // garantir que a mensagem lida, é a mensagem enviada
-                        Assert.AreEqual(message.ToString(), guid);
-
-                        // retornando true, tem que tirar da fila principal, e não gerar erro
+                        Assert.AreEqual(message.ToString(), e.AsString);
                         return true;
                     });
                 }
             }
             catch { }
-            // depois de consumir, com erro, garantir que o tamanho da fila normal é 0
             Assert.AreEqual(0, GetQueueSize(queueName));
-
-            // depois de consumir, com erro, garantir que o tamanho da fila de erro é 1
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
         }
 
         [TestMethod]
         public void Testa_o_not_acknowledge_no_metodo_de_recebimento_sem_executar_o_consume_da_fila_no_activeMq()
         {
-            using (Connection conn = factory.CreateConnection() as Connection)
-            {
-                using (ISession session = conn.CreateSession())
-                {
-                    session.DeleteQueue(errorQueueName);
-                    session.DeleteQueue(queueName);
-                }
-            }
-
+            DeleteQueues();
             var message = Guid.NewGuid().ToString();
             Messaging.Enqueue(queueName, message, config);
 
@@ -138,7 +100,6 @@ namespace Benner.Messaging.Tests.Acknonledge
 
                     Assert.AreEqual(message, e.AsString);
 
-                    // retornando false, para não disparar o acknowledge
                     return false;
                 });
             }
@@ -147,21 +108,41 @@ namespace Benner.Messaging.Tests.Acknonledge
             Assert.AreEqual(1, GetQueueSize(queueName));
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
         }
+
+        [TestMethod]
+        public void Testa_o_not_acknowledge_no_metodo_de_recebimento_com_duas_mensagens_sem_executar_o_consume_da_fila_no_activeMq()
+        {
+            DeleteQueues();
+            var message = Guid.NewGuid().ToString();
+            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(queueName, message, config);
+
+            Assert.AreEqual(2, GetQueueSize(queueName));
+            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            var consumerFired = false;
+            using (var client = new Messaging(config))
+            {
+                client.StartListening(queueName, (e) =>
+                {
+                    consumerFired = true;
+
+                    Assert.AreEqual(message, e.AsString);
+
+                    return false;
+                });
+            }
+
+            Assert.IsFalse(consumerFired);
+            Assert.AreEqual(2, GetQueueSize(queueName));
+            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+        }
+
         [TestMethod]
         public void Testa_o_not_acknowledge_no_metodo_de_recebimento_executanso_o_consume_da_fila_no_activeMq()
         {
-            using (Connection conn = factory.CreateConnection() as Connection)
-            {
-                using (ISession session = conn.CreateSession())
-                {
-                    session.DeleteQueue(errorQueueName);
-                    session.DeleteQueue(queueName);
-                }
-            }
-
+            DeleteQueues();
             var message = Guid.NewGuid().ToString();
-            var producer = new Messaging(config);
-            producer.EnqueueMessage(queueName, message);
+            Messaging.Enqueue(queueName, message, config);
 
             Assert.AreEqual(1, GetQueueSize(queueName));
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
@@ -171,13 +152,11 @@ namespace Benner.Messaging.Tests.Acknonledge
                 client.StartListening(queueName, (e) =>
                 {
                     consumerFired = true;
-                    
+
                     Assert.IsTrue(e.AsString == message);
 
-                    // retornando false, para não disparar o acknowledge
                     return false;
                 });
-                Thread.Sleep(1_000);
             }
 
             Assert.IsTrue(consumerFired);
@@ -188,118 +167,94 @@ namespace Benner.Messaging.Tests.Acknonledge
         [TestMethod]
         public void Testa_garantia_de_recebimento_da_fila_no_activeMq_sem_using()
         {
-            var guid = Guid.NewGuid().ToString();
-            var message = new Messaging();
-            var producer = new Messaging(config);
+            DeleteQueues();
+            var message = Guid.NewGuid().ToString();
 
-            // limpar a fila de erro
-            using (Connection conn = factory.CreateConnection() as Connection)
-            {
-                using (ISession session = conn.CreateSession())
-                {
-                    session.DeleteQueue(errorQueueName);
-                    session.DeleteQueue(queueName);
-                }
-            }
 
-            producer.EnqueueMessage(queueName, message);
+            Messaging.Enqueue(queueName, message, config);
 
-            // antes de consumir, garantir que o tamanho da fila é 1
             Assert.AreEqual(1, GetQueueSize(queueName));
             try
             {
                 var receivedMessage = Messaging.Dequeue(queueName, config);
             }
             catch { }
-            // depois de consumir, com erro, garantir que o tamanho da fila ainda é 1
             Assert.AreEqual(0, GetQueueSize(queueName));
-
-            // a fila de erro também precisa estar zerada
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
         }
 
         [TestMethod]
         public void Testa_garantia_de_envio_para_fila_no_activeMq()
         {
-            var guid = Guid.NewGuid().ToString();
+            DeleteQueues();
+            var message = Guid.NewGuid().ToString();
 
-            // antes de enviar, garantir que a fila está vazia
-            using (Connection conn = factory.CreateConnection() as Connection)
-            {
-                using (ISession session = conn.CreateSession())
-                {
-                    session.DeleteQueue(errorQueueName);
-                    session.DeleteQueue(queueName);
-                }
-            }
             try
             {
-
                 using (var client = new Messaging(config))
                 {
                     bool exceptionWasThrow = false;
                     try
                     {
-                        client.EnqueueMessage(queueName, new { id = guid });
+                        client.EnqueueMessage(queueName, message);
                     }
                     catch
                     {
                         exceptionWasThrow = true;
                     }
-                    // garantir que exceptionWasThrow é false
                     Assert.IsFalse(exceptionWasThrow);
-                    // depois do envio, garantir que a fila tem 1
                     Assert.AreEqual(1, GetQueueSize(queueName));
-                    // disparar uma exceção antes do dispose
-                    throw new Exception(guid);
+                    throw new Exception(message);
                 }
             }
             catch (Exception exception)
             {
-                // garantir que a execao qui é a mesma do throw ali em cima
-                Assert.AreEqual(guid, exception.Message);
+                Assert.AreEqual(message, exception.Message);
             }
-            // depois do envio, garantir que a fila tem 1
             Assert.AreEqual(1, GetQueueSize(queueName));
-            // ler da fila e garantir que a mensagem da fila é exatamente aquela que foi enviada
             var received = Messaging.Dequeue(queueName, config);
-            Assert.IsTrue(received.Contains(guid));
+            Assert.IsTrue(received.Contains(message));
         }
 
+        [TestMethod]
         public void Testa_garantia_de_envio_para_fila_no_activeMq_sem_using()
         {
+            DeleteQueues();
             var guid = Guid.NewGuid().ToString();
             try
             {
-                // antes de enviar, garantir que a fila está vazia
-                var client = new Messaging(config);
-
                 bool exceptionWasThrow = false;
                 try
                 {
-                    client.EnqueueMessage(queueName, new { id = guid });
+                    Messaging.Enqueue(queueName, new { id = guid }, config);
                 }
                 catch
                 {
                     exceptionWasThrow = true;
                 }
-                // garantir que exceptionWasThrow é false
                 Assert.IsFalse(exceptionWasThrow);
-                // depois do envio, garantir que a fila tem 1
                 Assert.AreEqual(1, GetQueueSize(queueName));
-                // disparar uma exceção antes do dispose
                 throw new Exception(guid);
             }
             catch (Exception exception)
             {
-                // garantir que a execao qui é a mesma do throw ali em cima
                 Assert.AreEqual(guid, exception.Message);
             }
-            // depois do envio, garantir que a fila tem 1
             Assert.AreEqual(1, GetQueueSize(queueName));
-            // ler da fila e garantir que a mensagem da fila é exatamente aquela que foi enviada
             var received = Messaging.Dequeue(queueName, config);
             Assert.IsTrue(received.Contains(guid));
+        }
+
+        private void DeleteQueues()
+        {
+            using (Connection conn = factory.CreateConnection() as Connection)
+            {
+                using (ISession session = conn.CreateSession())
+                {
+                    session.DeleteQueue(queueName);
+                    session.DeleteQueue(errorQueueName);
+                }
+            }
         }
 
         public int GetQueueSize(string fila)
