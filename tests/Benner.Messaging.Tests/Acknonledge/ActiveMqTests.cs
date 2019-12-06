@@ -45,6 +45,9 @@ namespace Benner.Messaging.Tests.Acknonledge
 
                         throw new Exception(message);
                     });
+
+                    for (int index = 0; index < 20 && !consumerFired; ++index)
+                        Thread.Sleep(1000);
                 }
             }
             catch (Exception exception)
@@ -66,18 +69,20 @@ namespace Benner.Messaging.Tests.Acknonledge
 
             Assert.AreEqual(1, GetQueueSize(queueName));
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
-            try
+
+            var consumerFired = false;
+            using (var client = new Messaging(config))
             {
-                using (var client = new Messaging(config))
+                client.StartListening(queueName, (e) =>
                 {
-                    client.StartListening(queueName, (e) =>
-                    {
-                        Assert.AreEqual(message.ToString(), e.AsString);
-                        return true;
-                    });
-                }
+                    consumerFired = true;
+                    Assert.AreEqual(message.ToString(), e.AsString);
+                    return true;
+                });
+                for (int index = 0; index < 20 && !consumerFired; ++index)
+                    Thread.Sleep(1000);
             }
-            catch { }
+            Assert.IsTrue(consumerFired);
             Assert.AreEqual(0, GetQueueSize(queueName));
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
         }
@@ -157,6 +162,8 @@ namespace Benner.Messaging.Tests.Acknonledge
 
                     return false;
                 });
+                for (int index = 0; index < 20 && !consumerFired; ++index)
+                    Thread.Sleep(1000);
             }
 
             Assert.IsTrue(consumerFired);
