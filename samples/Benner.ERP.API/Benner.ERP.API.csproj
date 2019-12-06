@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benner.Messaging.Core\Benner.Messaging.Core.csproj" />
-    <ProjectReference Include="..\src\Benner.Messaging\Benner.Messaging.csproj" />
+    <ProjectReference Include="..\..\Benner.Messaging.Core\Benner.Messaging.Core.csproj" />
+    <ProjectReference Include="..\..\src\Benner.Messaging\Benner.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

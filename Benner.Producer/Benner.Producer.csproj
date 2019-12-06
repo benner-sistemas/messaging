@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benner.ERP.API\Benner.ERP.API.csproj" />
+    <ProjectReference Include="..\samples\Benner.ERP.API\Benner.ERP.API.csproj" />
   </ItemGroup>
 
 </Project>
