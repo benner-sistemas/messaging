@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Benner.Messaging.Tests.Acknonledge
+namespace Benner.Messaging.Tests.Acknowledge
 {
 
     [TestClass]

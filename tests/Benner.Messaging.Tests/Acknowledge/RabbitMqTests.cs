@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Benner.Messaging.Tests.Acknonledge
+namespace Benner.Messaging.Tests.Acknowledge
 {
 
     [TestClass]
