@@ -31,6 +31,8 @@ namespace Benner.Retry.Tests.MockMQ
             var messageAsString = message as string;
             if (messageAsString.Equals("emitir-excecao"))
                 throw new Exception(messageAsString);
+            if (messageAsString.Equals("emitir-excecao-mensagem-invalida"))
+                throw new InvalidMessageException();
         }
     }
 }

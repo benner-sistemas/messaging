@@ -14,6 +14,7 @@ namespace Benner.Messaging.Retry.Tests
         private static string _queueName = $"{Environment.MachineName}-test".ToLower();
         private static string _deadQueueName = $"{Environment.MachineName}-test-dead".ToLower();
         private static string _retryQueueName = $"{Environment.MachineName}-test-retry".ToLower();
+        private static string _invalidQueueName = $"{Environment.MachineName}-test-invalid".ToLower();
 
         private static ConnectionFactory _factory = new ConnectionFactory
         {
@@ -46,15 +47,19 @@ namespace Benner.Messaging.Retry.Tests
             CreateQueue(_queueName);
             CreateQueue(_deadQueueName);
             CreateQueue(_retryQueueName);
+            CreateQueue(_invalidQueueName);
 
             // garante que está vazia
             PurgeQueue(_queueName);
             PurgeQueue(_deadQueueName);
             PurgeQueue(_retryQueueName);
+            PurgeQueue(_invalidQueueName);
 
             Assert.AreEqual(0, GetQueueSize(_queueName));
             Assert.AreEqual(0, GetQueueSize(_deadQueueName));
             Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+
 
             using (var conn = _factory.CreateConnection())
             {
@@ -77,6 +82,7 @@ namespace Benner.Messaging.Retry.Tests
                         Assert.AreEqual(2, GetQueueSize(_queueName));
                         Assert.AreEqual(0, GetQueueSize(_deadQueueName));
                         Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+                        Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
 
                         using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
                         {
@@ -84,12 +90,12 @@ namespace Benner.Messaging.Retry.Tests
                             Thread.Sleep(1000);
 
                             //TODO: testar o tamanho da fila de retentativas, de alguma forma
-                            //TODO: criar um segundo teste, agora para testar a mensa inválida
                         }
 
                         Assert.AreEqual(0, GetQueueSize(_queueName));
                         Assert.AreEqual(2, GetQueueSize(_deadQueueName));
                         Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+                        Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
 
                         // garantir a quantidade de retentativas
                         Assert.AreEqual(4, _consumer.OnMessageCount);
@@ -107,10 +113,93 @@ namespace Benner.Messaging.Retry.Tests
             PurgeQueue(_queueName);
             PurgeQueue(_deadQueueName);
             PurgeQueue(_retryQueueName);
+            PurgeQueue(_invalidQueueName);
 
             Assert.AreEqual(0, GetQueueSize(_queueName));
             Assert.AreEqual(0, GetQueueSize(_deadQueueName));
             Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, _consumer.OnInvalidMessageCount);
+        }
+
+        [TestMethod]
+        public void testa_envio_de_mensagens_invalidas()
+        {
+            // garante que fila existe
+            CreateQueue(_queueName);
+            CreateQueue(_deadQueueName);
+            CreateQueue(_retryQueueName);
+            CreateQueue(_invalidQueueName);
+
+            // garante que está vazia
+            PurgeQueue(_queueName);
+            PurgeQueue(_deadQueueName);
+            PurgeQueue(_retryQueueName);
+            PurgeQueue(_invalidQueueName);
+
+            Assert.AreEqual(0, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+
+
+            using (var conn = _factory.CreateConnection())
+            {
+                using (var channel = conn.CreateModel())
+                {
+                    try
+                    {
+                        using (var producer = new Messaging(_config))
+                        {
+                            for (int i = 0; i < 2; i++)
+                            {
+                                producer.EnqueueMessage(_queueName, new EnterpriseIntegrationMessage()
+                                {
+                                    Body = "emitir-excecao-mensagem-invalida",
+                                    MessageID = Guid.NewGuid().ToString()
+                                });
+                            }
+                        }
+
+                        Assert.AreEqual(2, GetQueueSize(_queueName));
+                        Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+                        Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+                        Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+
+                        using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
+                        {
+                            listener.Start();
+                            Thread.Sleep(1000);
+
+                            //TODO: testar o tamanho da fila de retentativas, de alguma forma
+                        }
+
+                        Assert.AreEqual(0, GetQueueSize(_queueName));
+                        Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+                        Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+                        Assert.AreEqual(2, GetQueueSize(_invalidQueueName));
+
+                        // garantir a quantidade de retentativas
+                        Assert.AreEqual(2, _consumer.OnMessageCount);
+                        Assert.AreEqual(0, _consumer.OnDeadMessageCount);
+                        Assert.AreEqual(2, _consumer.OnInvalidMessageCount);
+                    }
+                    finally
+                    {
+                        conn.Close();
+                        channel.Close();
+                    }
+                }
+            }
+
+            PurgeQueue(_queueName);
+            PurgeQueue(_deadQueueName);
+            PurgeQueue(_retryQueueName);
+            PurgeQueue(_invalidQueueName);
+
+            Assert.AreEqual(0, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, _consumer.OnInvalidMessageCount);
         }
 
         private void PurgeQueue(string queueName)
