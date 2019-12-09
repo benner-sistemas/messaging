@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Benner.Listener\Benner.Listener.csproj" />
+    <ProjectReference Include="..\..\src\Benner.Messaging\Benner.Messaging.csproj" />
+    <ProjectReference Include="..\Benner.ERP.API\Benner.ERP.API.csproj" />
+  </ItemGroup>
+
+</Project>
