@@ -35,6 +35,9 @@ namespace Benner.Messaging
         /// </summary>
         public void Dispose()
         {
+            if (_brokers == null)
+                return;
+
             foreach (var transport in _brokers.Values)
                 transport.Dispose();
         }

@@ -138,28 +138,43 @@ namespace Benner.Messaging.Tests.Acknowledge
 
             Assert.AreEqual(2, GetQueueSize(queueName));
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
-            var consumerFired_A = false;
-            var consumerFired_B = false;
-            using (var client = new Messaging(config))
-            {
-                client.StartListening(queueName, (e) =>
-                {
-                    if (e.AsString == "Message_A")
-                        consumerFired_A = true;
 
-                    if (e.AsString == "Message_B")
-                        consumerFired_B = true;
+            var client01 = new Messaging(config);
+            var client02 = new Messaging(config);
 
-                    return false;
-                });
-                for (int index = 0; index < 20 && !(consumerFired_A && consumerFired_B); ++index)
-                    Thread.Sleep(1000);
-            }
+            client01.StartListening(queueName, ProcessQueueAorB);
+            client02.StartListening(queueName, ProcessQueueAorB);
 
-            Assert.IsTrue(consumerFired_A);
-            Assert.IsTrue(consumerFired_B);
+            for (int index = 0; index < 200 && !(_consumerFired_A && _consumerFired_B); ++index)
+                Thread.Sleep(100);
+
+            client01.Dispose();
+            client02.Dispose();
+
+            Assert.IsTrue(_consumerFired_A);
+            Assert.IsTrue(_consumerFired_B);
             Assert.AreEqual(2, GetQueueSize(queueName));
             Assert.AreEqual(0, GetQueueSize(errorQueueName));
+
+            PurgeQueue(queueName);
+            PurgeQueue(errorQueueName);
+
+            Assert.AreEqual(0, GetQueueSize(queueName));
+            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+        }
+
+        private bool _consumerFired_A = false;
+        private bool _consumerFired_B = false;
+
+        private bool ProcessQueueAorB(MessagingArgs arg)
+        {
+            if (arg.AsString == "Message_A")
+                _consumerFired_A = true;
+
+            if (arg.AsString == "Message_B")
+                _consumerFired_B = true;
+
+            return false;
         }
 
         [TestMethod]
