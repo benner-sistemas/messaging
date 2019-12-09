@@ -1,30 +1,36 @@
 ﻿using Benner.Listener;
 using Benner.Messaging;
-using Benner.Messaging.Retry.Tests.Mocks;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Benner.Retry.Tests.MockMQ
 {
     public class EnterpriseIntegrationConsumerMock : IEnterpriseIntegrationConsumer
     {
-        public IEnterpriseIntegrationSettings Settings => new SettingsMock();
+        public EnterpriseIntegrationConsumerMock(IEnterpriseIntegrationSettings settings) => this.Settings = settings;
+
+        public IEnterpriseIntegrationSettings Settings { get; set; }
+
+        public int OnMessageCount { get; internal set; }
+        public int OnDeadMessageCount { get; internal set; }
+        public int OnInvalidMessageCount { get; internal set; }
 
         public void OnDeadMessage(object message)
         {
-            throw new NotImplementedException();
+            ++OnDeadMessageCount;
         }
 
         public void OnInvalidMessage(object message)
         {
+            ++OnInvalidMessageCount;
         }
 
         public void OnMessage(object message)
         {
-            var mensagem = message as EnterpriseIntegrationMessage;
-            if (mensagem.Body.ToString() == "emitir-excecao")
-                throw new Exception();
+            ++OnMessageCount;
+
+            var messageAsString = message as string;
+            if (messageAsString.Equals("emitir-excecao"))
+                throw new Exception(messageAsString);
         }
     }
 }

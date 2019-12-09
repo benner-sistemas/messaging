@@ -28,8 +28,6 @@ namespace Benner.Messaging.Tests.Acknowledge
                 })
                 .Create();
 
-        private readonly EnterpriseIntegrationConsumerMock consumer = new EnterpriseIntegrationConsumerMock();
-
         [TestMethod]
         public void Testa_garantia_de_recebimento_da_fila_no_rabbitMq()
         {
