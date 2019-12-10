@@ -1,78 +1,217 @@
-﻿using Apache.NMS;
-using Apache.NMS.ActiveMQ;
-using Benner.Listener;
-using Benner.Retry.Tests.MockMQ;
+﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections;
+using Benner.Messaging;
 using System.Collections.Generic;
 using System.Threading;
+using Apache.NMS;
+using System.Collections;
+using Apache.NMS.ActiveMQ;
+using Benner.Retry.Tests.MockMQ;
+using Benner.Listener;
 
 namespace Benner.Messaging.Retry.Tests
 {
     [TestClass]
     public class ActiveMqTests
     {
-        private readonly QueueName _queueName = new QueueName($"{Environment.MachineName}-retryteste01");
-        private readonly ConnectionFactory factory = new ConnectionFactory("tcp://bnu-vtec001:61616");
-        private readonly MessagingConfig config = new MessagingConfigBuilder("ActiveMQ", BrokerType.ActiveMQ, new Dictionary<string, string>()
+        private static string _queueName = $"{Environment.MachineName}-test".ToLower();
+        private static string _deadQueueName = $"{Environment.MachineName}-test-dead".ToLower();
+        private static string _retryQueueName = $"{Environment.MachineName}-test-retry".ToLower();
+        private static string _invalidQueueName = $"{Environment.MachineName}-test-invalid".ToLower();
+
+        private readonly ConnectionFactory _factory = new ConnectionFactory("tcp://bnu-vtec001:61616");
+
+        private readonly MessagingConfig _config = new MessagingConfigBuilder("ActiveMQ", BrokerType.ActiveMQ, new Dictionary<string, string>()
             {   {"UserName", "admin"},
                 {"Password", "admin"},
                 {"Hostname", "bnu-vtec001" }
             }).Create();
-        private readonly EnterpriseIntegrationConsumerMock consumer = new EnterpriseIntegrationConsumerMock(null);
+
+        private static IEnterpriseIntegrationSettings _settings = new EnterpriseIntegrationSettings
+        {
+            QueueName = _queueName,
+            RetryIntervalInMilliseconds = 10,
+            RetryLimit = 2,
+        };
+
+        private static EnterpriseIntegrationConsumerMock _consumer = new EnterpriseIntegrationConsumerMock(_settings);
+
 
         [TestMethod]
-        public void Testa_retentativa_activemq()
+        public void Testa_retentativas_activemq()
         {
-            try
+            // garante que fila existe
+            CreateQueue(_queueName);
+            CreateQueue(_deadQueueName);
+            CreateQueue(_retryQueueName);
+            CreateQueue(_invalidQueueName);
+
+            // garante que está vazia
+            TryDeleteQueue(_queueName);
+            TryDeleteQueue(_deadQueueName);
+            TryDeleteQueue(_retryQueueName);
+            TryDeleteQueue(_invalidQueueName);
+
+            Assert.AreEqual(0, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+
+            //zera os contadores de mensagens
+            _consumer.OnMessageCount = 0;
+            _consumer.OnInvalidMessageCount = 0;
+            _consumer.OnDeadMessageCount = 0;
+            using (var producer = new Messaging(_config))
             {
-                var guid = Guid.NewGuid().ToString();
-
-                var message = new EnterpriseIntegrationMessage()
+                for (int i = 0; i < 2; i++)
                 {
-                    Body = "emitir-excecao",
-                    MessageID = Guid.NewGuid().ToString()
-                };
+                    producer.EnqueueMessage(_queueName, new EnterpriseIntegrationMessage()
+                    {
+                        Body = "emitir-excecao",
+                        MessageID = Guid.NewGuid().ToString()
+                    });
+                }
+            }
 
-                var listener = new EnterpriseIntegrationListener(config, consumer);
-                var producer = new Messaging(config);
+            Assert.AreEqual(2, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
 
-                producer.EnqueueMessage(_queueName.Default, message);
-
-                Assert.AreEqual(1, GetQueueSize(_queueName.Default));
-
+            using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
+            {
                 listener.Start();
-
                 Thread.Sleep(1000);
 
-                var received = Messaging.Dequeue<EnterpriseIntegrationMessage>(_queueName.Dead, config);
-
-                Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
-                Assert.AreEqual(message.MessageID, received.MessageID);
-                Assert.AreEqual(0, GetQueueSize(_queueName.Default));
-                Assert.AreEqual(1, consumer.OnMessageCount);
+                //TODO: testar o tamanho da fila de retentativas, de alguma forma
             }
-            catch (Exception e)
+
+            Assert.AreEqual(0, GetQueueSize(_queueName));
+            Assert.AreEqual(2, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+
+            // garantir a quantidade de retentativas
+
+            Assert.AreEqual(4, _consumer.OnMessageCount);
+            Assert.AreEqual(2, _consumer.OnDeadMessageCount);
+            Assert.AreEqual(0, _consumer.OnInvalidMessageCount);
+
+            TryDeleteQueue(_queueName);
+            TryDeleteQueue(_deadQueueName);
+            TryDeleteQueue(_retryQueueName);
+            TryDeleteQueue(_invalidQueueName);
+
+            Assert.AreEqual(0, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, _consumer.OnInvalidMessageCount);
+        }
+
+        [TestMethod]
+        public void testa_envio_de_mensagens_invalidas()
+        {
+            // garante que fila existe
+            CreateQueue(_queueName);
+            CreateQueue(_deadQueueName);
+            CreateQueue(_retryQueueName);
+            CreateQueue(_invalidQueueName);
+
+            // garante que está vazia
+            TryDeleteQueue(_queueName);
+            TryDeleteQueue(_deadQueueName);
+            TryDeleteQueue(_retryQueueName);
+            TryDeleteQueue(_invalidQueueName);
+
+            //zera os contadores de mensagens
+            _consumer.OnMessageCount = 0;
+            _consumer.OnInvalidMessageCount = 0;
+            _consumer.OnDeadMessageCount = 0;
+
+            Assert.AreEqual(0, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+
+            using (var producer = new Messaging(_config))
             {
-                using (Connection conn = factory.CreateConnection() as Connection)
+                for (int i = 0; i < 2; i++)
                 {
-                    using (ISession session = conn.CreateSession())
+                    producer.EnqueueMessage(_queueName, new EnterpriseIntegrationMessage()
                     {
-                        session.DeleteQueue(_queueName.Default);
-                        session.DeleteQueue(_queueName.Dead);
-                        session.DeleteQueue(_queueName.Retry);
-                        session.DeleteQueue(_queueName.Invalid);
-                    }
+                        Body = "emitir-excecao-mensagem-invalida",
+                        MessageID = Guid.NewGuid().ToString()
+                    });
                 }
-                throw new Exception(e.InnerException.ToString());
+            }
+
+            Assert.AreEqual(2, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+
+            using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
+            {
+                listener.Start();
+                Thread.Sleep(1000);
+
+                //TODO: testar o tamanho da fila de retentativas, de alguma forma
+            }
+
+            Assert.AreEqual(0, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(2, GetQueueSize(_invalidQueueName));
+
+            // garantir a quantidade de retentativas
+            Assert.AreEqual(2, _consumer.OnMessageCount);
+            Assert.AreEqual(0, _consumer.OnDeadMessageCount);
+            Assert.AreEqual(2, _consumer.OnInvalidMessageCount);
+
+
+
+            TryDeleteQueue(_queueName);
+            TryDeleteQueue(_deadQueueName);
+            TryDeleteQueue(_retryQueueName);
+            TryDeleteQueue(_invalidQueueName);
+
+            Assert.AreEqual(0, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+        }
+
+
+        internal void CreateQueue(string queueName)
+        {
+            using (Connection conn = _factory.CreateConnection() as Connection)
+            {
+                using (ISession session = conn.CreateSession())
+                {
+                    session.GetQueue(queueName);
+                }
+            }
+        }
+
+        internal void TryDeleteQueue(string queueName)
+        {
+            using (Connection connection = _factory.CreateConnection() as Connection)
+            using (ISession session = connection.CreateSession())
+            {
+                IQueue queue = session.GetQueue(queueName);
+                try
+                {
+                    connection.DeleteDestination(queue);
+                }
+                catch
+                { /*ignore errros*/ }
             }
         }
 
         public int GetQueueSize(string fila)
         {
             int count = 0;
-            using (Connection conn = factory.CreateConnection() as Connection)
+            using (Connection conn = _factory.CreateConnection() as Connection)
             {
                 conn.Start();
                 using (ISession session = conn.CreateSession())
