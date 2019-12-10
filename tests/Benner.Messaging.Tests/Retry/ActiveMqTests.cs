@@ -1,27 +1,26 @@
-﻿using System;
+﻿using Apache.NMS;
+using Apache.NMS.ActiveMQ;
+using Benner.Listener;
+using Benner.Retry.Tests.MockMQ;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Benner.Messaging;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using Apache.NMS;
-using System.Collections;
-using Apache.NMS.ActiveMQ;
-using Benner.Retry.Tests.MockMQ;
-using Benner.Listener;
 
 namespace Benner.Messaging.Retry.Tests
 {
     [TestClass]
     public class ActiveMqTests
     {
+        private readonly QueueName _queueName = new QueueName($"{Environment.MachineName}-retryteste01");
         private readonly ConnectionFactory factory = new ConnectionFactory("tcp://bnu-vtec001:61616");
-        private readonly EnterpriseIntegrationConsumerMock consumer = new EnterpriseIntegrationConsumerMock(null);
         private readonly MessagingConfig config = new MessagingConfigBuilder("ActiveMQ", BrokerType.ActiveMQ, new Dictionary<string, string>()
             {   {"UserName", "admin"},
                 {"Password", "admin"},
                 {"Hostname", "bnu-vtec001" }
             }).Create();
-        private readonly string queueName = "nathank-teste";
+        private readonly EnterpriseIntegrationConsumerMock consumer = new EnterpriseIntegrationConsumerMock(null);
 
         [TestMethod]
         public void Testa_retentativa_activemq()
@@ -39,19 +38,19 @@ namespace Benner.Messaging.Retry.Tests
                 var listener = new EnterpriseIntegrationListener(config, consumer);
                 var producer = new Messaging(config);
 
-                producer.EnqueueMessage(queueName, message);
+                producer.EnqueueMessage(_queueName.Default, message);
 
-                Assert.AreEqual(1, GetQueueSize(queueName));
+                Assert.AreEqual(1, GetQueueSize(_queueName.Default));
 
                 listener.Start();
 
                 Thread.Sleep(1000);
 
-                var received = Messaging.Dequeue<EnterpriseIntegrationMessage>(queueName + "-dead", config);
+                var received = Messaging.Dequeue<EnterpriseIntegrationMessage>(_queueName.Dead, config);
 
-                Assert.AreEqual(0, GetQueueSize(queueName + "-dead"));
+                Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
                 Assert.AreEqual(message.MessageID, received.MessageID);
-                Assert.AreEqual(0, GetQueueSize(queueName));
+                Assert.AreEqual(0, GetQueueSize(_queueName.Default));
                 Assert.AreEqual(1, consumer.OnMessageCount);
             }
             catch (Exception e)
@@ -60,10 +59,10 @@ namespace Benner.Messaging.Retry.Tests
                 {
                     using (ISession session = conn.CreateSession())
                     {
-                        session.DeleteQueue(queueName);
-                        session.DeleteQueue(queueName + "-dead");
-                        session.DeleteQueue(queueName + "-retry");
-                        session.DeleteQueue(queueName + "-error");
+                        session.DeleteQueue(_queueName.Default);
+                        session.DeleteQueue(_queueName.Dead);
+                        session.DeleteQueue(_queueName.Retry);
+                        session.DeleteQueue(_queueName.Invalid);
                     }
                 }
                 throw new Exception(e.InnerException.ToString());
