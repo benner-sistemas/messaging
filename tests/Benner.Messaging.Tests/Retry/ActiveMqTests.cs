@@ -7,6 +7,7 @@ using Apache.NMS;
 using System.Collections;
 using Apache.NMS.ActiveMQ;
 using Benner.Retry.Tests.MockMQ;
+using Benner.Listener;
 
 namespace Benner.Messaging.Retry.Tests
 {
@@ -14,7 +15,7 @@ namespace Benner.Messaging.Retry.Tests
     public class ActiveMqTests
     {
         private readonly ConnectionFactory factory = new ConnectionFactory("tcp://bnu-vtec001:61616");
-        private readonly EnterpriseIntegrationConsumerMock consumer = new EnterpriseIntegrationConsumerMock();
+        private readonly EnterpriseIntegrationConsumerMock consumer = new EnterpriseIntegrationConsumerMock(null);
         private readonly MessagingConfig config = new MessagingConfigBuilder("ActiveMQ", BrokerType.ActiveMQ, new Dictionary<string, string>()
             {   {"UserName", "admin"},
                 {"Password", "admin"},
@@ -35,7 +36,7 @@ namespace Benner.Messaging.Retry.Tests
                     MessageID = Guid.NewGuid().ToString()
                 };
 
-                var listener = new EnterpriseIntegrationListenerMock(config, consumer);
+                var listener = new EnterpriseIntegrationListener(config, consumer);
                 var producer = new Messaging(config);
 
                 producer.EnqueueMessage(queueName, message);
@@ -51,7 +52,7 @@ namespace Benner.Messaging.Retry.Tests
                 Assert.AreEqual(0, GetQueueSize(queueName + "-dead"));
                 Assert.AreEqual(message.MessageID, received.MessageID);
                 Assert.AreEqual(0, GetQueueSize(queueName));
-                Assert.AreEqual(1, listener.GetCountRetry());
+                Assert.AreEqual(1, consumer.OnMessageCount);
             }
             catch (Exception e)
             {
