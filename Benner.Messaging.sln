@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.ERP.API", "samples\B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERP.Consumer", "samples\ERP.Consumer\ERP.Consumer.csproj", "{FF408277-E4EB-40DB-8EE6-B57B6AD37D56}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERP.Tests", "samples\ERP.Tests\ERP.Tests.csproj", "{A9695054-61F3-4845-87DB-9E709409ABD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +117,10 @@ Global
 		{FF408277-E4EB-40DB-8EE6-B57B6AD37D56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF408277-E4EB-40DB-8EE6-B57B6AD37D56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF408277-E4EB-40DB-8EE6-B57B6AD37D56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9695054-61F3-4845-87DB-9E709409ABD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9695054-61F3-4845-87DB-9E709409ABD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9695054-61F3-4845-87DB-9E709409ABD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9695054-61F3-4845-87DB-9E709409ABD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -129,6 +135,7 @@ Global
 		{1B762F53-0BD3-4787-9BAA-B8377A26F666} = {E7BA2632-92C4-423D-83A1-E65694FD082B}
 		{011252BD-CE6C-4480-86A8-0085205A870F} = {97839F13-D676-4324-941A-16FD5151B2F2}
 		{FF408277-E4EB-40DB-8EE6-B57B6AD37D56} = {97839F13-D676-4324-941A-16FD5151B2F2}
+		{A9695054-61F3-4845-87DB-9E709409ABD6} = {97839F13-D676-4324-941A-16FD5151B2F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E33B176C-4421-406A-A00A-0FCB277089B1}

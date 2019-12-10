@@ -6,7 +6,12 @@ namespace ERP.Consumer
 {
     public class PessoaConsumer : IEnterpriseIntegrationConsumer
     {
-        public IEnterpriseIntegrationSettings Settings => throw new NotImplementedException();
+        public IEnterpriseIntegrationSettings Settings => new EnterpriseIntegrationSettings()
+        {
+            QueueName = "nome-da-fila",
+            RetryIntervalInMilliseconds = 1000,
+            RetryLimit = 3
+        };
 
         public void OnMessage(object message)
         {
@@ -24,6 +29,9 @@ namespace ERP.Consumer
             if (string.IsNullOrWhiteSpace(request.Nome))
                 throw new InvalidMessageException("Nome deve ser informado");
 
+            if (request?.RequestID == null || !request.RequestID.HasValue)
+                throw new InvalidMessageException("Request ID deve ser informado");
+
             if (request.Endereco == null)
                 throw new InvalidMessageException("Endereço deve ser preenchido");
 
@@ -32,20 +40,14 @@ namespace ERP.Consumer
 
         public void OnInvalidMessage(object message)
         {
-            var request = message as PessoaRequest;
-
-            if (request == null)
-                throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
+            var request = message as PessoaRequest ?? throw new ArgumentNullException($"Request não é do tipo '{nameof(PessoaRequest)}'");
 
             // fazer algo com a request
         }
 
         public void OnDeadMessage(object message)
         {
-            var request = message as PessoaRequest;
-
-            if (request == null)
-                throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
+            var request = message as PessoaRequest ?? throw new ArgumentNullException($"Request não é do tipo '{nameof(PessoaRequest)}'");
 
             // fazer algo com a request
         }
