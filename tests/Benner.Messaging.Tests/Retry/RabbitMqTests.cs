@@ -64,55 +64,41 @@ namespace Benner.Messaging.Retry.Tests
             _consumer.OnMessageCount = 0;
             _consumer.OnInvalidMessageCount = 0;
             _consumer.OnDeadMessageCount = 0;
-            using (var conn = _factory.CreateConnection())
+            using (var producer = new Messaging(_config))
             {
-                using (var channel = conn.CreateModel())
+                for (int i = 0; i < 2; i++)
                 {
-                    try
+                    producer.EnqueueMessage(_queueName, new EnterpriseIntegrationMessage()
                     {
-                        using (var producer = new Messaging(_config))
-                        {
-                            for (int i = 0; i < 2; i++)
-                            {
-                                producer.EnqueueMessage(_queueName, new EnterpriseIntegrationMessage()
-                                {
-                                    Body = "emitir-excecao",
-                                    MessageID = Guid.NewGuid().ToString()
-                                });
-                            }
-                        }
-
-                        Assert.AreEqual(2, GetQueueSize(_queueName));
-                        Assert.AreEqual(0, GetQueueSize(_deadQueueName));
-                        Assert.AreEqual(0, GetQueueSize(_retryQueueName));
-                        Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
-
-                        using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
-                        {
-                            listener.Start();
-                            Thread.Sleep(1000);
-
-                            //TODO: testar o tamanho da fila de retentativas, de alguma forma
-                        }
-
-                        Assert.AreEqual(0, GetQueueSize(_queueName));
-                        Assert.AreEqual(2, GetQueueSize(_deadQueueName));
-                        Assert.AreEqual(0, GetQueueSize(_retryQueueName));
-                        Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
-
-                        // garantir a quantidade de retentativas
-                    
-                        Assert.AreEqual(4, _consumer.OnMessageCount);
-                        Assert.AreEqual(2, _consumer.OnDeadMessageCount);
-                        Assert.AreEqual(0, _consumer.OnInvalidMessageCount);
-                    }
-                    finally
-                    {
-                        conn.Close();
-                        channel.Close();
-                    }
+                        Body = "emitir-excecao",
+                        MessageID = Guid.NewGuid().ToString()
+                    });
                 }
             }
+
+            Assert.AreEqual(2, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+
+            using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
+            {
+                listener.Start();
+                Thread.Sleep(1000);
+
+                //TODO: testar o tamanho da fila de retentativas, de alguma forma
+            }
+
+            Assert.AreEqual(0, GetQueueSize(_queueName));
+            Assert.AreEqual(2, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+
+            // garantir a quantidade de retentativas
+
+            Assert.AreEqual(4, _consumer.OnMessageCount);
+            Assert.AreEqual(2, _consumer.OnDeadMessageCount);
+            Assert.AreEqual(0, _consumer.OnInvalidMessageCount);
 
             PurgeQueue(_queueName);
             PurgeQueue(_deadQueueName);
@@ -150,55 +136,40 @@ namespace Benner.Messaging.Retry.Tests
             Assert.AreEqual(0, GetQueueSize(_retryQueueName));
             Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
 
-
-            using (var conn = _factory.CreateConnection())
+            using (var producer = new Messaging(_config))
             {
-                using (var channel = conn.CreateModel())
+                for (int i = 0; i < 2; i++)
                 {
-                    try
+                    producer.EnqueueMessage(_queueName, new EnterpriseIntegrationMessage()
                     {
-                        using (var producer = new Messaging(_config))
-                        {
-                            for (int i = 0; i < 2; i++)
-                            {
-                                producer.EnqueueMessage(_queueName, new EnterpriseIntegrationMessage()
-                                {
-                                    Body = "emitir-excecao-mensagem-invalida",
-                                    MessageID = Guid.NewGuid().ToString()
-                                });
-                            }
-                        }
-
-                        Assert.AreEqual(2, GetQueueSize(_queueName));
-                        Assert.AreEqual(0, GetQueueSize(_deadQueueName));
-                        Assert.AreEqual(0, GetQueueSize(_retryQueueName));
-                        Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
-
-                        using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
-                        {
-                            listener.Start();
-                            Thread.Sleep(1000);
-
-                            //TODO: testar o tamanho da fila de retentativas, de alguma forma
-                        }
-
-                        Assert.AreEqual(0, GetQueueSize(_queueName));
-                        Assert.AreEqual(0, GetQueueSize(_deadQueueName));
-                        Assert.AreEqual(0, GetQueueSize(_retryQueueName));
-                        Assert.AreEqual(2, GetQueueSize(_invalidQueueName));
-
-                        // garantir a quantidade de retentativas
-                        Assert.AreEqual(2, _consumer.OnMessageCount);
-                        Assert.AreEqual(0, _consumer.OnDeadMessageCount);
-                        Assert.AreEqual(2, _consumer.OnInvalidMessageCount);
-                    }
-                    finally
-                    {
-                        conn.Close();
-                        channel.Close();
-                    }
+                        Body = "emitir-excecao-mensagem-invalida",
+                        MessageID = Guid.NewGuid().ToString()
+                    });
                 }
             }
+
+            Assert.AreEqual(2, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
+
+            using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
+            {
+                listener.Start();
+                Thread.Sleep(1000);
+
+                //TODO: testar o tamanho da fila de retentativas, de alguma forma
+            }
+
+            Assert.AreEqual(0, GetQueueSize(_queueName));
+            Assert.AreEqual(0, GetQueueSize(_deadQueueName));
+            Assert.AreEqual(0, GetQueueSize(_retryQueueName));
+            Assert.AreEqual(2, GetQueueSize(_invalidQueueName));
+
+            // garantir a quantidade de retentativas
+            Assert.AreEqual(2, _consumer.OnMessageCount);
+            Assert.AreEqual(0, _consumer.OnDeadMessageCount);
+            Assert.AreEqual(2, _consumer.OnInvalidMessageCount);
 
             PurgeQueue(_queueName);
             PurgeQueue(_deadQueueName);
