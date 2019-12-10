@@ -11,13 +11,12 @@ namespace Benner.Listener
         private readonly IEnterpriseIntegrationConsumer _consumer;
         private readonly Messaging.Messaging _receiver;
         private readonly Messaging.Messaging _sender;
-        private string DefaultQueueName => _consumer.Settings.QueueName;
-        private string InvalidQueueName => $"{_consumer.Settings.QueueName}-invalid";
-        private string DeadQueueName => $"{_consumer.Settings.QueueName}-dead";
-        private string RetryQueueName => $"{_consumer.Settings.QueueName}-retry";
+        private readonly QueueName _queueName;
+        
         public EnterpriseIntegrationListener(IMessagingConfig config, IEnterpriseIntegrationConsumer consumer)
         {
             _consumer = consumer;
+            _queueName = new QueueName(consumer.Settings.QueueName);
             _receiver = new Messaging.Messaging(config);
             _sender = new Messaging.Messaging(config);
         }
@@ -31,8 +30,8 @@ namespace Benner.Listener
         }
         public void Start()
         {
-            _receiver.StartListening(DefaultQueueName, ProcessDefaultQueue);
-            _receiver.StartListening(RetryQueueName, ProcessRetryQueue);
+            _receiver.StartListening(_queueName.Default, ProcessDefaultQueue);
+            _receiver.StartListening(_queueName.Retry, ProcessRetryQueue);
         }
         private bool ProcessDefaultQueue(MessagingArgs arg)
         {
@@ -82,7 +81,7 @@ namespace Benner.Listener
         private bool CallInvalidMessage(EnterpriseIntegrationMessage integrationMessage, InvalidMessageException invalidMessageException)
         {
             integrationMessage.ExceptionList.Add(invalidMessageException);
-            _sender.EnqueueMessage(InvalidQueueName, integrationMessage);
+            _sender.EnqueueMessage(_queueName.Invalid, integrationMessage);
             Task.Run(() => { try { _consumer.OnInvalidMessage(integrationMessage.Body); } catch { /*silent!*/ } });
             return true;
         }
@@ -93,11 +92,11 @@ namespace Benner.Listener
             if (integrationMessage.RetryCount < _consumer.Settings.RetryLimit)
             {
                 integrationMessage.WaitUntil = DateTime.Now.AddMilliseconds(_consumer.Settings.RetryIntervalInMilliseconds);
-                _sender.EnqueueMessage(RetryQueueName, integrationMessage);
+                _sender.EnqueueMessage(_queueName.Retry, integrationMessage);
             }
             else
             {
-                _sender.EnqueueMessage(DeadQueueName, integrationMessage);
+                _sender.EnqueueMessage(_queueName.Dead, integrationMessage);
                 Task.Run(() => { try { _consumer.OnDeadMessage(integrationMessage.Body); } catch { /*silent!*/ } });
             }
             return true;

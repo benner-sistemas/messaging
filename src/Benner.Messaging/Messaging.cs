@@ -220,9 +220,9 @@ namespace Benner.Messaging
         /// The method that will receive and process the messages.
         /// Returns true: the processing is considered as succeeded. The message is deleted from queue.
         /// Returns false: the processing is considered complete with flaws. The message returns to the queue.
-        /// Throws exception: the message is considered dangerous, removed from the queue and enqueued to another error queue.
-        /// This error queue is another queue with the same name followed by "-error", e.g. if <paramref name="queueName"/> equals "test-queue",
-        /// the error queue will be "test-queue-error".
+        /// Throws exception: the message is considered dangerous, removed from the queue and enqueued to another dead queue.
+        /// This dead queue is another queue with the same name followed by "-dead", e.g. if <paramref name="queueName"/> equals "test-queue",
+        /// the dead queue will be "test-queue-dead".
         /// </param>
         /// <exception cref="InvalidOperationException">Occurs when the connection to the server fails.</exception>
         public void StartListening(string queueName, Func<MessagingArgs, bool> func)

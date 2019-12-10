@@ -11,15 +11,14 @@ namespace Benner.Messaging.Tests.Acknowledge
     [TestClass]
     public class RabbitMqTests
     {
-        private readonly string queueName = $"{Environment.MachineName}-teste-ack".ToLower();
-        private readonly string errorQueueName = $"{Environment.MachineName}-teste-ack-error".ToLower();
+        private readonly QueueName _queueName = new QueueName($"{Environment.MachineName}-ackteste01");
+
         private readonly ConnectionFactory factory = new ConnectionFactory
         {
             HostName = "bnu-vtec012",
             UserName = "guest",
             Port = 5672
         };
-
         private readonly MessagingConfig config = new MessagingConfigBuilder("RabbitMQ", BrokerType.RabbitMQ, new Dictionary<string, string>()
                 {
                     {"UserName", "guest"},
@@ -31,20 +30,20 @@ namespace Benner.Messaging.Tests.Acknowledge
         [TestMethod]
         public void Testa_garantia_de_recebimento_da_fila_no_rabbitMq()
         {
-            PurgeQueue(queueName);
-            PurgeQueue(errorQueueName);
+            PurgeQueue(_queueName.Default);
+            PurgeQueue(_queueName.Dead);
 
             var message = Guid.NewGuid().ToString();
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(_queueName.Default, message, config);
 
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
             var consumerFired = false;
             try
             {
                 using (var client = new Messaging(config))
                 {
-                    client.StartListening(queueName, (e) =>
+                    client.StartListening(_queueName.Default, (e) =>
                     {
                         consumerFired = true;
 
@@ -63,26 +62,26 @@ namespace Benner.Messaging.Tests.Acknowledge
             }
 
             Assert.IsTrue(consumerFired);
-            Assert.AreEqual(0, GetQueueSize(queueName));
-            Assert.AreEqual(1, GetQueueSize(errorQueueName));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
         public void Testa_o_acknowledge_no_metodo_de_recebimento_da_fila_no_rabbitMq()
         {
-            PurgeQueue(queueName);
-            PurgeQueue(errorQueueName);
+            PurgeQueue(_queueName.Default);
+            PurgeQueue(_queueName.Dead);
 
             var message = Guid.NewGuid().ToString();
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(_queueName.Default, message, config);
 
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
 
             var consumerFired = false;
             using (var client = new Messaging(config))
             {
-                client.StartListening(queueName, (e) =>
+                client.StartListening(_queueName.Default, (e) =>
                 {
                     consumerFired = true;
                     Assert.AreEqual(message.ToString(), e.AsString);
@@ -92,56 +91,54 @@ namespace Benner.Messaging.Tests.Acknowledge
                     Thread.Sleep(1000);
             }
             Assert.IsTrue(consumerFired);
-            Assert.AreEqual(0, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
         public void Testa_o_not_acknowledge_no_metodo_de_recebimento_sem_executar_o_consume_da_fila_no_rabbitMq()
         {
-            PurgeQueue(queueName);
-            PurgeQueue(errorQueueName);
+            PurgeQueue(_queueName.Default);
+            PurgeQueue(_queueName.Dead);
+            Assert.AreEqual(0, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
 
             var message = Guid.NewGuid().ToString();
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(_queueName.Default, message, config);
 
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
+
             var consumerFired = false;
             using (var client = new Messaging(config))
             {
-                client.StartListening(queueName, (e) =>
-                {
-                    consumerFired = true;
-
-                    Assert.AreEqual(message, e.AsString);
-
-                    return false;
-                });
+                Thread.Sleep(10);
+                client.StartListening(_queueName.Default, null);
             }
+            Thread.Sleep(10);
 
             Assert.IsFalse(consumerFired);
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
         public void Testa_o_not_acknowledge_no_metodo_de_recebimento_com_duas_mensagens_sem_executar_o_consume_da_fila_no_rabbitMq()
         {
-            PurgeQueue(queueName);
-            PurgeQueue(errorQueueName);
+            PurgeQueue(_queueName.Default);
+            PurgeQueue(_queueName.Dead);
 
-            Messaging.Enqueue(queueName, "Message_A", config);
-            Messaging.Enqueue(queueName, "Message_B", config);
+            Messaging.Enqueue(_queueName.Default, "Message_A", config);
+            Messaging.Enqueue(_queueName.Default, "Message_B", config);
 
-            Assert.AreEqual(2, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(2, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
 
             var client01 = new Messaging(config);
             var client02 = new Messaging(config);
 
-            client01.StartListening(queueName, ProcessQueueAorB);
-            client02.StartListening(queueName, ProcessQueueAorB);
+            client01.StartListening(_queueName.Default, ProcessQueueAorB);
+            client02.StartListening(_queueName.Default, ProcessQueueAorB);
 
             for (int index = 0; index < 200 && !(_consumerFired_A && _consumerFired_B); ++index)
                 Thread.Sleep(100);
@@ -151,14 +148,14 @@ namespace Benner.Messaging.Tests.Acknowledge
 
             Assert.IsTrue(_consumerFired_A);
             Assert.IsTrue(_consumerFired_B);
-            Assert.AreEqual(2, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(2, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
 
-            PurgeQueue(queueName);
-            PurgeQueue(errorQueueName);
+            PurgeQueue(_queueName.Default);
+            PurgeQueue(_queueName.Dead);
 
-            Assert.AreEqual(0, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
         }
 
         private bool _consumerFired_A = false;
@@ -178,18 +175,18 @@ namespace Benner.Messaging.Tests.Acknowledge
         [TestMethod]
         public void Testa_o_not_acknowledge_no_metodo_de_recebimento_executanso_o_consume_da_fila_no_rabbitMq()
         {
-            PurgeQueue(queueName);
-            PurgeQueue(errorQueueName);
+            PurgeQueue(_queueName.Default);
+            PurgeQueue(_queueName.Dead);
 
             var message = Guid.NewGuid().ToString();
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(_queueName.Default, message, config);
 
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
             var consumerFired = false;
             using (var client = new Messaging(config))
             {
-                client.StartListening(queueName, (e) =>
+                client.StartListening(_queueName.Default, (e) =>
                 {
                     consumerFired = true;
 
@@ -202,36 +199,36 @@ namespace Benner.Messaging.Tests.Acknowledge
             }
 
             Assert.IsTrue(consumerFired);
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
         public void Testa_garantia_de_recebimento_da_fila_no_rabbitMq_sem_using()
         {
-            PurgeQueue(queueName);
-            PurgeQueue(errorQueueName);
+            PurgeQueue(_queueName.Default);
+            PurgeQueue(_queueName.Dead);
 
             var message = Guid.NewGuid().ToString();
 
 
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(_queueName.Default, message, config);
 
-            Assert.AreEqual(1, GetQueueSize(queueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
             try
             {
-                var receivedMessage = Messaging.Dequeue(queueName, config);
+                var receivedMessage = Messaging.Dequeue(_queueName.Default, config);
             }
             catch { }
-            Assert.AreEqual(0, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
         public void Testa_garantia_de_envio_para_fila_no_rabbitMq()
         {
-            PurgeQueue(queueName);
-            PurgeQueue(errorQueueName);
+            PurgeQueue(_queueName.Default);
+            PurgeQueue(_queueName.Dead);
 
             var message = Guid.NewGuid().ToString();
 
@@ -242,14 +239,14 @@ namespace Benner.Messaging.Tests.Acknowledge
                     bool exceptionWasThrow = false;
                     try
                     {
-                        client.EnqueueMessage(queueName, message);
+                        client.EnqueueMessage(_queueName.Default, message);
                     }
                     catch
                     {
                         exceptionWasThrow = true;
                     }
                     Assert.IsFalse(exceptionWasThrow);
-                    Assert.AreEqual(1, GetQueueSize(queueName));
+                    Assert.AreEqual(1, GetQueueSize(_queueName.Default));
                     throw new Exception(message);
                 }
             }
@@ -257,16 +254,16 @@ namespace Benner.Messaging.Tests.Acknowledge
             {
                 Assert.AreEqual(message, exception.Message);
             }
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            var received = Messaging.Dequeue(queueName, config);
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            var received = Messaging.Dequeue(_queueName.Default, config);
             Assert.IsTrue(received.Contains(message));
         }
 
         [TestMethod]
         public void Testa_garantia_de_envio_para_fila_no_rabbitMq_sem_using()
         {
-            PurgeQueue(queueName);
-            PurgeQueue(errorQueueName);
+            PurgeQueue(_queueName.Default);
+            PurgeQueue(_queueName.Dead);
 
             var guid = Guid.NewGuid().ToString();
             try
@@ -274,22 +271,22 @@ namespace Benner.Messaging.Tests.Acknowledge
                 bool exceptionWasThrow = false;
                 try
                 {
-                    Messaging.Enqueue(queueName, new { id = guid }, config);
+                    Messaging.Enqueue(_queueName.Default, new { id = guid }, config);
                 }
                 catch
                 {
                     exceptionWasThrow = true;
                 }
                 Assert.IsFalse(exceptionWasThrow);
-                Assert.AreEqual(1, GetQueueSize(queueName));
+                Assert.AreEqual(1, GetQueueSize(_queueName.Default));
                 throw new Exception(guid);
             }
             catch (Exception exception)
             {
                 Assert.AreEqual(guid, exception.Message);
             }
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            var received = Messaging.Dequeue(queueName, config);
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            var received = Messaging.Dequeue(_queueName.Default, config);
             Assert.IsTrue(received.Contains(guid));
         }
 
@@ -321,8 +318,6 @@ namespace Benner.Messaging.Tests.Acknowledge
                     try
                     {
                         channel.QueuePurge(queueName);
-                        channel.QueuePurge(queueName + "-retry");
-                        channel.QueuePurge(queueName + "-dead");
                     }
                     catch
                     { }

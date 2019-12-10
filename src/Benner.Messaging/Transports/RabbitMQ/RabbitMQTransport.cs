@@ -147,7 +147,8 @@ namespace Benner.Messaging
                 }
                 catch (Exception exception)
                 {
-                    EnqueueMessage($"{queueName}-error", string.Concat(exception.Message, "\r\n", Encoding.UTF8.GetString(ea.Body)));
+                    
+                    EnqueueMessage(QueueName.DeadQueueName(queueName), string.Concat(exception.Message, "\r\n", Encoding.UTF8.GetString(ea.Body)));
                 }
                 finally
                 {

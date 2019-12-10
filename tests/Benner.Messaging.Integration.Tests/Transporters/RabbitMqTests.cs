@@ -31,25 +31,25 @@ namespace Benner.Messaging.Tests.Transporters
         public void RabbitMQ_deve_consumir_mensagem_lancando_exception_e_verificar_que_ela_continua_na_fila()
         {
             var guid = Guid.NewGuid().ToString();
-            string queueName = $"fila-teste-rabbitmq-{guid}";
+            var queueName = new QueueName($"fila-teste-rabbitmq-{guid}");
             string message = $"Mensagem que deve retornar {guid}";
             var config = new FileMessagingConfig(LoadFileConfig(Broker.RabbitMQ));
 
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(queueName.Default, message, config);
 
             using (var receiver = new Messaging(config))
             {
-                receiver.StartListening(queueName, (args) =>
+                receiver.StartListening(queueName.Default, (args) =>
                 {
                     throw new Exception("Vai para fila de error.");
                 });
                 System.Threading.Thread.Sleep(100);
             }
 
-            var received = Messaging.Dequeue(queueName, config);
+            var received = Messaging.Dequeue(queueName.Default, config);
             Assert.IsNull(received);
 
-            var errorMessage = Messaging.Dequeue($"{queueName}-error", config);
+            var errorMessage = Messaging.Dequeue(queueName.Dead, config);
             Assert.AreEqual($"Vai para fila de error.\r\n{message}", errorMessage);
         }
 

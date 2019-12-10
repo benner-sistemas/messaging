@@ -29,25 +29,25 @@ namespace Benner.Messaging.Tests.Transporters
         public void AmazonSQS_deve_consumir_mensagem_lancando_exception_e_verificar_que_ela_continua_na_fila()
         {
             var guid = Guid.NewGuid().ToString();
-            string queueName = $"fila-teste-amazonsqs-{guid}";
+            var queueName = new QueueName($"fila-teste-amazonsqs-{guid}");
             string message = $"Mensagem que deve retornar {guid}";
             var config = new FileMessagingConfig(LoadFileConfig(Broker.AmazonSQS));
 
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(queueName.Default, message, config);
 
             using (var receiver = new Messaging(config))
             {
-                receiver.StartListening(queueName, (args) =>
+                receiver.StartListening(queueName.Default, (args) =>
                 {
                     throw new Exception("Vai para fila de error.");
                 });
                 System.Threading.Thread.Sleep(100);
             }
 
-            var received = Messaging.Dequeue(queueName, config);
+            var received = Messaging.Dequeue(queueName.Default, config);
             Assert.IsNull(received);
 
-            var errorMessage = Messaging.Dequeue($"{queueName}-error", config);
+            var errorMessage = Messaging.Dequeue(queueName.Dead, config);
             Assert.AreEqual($"Vai para fila de error.\r\n{message}", errorMessage);
         }
 
@@ -55,11 +55,11 @@ namespace Benner.Messaging.Tests.Transporters
         public void AmazonSQS_deve_consumir_mensagem_retornando_false_e_verificar_que_ela_continua_na_fila()
         {
             var guid = Guid.NewGuid().ToString();
-            string queueName = $"fila-teste-amazonsqs-{guid}";
+            var queueName = new QueueName($"fila-teste-amazonsqs-{guid}");
             string message = $"Mensagem que deve retornar {guid}";
             var config = new FileMessagingConfig(LoadFileConfig(Broker.AmazonSQS));
 
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(queueName.Default, message, config);
 
             string received = "";
             bool isFirst = true;
@@ -67,7 +67,7 @@ namespace Benner.Messaging.Tests.Transporters
             using (var receiver = new Messaging(config))
             {
                 bool shouldRun = true;
-                receiver.StartListening(queueName, (args) =>
+                receiver.StartListening(queueName.Default, (args) =>
                 {
                     if (shouldRun)
                     {
@@ -106,9 +106,10 @@ namespace Benner.Messaging.Tests.Transporters
         public void AmazonSQS_deve_enviar_e_receber_objeto_serializado()
         {
             var config = new FileMessagingConfig(LoadFileConfig(Broker.AmazonSQS));
-            string queueName = $"fila-teste-amazonsqs-{Guid.NewGuid()}";
-            Messaging.Enqueue(queueName, _invoiceMessage, config);
-            var typedMessage = Messaging.Dequeue<Invoice>(queueName, config);
+            var queueName = new QueueName($"fila-teste-amazonsqs-{Guid.NewGuid()}");
+
+            Messaging.Enqueue(queueName.Default, _invoiceMessage, config);
+            var typedMessage = Messaging.Dequeue<Invoice>(queueName.Default, config);
 
             Assert.AreEqual(_invoiceMessage.AccountReference, typedMessage.AccountReference);
             Assert.AreEqual(_invoiceMessage.CurrencyUsed, typedMessage.CurrencyUsed);
@@ -123,7 +124,7 @@ namespace Benner.Messaging.Tests.Transporters
         }
 
         [TestMethod]
-        public void AmazonSQS_deve_receber_nulo_ao_ouvir_mensagem_inexistente()
+        public void AmazonSQS_deve_receber_nulo_ao_ouvir_fila_inexistente()
         {
             var single = Messaging.Dequeue($"fila-teste-amazonsqs-{Guid.NewGuid()}", new FileMessagingConfig(LoadFileConfig(Broker.AmazonSQS)));
             Assert.IsNull(single);

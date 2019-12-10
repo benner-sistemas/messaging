@@ -13,6 +13,8 @@ namespace Benner.Messaging.Tests.Acknowledge
     [TestClass]
     public class ActiveMqTests
     {
+        private readonly QueueName _queueName = new QueueName($"{Environment.MachineName}-ackteste01");
+
         private readonly ConnectionFactory factory = new ConnectionFactory("tcp://bnu-vtec001:61616");
         private readonly MessagingConfig config = new MessagingConfigBuilder("ActiveMQ", BrokerType.ActiveMQ, new Dictionary<string, string>()
             {   {"UserName", "admin"},
@@ -20,24 +22,22 @@ namespace Benner.Messaging.Tests.Acknowledge
                 {"Hostname", "bnu-vtec001" }
             }).Create();
 
-        private readonly string queueName = $"{Environment.MachineName}-teste-ack".ToLower();
-        private readonly string errorQueueName = $"{Environment.MachineName}-teste-ack-error".ToLower();
 
         [TestMethod]
         public void Testa_garantia_de_recebimento_da_fila_no_activeMq()
         {
             DeleteQueues();
             var message = Guid.NewGuid().ToString();
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(_queueName.Default, message, config);
 
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
             var consumerFired = false;
             try
             {
                 using (var client = new Messaging(config))
                 {
-                    client.StartListening(queueName, (e) =>
+                    client.StartListening(_queueName.Default, (e) =>
                     {
                         consumerFired = true;
 
@@ -56,8 +56,8 @@ namespace Benner.Messaging.Tests.Acknowledge
             }
 
             Assert.IsTrue(consumerFired);
-            Assert.AreEqual(0, GetQueueSize(queueName));
-            Assert.AreEqual(1, GetQueueSize(errorQueueName));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
@@ -65,15 +65,15 @@ namespace Benner.Messaging.Tests.Acknowledge
         {
             DeleteQueues();
             var message = Guid.NewGuid().ToString();
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(_queueName.Default, message, config);
 
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
 
             var consumerFired = false;
             using (var client = new Messaging(config))
             {
-                client.StartListening(queueName, (e) =>
+                client.StartListening(_queueName.Default, (e) =>
                 {
                     consumerFired = true;
                     Assert.AreEqual(message.ToString(), e.AsString);
@@ -83,8 +83,8 @@ namespace Benner.Messaging.Tests.Acknowledge
                     Thread.Sleep(1000);
             }
             Assert.IsTrue(consumerFired);
-            Assert.AreEqual(0, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
@@ -92,26 +92,20 @@ namespace Benner.Messaging.Tests.Acknowledge
         {
             DeleteQueues();
             var message = Guid.NewGuid().ToString();
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(_queueName.Default, message, config);
 
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
             var consumerFired = false;
             using (var client = new Messaging(config))
             {
-                client.StartListening(queueName, (e) =>
-                {
-                    consumerFired = true;
-
-                    Assert.AreEqual(message, e.AsString);
-
-                    return false;
-                });
+                Thread.Sleep(10);
+                client.StartListening(_queueName.Default, null);
             }
 
             Assert.IsFalse(consumerFired);
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
@@ -119,16 +113,16 @@ namespace Benner.Messaging.Tests.Acknowledge
         {
             DeleteQueues();
 
-            Messaging.Enqueue(queueName, "Message_A", config);
-            Messaging.Enqueue(queueName, "Message_B", config);
+            Messaging.Enqueue(_queueName.Default, "Message_A", config);
+            Messaging.Enqueue(_queueName.Default, "Message_B", config);
 
-            Assert.AreEqual(2, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(2, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
             var consumerFired_A = false;
             var consumerFired_B = false;
             using (var client = new Messaging(config))
             {
-                client.StartListening(queueName, (e) =>
+                client.StartListening(_queueName.Default, (e) =>
                 {
                     if (e.AsString == "Message_A")
                         consumerFired_A = true;
@@ -144,8 +138,8 @@ namespace Benner.Messaging.Tests.Acknowledge
 
             Assert.IsTrue(consumerFired_A);
             Assert.IsTrue(consumerFired_B);
-            Assert.AreEqual(2, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(2, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
@@ -153,14 +147,14 @@ namespace Benner.Messaging.Tests.Acknowledge
         {
             DeleteQueues();
             var message = Guid.NewGuid().ToString();
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(_queueName.Default, message, config);
 
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
             var consumerFired = false;
             using (var client = new Messaging(config))
             {
-                client.StartListening(queueName, (e) =>
+                client.StartListening(_queueName.Default, (e) =>
                 {
                     consumerFired = true;
 
@@ -173,8 +167,8 @@ namespace Benner.Messaging.Tests.Acknowledge
             }
 
             Assert.IsTrue(consumerFired);
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
@@ -184,16 +178,16 @@ namespace Benner.Messaging.Tests.Acknowledge
             var message = Guid.NewGuid().ToString();
 
 
-            Messaging.Enqueue(queueName, message, config);
+            Messaging.Enqueue(_queueName.Default, message, config);
 
-            Assert.AreEqual(1, GetQueueSize(queueName));
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
             try
             {
-                var receivedMessage = Messaging.Dequeue(queueName, config);
+                var receivedMessage = Messaging.Dequeue(_queueName.Default, config);
             }
             catch { }
-            Assert.AreEqual(0, GetQueueSize(queueName));
-            Assert.AreEqual(0, GetQueueSize(errorQueueName));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Default));
+            Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
         }
 
         [TestMethod]
@@ -209,14 +203,14 @@ namespace Benner.Messaging.Tests.Acknowledge
                     bool exceptionWasThrow = false;
                     try
                     {
-                        client.EnqueueMessage(queueName, message);
+                        client.EnqueueMessage(_queueName.Default, message);
                     }
                     catch
                     {
                         exceptionWasThrow = true;
                     }
                     Assert.IsFalse(exceptionWasThrow);
-                    Assert.AreEqual(1, GetQueueSize(queueName));
+                    Assert.AreEqual(1, GetQueueSize(_queueName.Default));
                     throw new Exception(message);
                 }
             }
@@ -224,8 +218,8 @@ namespace Benner.Messaging.Tests.Acknowledge
             {
                 Assert.AreEqual(message, exception.Message);
             }
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            var received = Messaging.Dequeue(queueName, config);
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            var received = Messaging.Dequeue(_queueName.Default, config);
             Assert.IsTrue(received.Contains(message));
         }
 
@@ -239,22 +233,22 @@ namespace Benner.Messaging.Tests.Acknowledge
                 bool exceptionWasThrow = false;
                 try
                 {
-                    Messaging.Enqueue(queueName, new { id = guid }, config);
+                    Messaging.Enqueue(_queueName.Default, new { id = guid }, config);
                 }
                 catch
                 {
                     exceptionWasThrow = true;
                 }
                 Assert.IsFalse(exceptionWasThrow);
-                Assert.AreEqual(1, GetQueueSize(queueName));
+                Assert.AreEqual(1, GetQueueSize(_queueName.Default));
                 throw new Exception(guid);
             }
             catch (Exception exception)
             {
                 Assert.AreEqual(guid, exception.Message);
             }
-            Assert.AreEqual(1, GetQueueSize(queueName));
-            var received = Messaging.Dequeue(queueName, config);
+            Assert.AreEqual(1, GetQueueSize(_queueName.Default));
+            var received = Messaging.Dequeue(_queueName.Default, config);
             Assert.IsTrue(received.Contains(guid));
         }
 
@@ -264,8 +258,8 @@ namespace Benner.Messaging.Tests.Acknowledge
             {
                 using (ISession session = conn.CreateSession())
                 {
-                    session.DeleteQueue(queueName);
-                    session.DeleteQueue(errorQueueName);
+                    session.DeleteQueue(_queueName.Default);
+                    session.DeleteQueue(_queueName.Dead);
                 }
             }
         }
