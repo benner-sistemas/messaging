@@ -60,7 +60,10 @@ namespace Benner.Messaging.Retry.Tests
             Assert.AreEqual(0, GetQueueSize(_retryQueueName));
             Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
 
-
+            //zera os contadores de mensagens
+            _consumer.OnMessageCount = 0;
+            _consumer.OnInvalidMessageCount = 0;
+            _consumer.OnDeadMessageCount = 0;
             using (var conn = _factory.CreateConnection())
             {
                 using (var channel = conn.CreateModel())
@@ -98,6 +101,7 @@ namespace Benner.Messaging.Retry.Tests
                         Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
 
                         // garantir a quantidade de retentativas
+                    
                         Assert.AreEqual(4, _consumer.OnMessageCount);
                         Assert.AreEqual(2, _consumer.OnDeadMessageCount);
                         Assert.AreEqual(0, _consumer.OnInvalidMessageCount);
@@ -135,6 +139,11 @@ namespace Benner.Messaging.Retry.Tests
             PurgeQueue(_deadQueueName);
             PurgeQueue(_retryQueueName);
             PurgeQueue(_invalidQueueName);
+
+            //zera os contadores de mensagens
+            _consumer.OnMessageCount = 0;
+            _consumer.OnInvalidMessageCount = 0;
+            _consumer.OnDeadMessageCount = 0;
 
             Assert.AreEqual(0, GetQueueSize(_queueName));
             Assert.AreEqual(0, GetQueueSize(_deadQueueName));
@@ -199,7 +208,7 @@ namespace Benner.Messaging.Retry.Tests
             Assert.AreEqual(0, GetQueueSize(_queueName));
             Assert.AreEqual(0, GetQueueSize(_deadQueueName));
             Assert.AreEqual(0, GetQueueSize(_retryQueueName));
-            Assert.AreEqual(0, _consumer.OnInvalidMessageCount);
+            Assert.AreEqual(0, GetQueueSize(_invalidQueueName));
         }
 
         private void PurgeQueue(string queueName)
