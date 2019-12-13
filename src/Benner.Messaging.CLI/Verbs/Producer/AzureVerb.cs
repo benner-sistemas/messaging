@@ -1,10 +1,10 @@
 ﻿using Benner.Messaging.Interfaces;
 using CommandLine;
 
-namespace Benner.Messaging.CLI.Verbs
+namespace Benner.Messaging.CLI.Verbs.Producer
 {
     [Verb("azure", HelpText = "Iniciar um listener para Azuere Queue")]
-    public class AzureVerb : ListenVerb
+    public class AzureVerb : ProducerVerb
     {
         [Option('c', "connectionString", HelpText = "A string de conexão com o serviço Azure.", Required = true)]
         public string ConnectionString { get; set; }
@@ -16,13 +16,17 @@ namespace Benner.Messaging.CLI.Verbs
 
         public override IMessagingConfig GetConfiguration()
         {
-            ValidateOption("-n/--consumerName", Consumer);
-            ValidateOption("-i/--invisibilityTime", InvisibilityTime);
-            ValidateOption("-c/--connectionString", ConnectionString);
+            ValidateParameters();
 
             return new MessagingConfigBuilder()
                 .WithAzureQueueBroker("azure", ConnectionString, InvisibilityTime, setAsDefault: true)
                 .Create();
+        }
+
+        public override void ValidateParameters()
+        {
+            OptionValidator.ValidateOption("-i/--invisibilityTime", InvisibilityTime);
+            OptionValidator.ValidateOption("-c/--connectionString", ConnectionString);
         }
     }
 }

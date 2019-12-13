@@ -18,7 +18,7 @@ namespace Benner.Messaging.CLI.Tests
         public void ListenAmazonDeveRetornarErrosDeCadaOpcaoFaltante()
         {
             var args = "listen amazon".Split(' ');
-            var cliConfig = new CliConfiguration(args);
+            var cliConfig = CliParserFactory.CreateForListener(args);
             cliConfig.Execute();
             IEnumerable<string> mensagensErro = cliConfig.ParsingErrors.InnerExceptions.Select(err => err.Message);
 
@@ -71,7 +71,7 @@ namespace Benner.Messaging.CLI.Tests
             var args = new string[] { "listen", "amazon", "-i", originalInvTime.ToString(), "-n", "Namespace.Classe",
                 "-a", originalAccessKeyId, "-s", originalSecretAccessKey };
 
-            var cliConfig = new CliConfiguration(args);
+            var cliConfig = CliParserFactory.CreateForListener(args);
             cliConfig.Execute();
 
             var config = cliConfig.Configuration;

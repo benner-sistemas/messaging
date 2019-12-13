@@ -1,15 +1,18 @@
 ﻿using Benner.Messaging.CLI.Extensions;
 using Benner.Messaging.CLI.Verbs;
+using Benner.Messaging.CLI.Verbs.Listener;
+using Benner.Messaging.CLI.Verbs.Producer;
 using Benner.Messaging.Interfaces;
 using CommandLine;
 using CommandLine.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Benner.Messaging.CLI
 {
-    public class CliConfiguration
+    public class CliParser
     {
         public string Consumer { get; private set; }
 
@@ -26,27 +29,46 @@ namespace Benner.Messaging.CLI
         public AggregateException ParsingErrors { get; private set; }
 
         private readonly string[] _args;
+        private readonly Type _toRemove;
 
-        public CliConfiguration(string[] args) => _args = args;
+        internal CliParser(string[] args, Type toRemove)
+        {
+            _toRemove = toRemove;
+            _args = args;
+        }
 
         public void Execute()
         {
             try
             {
-                var parsed = Parser.Default.ParseVerbs(_args, typeof(ListenVerb));
-                parsed.WithParsed(OnParseSuccess);
-                parsed.WithNotParsed(errors => OnParseError(parsed));
+                var tipos = new List<Type> { typeof(ListenerVerb), typeof(ProducerVerb) };
+                tipos.Remove(_toRemove);
+
+                var parsed = new Parser(p => p.HelpWriter = null)
+                    .ParseVerbs(_args, tipos.ToArray())
+                    .WithParsed(OnParseSuccess);
+                parsed.WithNotParsed(e => OnParseError(parsed));
             }
             catch (Exception e)
             {
                 HasParseError = true;
                 HasValidationError = false;
                 ParsingErrors = new AggregateException("Comando não encontrado.", e);
+                throw new ArgumentNullException("Comando não encontrado.", e);
             }
         }
 
         private void OnParseError<T>(ParserResult<T> result)
         {
+            var help = HelpText.AutoBuild(result, h =>
+              {
+                  h.AdditionalNewLineAfterOption = false;
+                  h.MaximumDisplayWidth = 120;
+                  return HelpText.DefaultParsingErrorsHandler(result, h);
+              }, e => e);
+
+            Console.WriteLine(help);
+
             var builder = SentenceBuilder.Create();
             var errorMessages = HelpText.RenderParsingErrorsTextAsLines(result, builder.FormatError, builder.FormatMutuallyExclusiveSetErrors, 1);
 
@@ -61,10 +83,14 @@ namespace Benner.Messaging.CLI
         {
             try
             {
-                var result = (ListenVerb)arg;
-                Consumer = result.Consumer;
-                Configuration = result.GetConfiguration();
-                BrokerName = result.BrokerName;
+                if (arg is ListenerVerb listenResult)
+                    Consumer = listenResult.Consumer;
+
+                if (arg is IBrokerVerb verb)
+                {
+                    BrokerName = verb.BrokerName;
+                    Configuration = verb.GetConfiguration();
+                }
             }
             catch (ArgumentException e)
             {

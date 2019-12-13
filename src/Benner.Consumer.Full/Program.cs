@@ -8,31 +8,35 @@ namespace Benner.Consumer.Core
     {
         static int Main(string[] args)
         {
-            var cliConfig = new CliConfiguration(args);
+            var parser = CliParserFactory.CreateForListener(args);
             try
             {
-                cliConfig.Execute();
-                if (!cliConfig.HasValidationError && cliConfig.Exception != null)
+                parser.Execute();
+                if (!parser.HasValidationError && parser.Exception != null)
                 {
-                    Console.WriteLine("ERROR(S):\r\n " + cliConfig.Exception);
+                    Console.WriteLine("ERROR(S):\r\n " + parser.Exception);
                     return 1;
                 }
-                if (cliConfig.HasValidationError)
+                if (parser.HasValidationError)
                 {
-                    Console.WriteLine("ERROR(S):\r\n " + cliConfig.Exception.Message);
+                    Console.WriteLine("ERROR(S):\r\n " + parser.Exception.Message);
                     return 1;
                 }
-                if (!string.IsNullOrWhiteSpace(cliConfig.Consumer) && cliConfig.Configuration != null)
+                if (!string.IsNullOrWhiteSpace(parser.Consumer) && parser.Configuration != null)
                 {
-                    var consumer = ConsumerFactory.CreateConsumer(cliConfig.Consumer);
+                    var consumer = ConsumerFactory.CreateConsumer(parser.Consumer);
                     if (consumer == null)
                     {
-                        Console.WriteLine($"Não foi encontrado uma classe '{cliConfig.Consumer}' em nenhum assembly.\r\n");
+                        Console.WriteLine($"Não foi encontrado uma classe '{parser.Consumer}' em nenhum assembly.\r\n");
                         return 1;
                     }
-                    Console.WriteLine($"Classe '{cliConfig.Consumer}' encontrada. Criando um listener...\r\n");
-                    var listener = new EnterpriseIntegrationListener(cliConfig.Configuration, consumer);
+                    Console.WriteLine($"Classe '{parser.Consumer}' encontrada. Criando um listener...\r\n");
+                    var listener = new EnterpriseIntegrationListener(parser.Configuration, consumer);
                     listener.Start();
+                    Console.WriteLine($"Escutando fila '{consumer.Settings.QueueName}' em broker '{parser.BrokerName}'...");
+                    Console.WriteLine("Pressione qualquer tecla para cancelar...");
+                    Console.ReadKey();
+                    Console.WriteLine("Ação cancelada pelo usuário.");
                     return 0;
                 }
             }

@@ -17,7 +17,7 @@ namespace Benner.Messaging.CLI.Tests
         public void ListenAzureDeveRetornarErrosDeCadaOpcaoFaltante()
         {
             var args = "listen azure".Split(' ');
-            var cliConfig = new CliConfiguration(args);
+            var cliConfig = CliParserFactory.CreateForListener(args);
             cliConfig.Execute();
             IEnumerable<string> mensagensErro = cliConfig.ParsingErrors.InnerExceptions.Select(err => err.Message);
 
@@ -72,7 +72,7 @@ namespace Benner.Messaging.CLI.Tests
 
             var args = new string[] { "listen", "azure", "-c", connStr, "-i", originalInvTime.ToString(), "-n", "Namespace.Classe" };
 
-            var cliConfig = new CliConfiguration(args);
+            var cliConfig = CliParserFactory.CreateForListener(args);
             cliConfig.Execute();
 
             var config = cliConfig.Configuration;

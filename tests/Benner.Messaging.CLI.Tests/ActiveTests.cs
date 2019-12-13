@@ -17,7 +17,7 @@ namespace Benner.Messaging.CLI.Tests
         public void ListenActiveDeveRetornarErrosDeCadaOpcaoFaltante()
         {
             var args = "listen active".Split(' ');
-            var cliConfig = new CliConfiguration(args);
+            var cliConfig = CliParserFactory.CreateForListener(args);
             cliConfig.Execute();
             IEnumerable<string> mensagensErro = cliConfig.ParsingErrors.InnerExceptions.Select(err => err.Message);
 
@@ -77,7 +77,7 @@ namespace Benner.Messaging.CLI.Tests
             var args = new string[] { "listen", "active", "-h", originalHost, "--port",
                 originalPort.ToString(), "-u", originalUser, "-p", originalPass, "-n", "Namespace.Classe" };
 
-            var cliConfig = new CliConfiguration(args);
+            var cliConfig = CliParserFactory.CreateForListener(args);
             cliConfig.Execute();
 
             var config = cliConfig.Configuration;
