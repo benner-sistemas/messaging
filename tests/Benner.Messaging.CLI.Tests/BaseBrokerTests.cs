@@ -13,7 +13,7 @@ namespace Benner.Messaging.CLI.Tests
         protected string GetErrorMessage(string[] args)
         {
             var cliConfig = CliParserFactory.CreateForListener(args);
-            cliConfig.Execute();
+            cliConfig.Parse();
             return cliConfig.Exception.Message;
         }
 

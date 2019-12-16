@@ -19,7 +19,7 @@ namespace Benner.Messaging.CLI.Tests
         {
             var args = "listen amazon".Split(' ');
             var cliConfig = CliParserFactory.CreateForListener(args);
-            cliConfig.Execute();
+            cliConfig.Parse();
             IEnumerable<string> mensagensErro = cliConfig.ParsingErrors.InnerExceptions.Select(err => err.Message);
 
             string[] expectedMsgs =
@@ -72,7 +72,7 @@ namespace Benner.Messaging.CLI.Tests
                 "-a", originalAccessKeyId, "-s", originalSecretAccessKey };
 
             var cliConfig = CliParserFactory.CreateForListener(args);
-            cliConfig.Execute();
+            cliConfig.Parse();
 
             var config = cliConfig.Configuration;
 

@@ -12,7 +12,7 @@ namespace Benner.Messaging.CLI.Tests
         {
             var args = "".Split(' ');
             var cliConfig = CliParserFactory.CreateForListener(args);
-            Assert.ThrowsException<ArgumentNullException>(() => cliConfig.Execute());
+            Assert.ThrowsException<ArgumentNullException>(() => cliConfig.Parse());
 
             Assert.IsTrue(cliConfig.ParsingErrors.Message.StartsWith("Comando não encontrado."));
             Assert.IsTrue(cliConfig.HasParseError);
@@ -26,7 +26,7 @@ namespace Benner.Messaging.CLI.Tests
         {
             var args = "listen".Split(' ');
             var cliConfig = CliParserFactory.CreateForListener(args);
-            cliConfig.Execute();
+            cliConfig.Parse();
             var msg = cliConfig.ParsingErrors.InnerExceptions.Select(err => err.Message).First();
             Assert.AreEqual(" No verb selected.", msg);
             Assert.IsTrue(cliConfig.HasParseError);

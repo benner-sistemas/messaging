@@ -11,7 +11,7 @@ namespace Benner.Consumer.Core
             var parser = CliParserFactory.CreateForListener(args);
             try
             {
-                parser.Execute();
+                parser.Parse();
                 if (!parser.HasValidationError && parser.Exception != null)
                 {
                     Console.WriteLine("ERROR(S):\r\n " + parser.Exception);

@@ -18,7 +18,7 @@ namespace Benner.Messaging.CLI.Tests
         {
             var args = "listen azure".Split(' ');
             var cliConfig = CliParserFactory.CreateForListener(args);
-            cliConfig.Execute();
+            cliConfig.Parse();
             IEnumerable<string> mensagensErro = cliConfig.ParsingErrors.InnerExceptions.Select(err => err.Message);
 
             string[] expectedMsgs =
@@ -73,7 +73,7 @@ namespace Benner.Messaging.CLI.Tests
             var args = new string[] { "listen", "azure", "-c", connStr, "-i", originalInvTime.ToString(), "-n", "Namespace.Classe" };
 
             var cliConfig = CliParserFactory.CreateForListener(args);
-            cliConfig.Execute();
+            cliConfig.Parse();
 
             var config = cliConfig.Configuration;
             var brokerConfig = config.GetConfigForQueue("azure");

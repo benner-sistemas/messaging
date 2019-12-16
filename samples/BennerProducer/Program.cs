@@ -11,9 +11,8 @@ namespace BennerProducer
 
         public static void Main(string[] args)
         {
-            //BrokerConnection = BrokerConfiguration.SetConfiguration(args);
             var cliConfig = CliParserFactory.CreateForProducer(args);
-            cliConfig.Execute();
+            cliConfig.Parse();
             BrokerConnection = cliConfig.Configuration;
             CreateWebHostBuilder(args).Build().Run();
         }

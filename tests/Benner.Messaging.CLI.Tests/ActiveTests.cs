@@ -18,7 +18,7 @@ namespace Benner.Messaging.CLI.Tests
         {
             var args = "listen active".Split(' ');
             var cliConfig = CliParserFactory.CreateForListener(args);
-            cliConfig.Execute();
+            cliConfig.Parse();
             IEnumerable<string> mensagensErro = cliConfig.ParsingErrors.InnerExceptions.Select(err => err.Message);
 
             string[] expectedMsgs =
@@ -78,7 +78,7 @@ namespace Benner.Messaging.CLI.Tests
                 originalPort.ToString(), "-u", originalUser, "-p", originalPass, "-n", "Namespace.Classe" };
 
             var cliConfig = CliParserFactory.CreateForListener(args);
-            cliConfig.Execute();
+            cliConfig.Parse();
 
             var config = cliConfig.Configuration;
             var brokerConfig = config.GetConfigForQueue("active");

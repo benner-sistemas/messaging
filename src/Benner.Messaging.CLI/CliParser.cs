@@ -29,15 +29,17 @@ namespace Benner.Messaging.CLI
         public AggregateException ParsingErrors { get; private set; }
 
         private readonly string[] _args;
+        private readonly string _obsMessage;
         private readonly Type _toRemove;
 
-        internal CliParser(string[] args, Type toRemove)
+        internal CliParser(string[] args, Type toRemove, string obsMessage = null)
         {
             _toRemove = toRemove;
             _args = args;
+            _obsMessage = obsMessage;
         }
 
-        public void Execute()
+        public void Parse()
         {
             try
             {
@@ -46,7 +48,7 @@ namespace Benner.Messaging.CLI
 
                 var parsed = new Parser(p => p.HelpWriter = null)
                     .ParseVerbs(_args, tipos.ToArray())
-                    .WithParsed(OnParseSuccess);
+                    .WithParsed(p => OnParseSuccess(p as IBrokerVerb));
                 parsed.WithNotParsed(e => OnParseError(parsed));
             }
             catch (Exception e)
@@ -61,11 +63,17 @@ namespace Benner.Messaging.CLI
         private void OnParseError<T>(ParserResult<T> result)
         {
             var help = HelpText.AutoBuild(result, h =>
-              {
-                  h.AdditionalNewLineAfterOption = false;
-                  h.MaximumDisplayWidth = 120;
-                  return HelpText.DefaultParsingErrorsHandler(result, h);
-              }, e => e);
+                   {
+                       h.AdditionalNewLineAfterOption = false;
+                       h.AutoVersion = false;
+                       h.AutoHelp = false;
+                       if (_obsMessage != null)
+                           h.AddPostOptionsLine(_obsMessage);
+                       h.AddPostOptionsLine("");
+                       return HelpText.DefaultParsingErrorsHandler(result, h);
+                   },
+                   e => e,
+                   HelpTextExtensions.IsHelp(((NotParsed<T>)result).Errors), 120);
 
             Console.WriteLine(help);
 
@@ -79,18 +87,15 @@ namespace Benner.Messaging.CLI
             ParsingErrors = new AggregateException("Ocorreu um erro na conversão da linha de comando em configuração.", exceptions);
         }
 
-        private void OnParseSuccess(object arg)
+        private void OnParseSuccess(IBrokerVerb arg)
         {
+            if (arg is ListenerVerb listenResult)
+                Consumer = listenResult.Consumer;
+
+            BrokerName = arg.BrokerName;
             try
             {
-                if (arg is ListenerVerb listenResult)
-                    Consumer = listenResult.Consumer;
-
-                if (arg is IBrokerVerb verb)
-                {
-                    BrokerName = verb.BrokerName;
-                    Configuration = verb.GetConfiguration();
-                }
+                Configuration = arg.GetConfiguration();
             }
             catch (ArgumentException e)
             {

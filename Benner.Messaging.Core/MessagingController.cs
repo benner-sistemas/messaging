@@ -1,6 +1,8 @@
-﻿using Benner.Messaging.Interfaces;
+﻿using Benner.Messaging.CLI;
+using Benner.Messaging.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 
 namespace Benner.Messaging.Core
 {
@@ -10,10 +12,27 @@ namespace Benner.Messaging.Core
 
         public MessagingController()
         {
-            // carregar da linha de comando
-            // senão, carregar do arquivo
-            // senão, deixar nulo
-            _messagingConfig = new FileMessagingConfig();
+            // quando tem linha de comando, o primeiro argumento é um path
+            try
+            {
+                var args = Environment.GetCommandLineArgs().ToList();
+                if (args.Count > 1)
+                {
+                    if (System.IO.File.Exists(args[0]))
+                        args.RemoveAt(0);
+
+                    var parser = CliParserFactory.CreateForProducer(args.ToArray());
+                    parser.Parse();
+
+                    _messagingConfig = parser.Configuration;
+                }
+                else
+                    _messagingConfig = new FileMessagingConfig();
+            }
+            catch (Exception)
+            {
+                _messagingConfig = null;
+            }
         }
 
         protected virtual string QueueName
