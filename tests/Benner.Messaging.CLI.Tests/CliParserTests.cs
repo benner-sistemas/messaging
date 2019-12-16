@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System;
 
 namespace Benner.Messaging.CLI.Tests
 {
@@ -10,8 +11,8 @@ namespace Benner.Messaging.CLI.Tests
         public void LinhaSemComandoDeveRetornarMensagemDeNaoEncontrado()
         {
             var args = "".Split(' ');
-            var cliConfig = new CliConfiguration(args);
-            cliConfig.Execute();
+            var cliConfig = CliParserFactory.CreateForListener(args);
+            Assert.ThrowsException<ArgumentNullException>(() => cliConfig.Parse());
 
             Assert.IsTrue(cliConfig.ParsingErrors.Message.StartsWith("Comando não encontrado."));
             Assert.IsTrue(cliConfig.HasParseError);
@@ -24,8 +25,8 @@ namespace Benner.Messaging.CLI.Tests
         public void LinhaComListenDeveContinuarERetornarMensagem()
         {
             var args = "listen".Split(' ');
-            var cliConfig = new CliConfiguration(args);
-            cliConfig.Execute();
+            var cliConfig = CliParserFactory.CreateForListener(args);
+            cliConfig.Parse();
             var msg = cliConfig.ParsingErrors.InnerExceptions.Select(err => err.Message).First();
             Assert.AreEqual(" No verb selected.", msg);
             Assert.IsTrue(cliConfig.HasParseError);
