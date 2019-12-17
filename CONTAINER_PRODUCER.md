@@ -4,7 +4,8 @@ Documentação referente a produção de um container linux para o Benner.Produc
 
 ## O que você precisa?
 
-Uma máquina com o Docker hub rodando para containers Linux ou uma máquina Linux com Docker rodando.
+- Uma máquina com o Docker hub rodando para containers Linux ou uma máquina Linux com Docker rodando.
+- Um container ou servidor rodando o RabbitMQ
 
 # Passo a passo:
 
