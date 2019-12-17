@@ -13,6 +13,7 @@ Uma máquina com o Docker hub rodando para containers Linux ou uma máquina Linu
 2 - Abrir a pasta onde os arquivos do Publish foram gerados
 
 3 - Altere o messaging.config gerado conforme está configurado o seu rabbitMq (ou qualquer outro meio de mensageria)
+Obs: Se o rabbitMQ estiver em outro container na mesma máquina, utilizar o nome do container do RabbitMQ como Hostname.
 
 4 - Criar um Dockerfile NA MESMA PASTA que se encontram os arquivos gerados do Publish com o seguinte conteúdo:
 
