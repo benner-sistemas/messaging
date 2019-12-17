@@ -8,10 +8,10 @@ Uma máquina com o Docker hub rodando para containers Linux ou uma máquina Linu
 
 # Passo a passo:
 
-1 - Realizar o Publish do Benner.Producer
-2 - Abrir a pasta onde os arquivos do Publish foram gerados
-3 - Altere o messaging.config gerado conforme está configurado o seu rabbitMq (ou qualquer outro meio de mensageria)
-4 - Criar um Dockerfile NA MESMA PASTA que se encontram os arquivos gerados do Publish com o seguinte conteúdo:
+1 - Realizar o Publish do Benner.Producer \n
+2 - Abrir a pasta onde os arquivos do Publish foram gerados \n
+3 - Altere o messaging.config gerado conforme está configurado o seu rabbitMq (ou qualquer outro meio de mensageria) \n
+4 - Criar um Dockerfile NA MESMA PASTA que se encontram os arquivos gerados do Publish com o seguinte conteúdo: \n
 
 ```csharp
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
