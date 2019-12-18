@@ -12,8 +12,8 @@ namespace Benner.Messaging.CLI.Tests
         protected string ConfigAssemblyName { get; set; }
         protected string GetErrorMessage(string[] args)
         {
-            var cliConfig = new CliConfiguration(args);
-            cliConfig.Execute();
+            var cliConfig = CliParserFactory.CreateForListener(args);
+            cliConfig.Parse();
             return cliConfig.Exception.Message;
         }
 

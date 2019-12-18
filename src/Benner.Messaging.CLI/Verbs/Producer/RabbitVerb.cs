@@ -1,10 +1,10 @@
 ﻿using Benner.Messaging.Interfaces;
 using CommandLine;
 
-namespace Benner.Messaging.CLI.Verbs
+namespace Benner.Messaging.CLI.Verbs.Producer
 {
     [Verb("rabbit", HelpText = "Iniciar um listener para RabbitMQ")]
-    public class RabbitVerb : ListenVerb
+    public class RabbitVerb : ProducerVerb
     {
         [Option('h', "hostName", HelpText = "O nome do host.", Required = true)]
         public string Host { get; set; }
@@ -22,15 +22,19 @@ namespace Benner.Messaging.CLI.Verbs
 
         public override IMessagingConfig GetConfiguration()
         {
-            ValidateOption("-n/--consumerName", Consumer);
-            ValidateOption("-h/--hostName", Host);
-            ValidateOption("--port", Port);
-            ValidateOption("-u/--user", User);
-            ValidateOption("-p/--password", Password);
+            ValidateParameters();
 
             return new MessagingConfigBuilder()
                 .WithRabbitMQBroker("rabbit", Host, port: Port, userName: User, password: Password, setAsDefault: true)
                 .Create();
+        }
+
+        public override void ValidateParameters()
+        {
+            OptionValidator.ValidateOption("-h/--hostName", Host);
+            OptionValidator.ValidateOption("--port", Port);
+            OptionValidator.ValidateOption("-u/--user", User);
+            OptionValidator.ValidateOption("-p/--password", Password);
         }
     }
 }

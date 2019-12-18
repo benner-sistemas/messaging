@@ -1,11 +1,10 @@
 ﻿using Benner.Messaging.Interfaces;
 using CommandLine;
 using System;
-
-namespace Benner.Messaging.CLI.Verbs
+namespace Benner.Messaging.CLI.Verbs.Producer
 {
     [Verb("amazon", HelpText = "Iniciar um listener para Amazon SQS")]
-    public class AmazonVerb : ListenVerb
+    public class AmazonVerb : ProducerVerb
     {
         [Option('i', "invisibilityTime", HelpText = "O tempo que a mensagem permanecerá invisível para outras filas, em segundos.", Required = true)]
         public int InvisibilityTime { get; set; }
@@ -20,16 +19,9 @@ namespace Benner.Messaging.CLI.Verbs
 
         public override IMessagingConfig GetConfiguration()
         {
-            ValidateOption("-n/--consumerName", Consumer);
-            ValidateOption("-i/--invisibilityTime", InvisibilityTime);
+            ValidateParameters();
 
-            bool isAccKeyIdInformed = !string.IsNullOrWhiteSpace(AccessKeyId);
-            bool isSecAccKeyInformed = !string.IsNullOrWhiteSpace(SecretAccessKey);
-
-            if (isAccKeyIdInformed != isSecAccKeyInformed)
-                throw new ArgumentException($"O parâmetro 'accessKeyId' ou 'secretAccessKey' são obrigatórios caso um deles seja informado.");
-
-            if (!isAccKeyIdInformed && !isSecAccKeyInformed)
+            if (string.IsNullOrWhiteSpace(AccessKeyId) && string.IsNullOrWhiteSpace(SecretAccessKey))
                 return new MessagingConfigBuilder()
                 .WithAmazonSQSBroker("amazon", InvisibilityTime, setAsDefault: true)
                 .Create();
@@ -37,6 +29,14 @@ namespace Benner.Messaging.CLI.Verbs
             return new MessagingConfigBuilder()
             .WithAmazonSQSBroker("amazon", InvisibilityTime, AccessKeyId, SecretAccessKey, setAsDefault: true)
             .Create();
+        }
+
+        public override void ValidateParameters()
+        {
+            OptionValidator.ValidateOption("-i/--invisibilityTime", InvisibilityTime);
+
+            if (!string.IsNullOrWhiteSpace(AccessKeyId) != !string.IsNullOrWhiteSpace(SecretAccessKey))
+                throw new ArgumentException($"O parâmetro 'accessKeyId' ou 'secretAccessKey' são obrigatórios caso um deles seja informado.");
         }
     }
 }
