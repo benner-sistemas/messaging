@@ -28,6 +28,11 @@ namespace Benner.Messaging.Core
 
         protected ActionResult<IEnterpriseIntegrationResponse> Enqueue(IEnterpriseIntegrationResquest request)
         {
+            /*
+            this.Authenticate(token);
+            var json = OpenIDConnectService.GetRawJson(accessToken);
+            var userInfo = OidcUserInfo.GetOidcUserInfo(json);
+            */
             var message = EnterpriseIntegrationMessage.Create(request);
 
             Messaging.Enqueue(
