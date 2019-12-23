@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Benner.Consumer.Core": {
+      "commandName": "Project",
+      "commandLineArgs": "listen rabbit -h 192.168.5.82 --port 5672 -u guest -p guest -n Benner.Consumer.Core.ContabilizacaoConsumer"
+    }
+  }
+}

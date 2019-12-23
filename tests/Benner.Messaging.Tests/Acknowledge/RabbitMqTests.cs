@@ -27,6 +27,16 @@ namespace Benner.Messaging.Tests.Acknowledge
                 })
                 .Create();
 
+
+
+        [TestMethod]
+        public void Envia_mensagem_para_fila_de_contabilizacao()
+        {
+            var message = Guid.NewGuid().ToString();
+            Messaging.Enqueue("contabilizacao", message, config);
+        }
+
+
         [TestMethod]
         public void Testa_garantia_de_recebimento_da_fila_no_rabbitMq()
         {
