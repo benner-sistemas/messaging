@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Benner.Producer.Configuration;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
 
 namespace Benner.Producer
 {
@@ -17,18 +17,25 @@ namespace Benner.Producer
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// This method gets called by the runtime. 
+        /// Used for add services to the container.
+        /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
-            // carregar dlls do sistema dinamicamente?
-            var assembly = Assembly.Load("Benner.ERP.API");
+            var commandLineController = Configuration.GetValue<string>("controller");
 
-            services
-                .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                // o código abaixo adiciona controllers de outro assembly nesse webapp
-                .AddApplicationPart(assembly)
-                .AddControllersAsServices();
+            var configuration = new ControllerConfiguration();
+            configuration.SetAssemblyControllers(commandLineController);
+
+            foreach (var assembly in configuration.AssembliesControllers)
+            {
+                services
+                    .AddMvc()
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                    .AddApplicationPart(assembly) //add controllers from another assembly
+                    .AddControllersAsServices();
+            }
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
@@ -37,12 +44,15 @@ namespace Benner.Producer
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// This method gets called by the runtime.
+        /// Used for configure the HTTP request pipeline.
+        /// </summary>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
-            
+
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>

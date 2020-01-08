@@ -1,8 +1,8 @@
-﻿using Benner.Messaging;
-using Benner.Messaging.CLI;
+﻿using Benner.Producer.Configuration;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using System;
+using System.Linq;
 
 namespace Benner.Producer
 {
@@ -10,48 +10,60 @@ namespace Benner.Producer
     {
         public static void Main(string[] args)
         {
-            bool succeededCliConfig = false;
-            if (args.Length >= 1)
+            try
             {
-                var parser = CliParserFactory.CreateForProducer(args);
-                try
+                BrokerConfiguration brokerConfiguration = CreateBrokerConfiguration(args);
+
+                brokerConfiguration.SetConfiguration();
+
+                CreateWebHostBuilder(args).Build().Run();
+            }
+            catch (Exception e)
+            {
+                if (string.IsNullOrWhiteSpace(e.Message))
                 {
-                    parser.Parse();
-                    if (!parser.HasValidationError && parser.Exception != null)
-                    {
-                        Console.WriteLine("ERROR(S):\r\n " + parser.Exception);
-                        return;
-                    }
-                    if (parser.HasValidationError)
-                    {
-                        Console.WriteLine("ERROR(S):\r\n " + parser.Exception.Message);
-                        return;
-                    }
-                    if (parser.HasParseError)
-                        return;
-                    if (parser.Configuration != null)
-                        succeededCliConfig = true;
-                }
-                catch (Exception e)
-                {
-                    PrintErrorMessageWithTip(e.Message);
                     return;
                 }
-            }
-            var configFileExists = FileMessagingConfig.DefaultConfigFileExists;
-            if (succeededCliConfig && configFileExists)
-            {
-                PrintErrorMessageWithTip("Foi detectado um arquivo de configuração. " +
-                    "Não é possível utilizar configuração por arquivo e por linha de comando simultaneamente.");
-                return;
-            }
 
-            if (!succeededCliConfig && !configFileExists)
-            {
-                PrintErrorMessageWithTip("Não foi detectado um arquivo de configuração.");
+                PrintErrorMessageWithTip(e.Message);
+
                 return;
             }
-            CreateWebHostBuilder(args).Build().Run();
+        }
+
+        /// <summary>
+        /// The broker configuration does not suport the argument --controller.
+        /// </summary>
+        private static BrokerConfiguration CreateBrokerConfiguration(string[] args)
+        {
+            if (args.Length == 1 &&
+                args.Any(s => s.Contains("--controller")))
+            {
+                return new BrokerConfiguration(null);
+            }
+            else if (args.Length > 1 &&
+                     args.Any(s => s.Contains("--controller")))
+            {
+                string[] argsWithoutController;
+
+                if (args.Any(s => s.Contains("--controller=")))
+                {
+                    argsWithoutController = args.Where(w => !w.Contains("--controller=")).ToArray();
+                }
+                else
+                {
+                    int i = Array.IndexOf(args, "--controller");
+
+                    argsWithoutController = args.Where(w => w != args[i] && w != args[i + 1]).ToArray();
+                }
+
+                return new BrokerConfiguration(argsWithoutController);
+            }
+            else
+            {
+                return new BrokerConfiguration(args);
+
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
