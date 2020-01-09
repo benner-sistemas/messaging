@@ -32,7 +32,7 @@ namespace Benner.Listener
                 return null;
 
             string folder = GetExecutingDirectoryName();
-            string[] assembliesPathes = Directory.EnumerateFiles(folder, "*.Consumer.Core.dll", SearchOption.TopDirectoryOnly).ToArray();
+            string[] assembliesPathes = Directory.EnumerateFiles(folder, "*.Consumer.dll", SearchOption.TopDirectoryOnly).ToArray();
 
             if (assembliesPathes.Length == 0)
                 throw new FileNotFoundException("Não foi encontrado qualquer assembly com pattern '*.Consumer.dll' no diretório de trabalho.");

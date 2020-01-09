@@ -63,17 +63,15 @@ namespace Benner.Messaging.CLI
         private void OnParseError<T>(ParserResult<T> result)
         {
             var help = HelpText.AutoBuild(result, h =>
-                   {
-                       h.AdditionalNewLineAfterOption = false;
-                       h.AutoVersion = false;
-                       h.AutoHelp = false;
-                       if (_obsMessage != null)
-                           h.AddPostOptionsLine(_obsMessage);
-                       h.AddPostOptionsLine("");
-                       return HelpText.DefaultParsingErrorsHandler(result, h);
-                   },
-                   e => e,
-                   HelpTextExtensions.IsHelp(((NotParsed<T>)result).Errors), 120);
+            {
+                h.AdditionalNewLineAfterOption = false;
+                h.AutoVersion = false;
+                if (_obsMessage != null)
+                    h.AddPostOptionsLine(_obsMessage);
+                h.AddPostOptionsLine("");
+
+                return h;
+            }, 120);
 
             Console.WriteLine(help);
 
