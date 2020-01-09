@@ -13,12 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Benner.Messaging.CLI\Benner.Messaging.CLI.csproj" />
-    <ProjectReference Include="..\src\Benner.Messaging\Benner.Messaging.csproj" />
+    <Folder Include="Properties\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <ProjectReference Include="..\Benner.Messaging.CLI\Benner.Messaging.CLI.csproj" />
+    <ProjectReference Include="..\Benner.Messaging\Benner.Messaging.csproj" />
   </ItemGroup>
 
 </Project>
