@@ -1,6 +1,7 @@
 ﻿using Benner.Listener;
 using Benner.Messaging.CLI;
 using System;
+using System.Threading;
 
 namespace Benner.Consumer.Core
 {
@@ -34,8 +35,7 @@ namespace Benner.Consumer.Core
                     var listener = new EnterpriseIntegrationListener(parser.Configuration, consumer);
                     listener.Start();
                     Console.WriteLine($"Escutando fila '{consumer.Settings.QueueName}' em broker '{parser.BrokerName}'...");
-                    Console.WriteLine("Pressione qualquer tecla para cancelar...");
-                    Console.ReadKey();
+                    Thread.Sleep(Timeout.Infinite);
                     Console.WriteLine("Ação cancelada pelo usuário.");
                     return 0;
                 }
