@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using Benner.Messaging;
 
 namespace Benner.Messaging.Tests.Transporters
 {
@@ -14,11 +13,13 @@ namespace Benner.Messaging.Tests.Transporters
             var guid = Guid.NewGuid().ToString();
             string queueName = $"fila-teste-activemq-{guid}";
             string message = $"Mensagem que deve retornar {guid}";
+
             var config = new MessagingConfigBuilder("ActiveMQ", BrokerType.ActiveMQ, new Dictionary<string, string>()
             {
-                {"Hostname", ServerName}
-            })
-                .Create();
+                {"UserName", "admin"},
+                {"Password", "admin"},
+                {"Hostname", ActiveMQServerName}
+            }).Create();
 
             Messaging.Enqueue(queueName, message, config);
             var received = Messaging.Dequeue(queueName, config);
@@ -138,7 +139,7 @@ namespace Benner.Messaging.Tests.Transporters
             string queueName = $"fila-teste-activemq-{guid}";
             var config = new MessagingConfigBuilder("ActiveMQ", BrokerType.ActiveMQ, new Dictionary<string, string>()
                 {
-                    {"Hostname", ServerName}
+                    {"Hostname", ActiveMQServerName}
                 }).Create();
 
             // garantir que a fila tem 0 mensagens

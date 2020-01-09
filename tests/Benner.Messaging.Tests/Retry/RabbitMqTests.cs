@@ -37,7 +37,7 @@ namespace Benner.Messaging.Retry.Tests
         private static EnterpriseIntegrationConsumerMock _consumer = new EnterpriseIntegrationConsumerMock(_settings);
 
         [TestMethod]
-        public void testa_retentativa_rabbitmq()
+        public void EnterpriseIntegrationListener_deve_disparar_fluxo_de_retentativas_com_rabbitMQ()
         {
             // garante que fila existe
             CreateQueue(_queueName.Default);
@@ -80,7 +80,9 @@ namespace Benner.Messaging.Retry.Tests
             using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
             {
                 listener.Start();
-                Thread.Sleep(1000);
+
+                for (int index = 0; index < 100 && _consumer.OnDeadMessageCount < 4; ++index)
+                    Thread.Sleep(10);
 
                 //TODO: testar o tamanho da fila de retentativas, de alguma forma
             }
@@ -104,11 +106,11 @@ namespace Benner.Messaging.Retry.Tests
             Assert.AreEqual(0, GetQueueSize(_queueName.Default));
             Assert.AreEqual(0, GetQueueSize(_queueName.Dead));
             Assert.AreEqual(0, GetQueueSize(_queueName.Retry));
-            Assert.AreEqual(0, _consumer.OnInvalidMessageCount);
+            Assert.AreEqual(0, GetQueueSize(_queueName.Invalid));
         }
 
         [TestMethod]
-        public void testa_envio_de_mensagens_invalidas()
+        public void EnterpriseIntegrationListener_deve_direcionar_para_fila_de_imagens_invalidas_com_rabbitMQ()
         {
             // garante que fila existe
             CreateQueue(_queueName.Default);
@@ -152,7 +154,9 @@ namespace Benner.Messaging.Retry.Tests
             using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
             {
                 listener.Start();
-                Thread.Sleep(1000);
+
+                for (int index = 0; index < 100 && _consumer.OnInvalidMessageCount < 2; ++index)
+                    Thread.Sleep(10);
 
                 //TODO: testar o tamanho da fila de retentativas, de alguma forma
             }

@@ -106,7 +106,7 @@ namespace Benner.Messaging
             _listeningTask?.Wait();
         }
 
-        public override void DequeueSingleMessage(string queueName, Func<string, bool> func)
+        public override void DequeueSingleMessage(string queueName, Func<MessagingArgs, bool> func)
         {
             var queue = GetQueue(queueName);
 
@@ -117,7 +117,7 @@ namespace Benner.Messaging
                 return;
             }
 
-            bool succeeded = func(message.AsString);
+            bool succeeded = func(new MessagingArgs(message.AsString));
 
             if (succeeded)
                 queue.DeleteMessage(message);

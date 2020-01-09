@@ -85,7 +85,7 @@ namespace Benner.Messaging
 
                     try
                     {
-                        deserialized = Utils.DeserializeObject<T>(msg);
+                        deserialized = Utils.DeserializeObject<T>(msg.AsString);
                         return true;
                     }
                     catch (Exception e)
@@ -132,7 +132,7 @@ namespace Benner.Messaging
                 var transporter = client.GetTransporter(queueName);
                 transporter.DequeueSingleMessage(queueName, (msg) =>
                 {
-                    message = msg;
+                    message = msg.AsString;
                     return true;
                 });
             }
@@ -229,6 +229,8 @@ namespace Benner.Messaging
         {
             queueName = queueName.ToLower();
             Utils.ValidateQueueName(queueName, true);
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
             var transporter = GetTransporter(queueName);
             transporter.StartListening(queueName, func);
         }

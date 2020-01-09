@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Apache.NMS;
+using Apache.NMS.ActiveMQ;
+using Benner.Listener;
+using Benner.Retry.Tests.MockMQ;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Benner.Messaging;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using Apache.NMS;
-using System.Collections;
-using Apache.NMS.ActiveMQ;
-using Benner.Retry.Tests.MockMQ;
-using Benner.Listener;
 
 namespace Benner.Messaging.Retry.Tests
 {
@@ -21,7 +20,8 @@ namespace Benner.Messaging.Retry.Tests
         private readonly MessagingConfig _config = new MessagingConfigBuilder("ActiveMQ", BrokerType.ActiveMQ, new Dictionary<string, string>()
             {   {"UserName", "admin"},
                 {"Password", "admin"},
-                {"Hostname", "bnu-vtec001" }
+                {"Hostname", "bnu-vtec001" },
+                {"Port", "61616" }
             }).Create();
 
         private static IEnterpriseIntegrationSettings _settings = new EnterpriseIntegrationSettings
@@ -35,7 +35,7 @@ namespace Benner.Messaging.Retry.Tests
 
 
         [TestMethod]
-        public void Testa_retentativas_activemq()
+        public void EnterpriseIntegrationListener_deve_disparar_fluxo_de_retentativas_com_activeMQ()
         {
             // garante que fila existe
             CreateQueue(_queueName.Default);
@@ -78,7 +78,9 @@ namespace Benner.Messaging.Retry.Tests
             using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
             {
                 listener.Start();
-                Thread.Sleep(1000);
+
+                for (int index = 0; index < 100 && _consumer.OnDeadMessageCount < 4; ++index)
+                    Thread.Sleep(10);
 
                 //TODO: testar o tamanho da fila de retentativas, de alguma forma
             }
@@ -106,7 +108,7 @@ namespace Benner.Messaging.Retry.Tests
         }
 
         [TestMethod]
-        public void testa_envio_de_mensagens_invalidas()
+        public void EnterpriseIntegrationListener_deve_direcionar_para_fila_de_imagens_invalidas_com_activeMQ()
         {
             // garante que fila existe
             CreateQueue(_queueName.Default);
@@ -150,7 +152,9 @@ namespace Benner.Messaging.Retry.Tests
             using (var listener = new EnterpriseIntegrationListener(_config, _consumer))
             {
                 listener.Start();
-                Thread.Sleep(1000);
+
+                for (int index = 0; index < 100 && _consumer.OnInvalidMessageCount < 2; ++index)
+                    Thread.Sleep(10);
 
                 //TODO: testar o tamanho da fila de retentativas, de alguma forma
             }
