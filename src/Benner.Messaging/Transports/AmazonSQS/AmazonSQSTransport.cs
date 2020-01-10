@@ -144,7 +144,7 @@ namespace Benner.Messaging
             return client.DeleteMessageAsync(deleteRequest).Result;
         }
 
-        public override void DequeueSingleMessage(string queueName, Func<string, bool> func)
+        public override void DequeueSingleMessage(string queueName, Func<MessagingArgs, bool> func)
         {
             var client = GetClient();
             var queueUrl = GetQueueUrl(queueName, client);
@@ -167,7 +167,7 @@ namespace Benner.Messaging
                 return;
             }
 
-            bool succeeded = func(receivedMessage.Body);
+            bool succeeded = func(new MessagingArgs(receivedMessage.Body));
 
             if (succeeded)
             {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Benner.Messaging.Tests.Transporters
 {
-    [TestClass]
+    //[TestClass]
     public class AmazonSqsTests : TransporterBaseTests
     {
         [TestMethod]

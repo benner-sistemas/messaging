@@ -127,9 +127,11 @@ namespace Benner.Messaging
                 throw new InvalidOperationException(ErrorMessages.EnqueueFailed, e);
             }
         }
-
         public override void StartListening(string queueName, Func<MessagingArgs, bool> func)
         {
+            if (func == null)
+                throw new InvalidOperationException(ErrorMessages.ConsumerFunctionMustBeInformed);
+
             if (_isListening)
                 throw new InvalidOperationException(ErrorMessages.AlreadyListening);
 
@@ -140,27 +142,31 @@ namespace Benner.Messaging
 
             consumer.Received += (model, ea) =>
             {
-                var acknowledge = true;
-                try
-                {
-                    acknowledge = func(new MessagingArgs(ea.Body));
-                }
-                catch (Exception exception)
-                {
-                    
-                    EnqueueMessage(QueueName.DeadQueueName(queueName), string.Concat(exception.Message, "\r\n", Encoding.UTF8.GetString(ea.Body)));
-                }
-                finally
-                {
-                    if (acknowledge)
-                        channel.BasicAck(ea.DeliveryTag, false);
-                    else
-                        channel.BasicReject(ea.DeliveryTag, true);
-                }
+                ProcessMessage(queueName, func, channel, ea.Body, ea.DeliveryTag);
             };
 
             channel.BasicConsume(queueName, false, consumer);
             _isListening = true;
+        }
+
+        private void ProcessMessage(string queueName, Func<MessagingArgs, bool> func, IModel channel, byte[] messageBody, ulong deliveryTag)
+        {
+            var acknowledge = true;
+            try
+            {
+                acknowledge = func(new MessagingArgs(messageBody));
+            }
+            catch (Exception exception)
+            {
+                EnqueueMessage(QueueName.DeadQueueName(queueName), string.Concat(exception.Message, "\r\n", Encoding.UTF8.GetString(messageBody)));
+            }
+            finally
+            {
+                if (acknowledge)
+                    channel.BasicAck(deliveryTag, false);
+                else
+                    channel.BasicNack(deliveryTag, false, true);
+            }
         }
 
         private void EnsureQueueDeclared(IModel channel, string queue)
@@ -174,28 +180,29 @@ namespace Benner.Messaging
 
         public override void Dispose()
         {
+            _publishConnection?.Close();
             _publishConnection?.Dispose();
+
+            _consumeConnection?.Close();
             _consumeConnection?.Dispose();
         }
 
-        public override void DequeueSingleMessage(string queueName, Func<string, bool> func)
+        public override void DequeueSingleMessage(string queueName, Func<MessagingArgs, bool> func)
         {
+            if (func == null)
+                throw new InvalidOperationException(ErrorMessages.ConsumerFunctionMustBeInformed);
+
+            if (_isListening)
+                throw new InvalidOperationException(ErrorMessages.AlreadyListening);
+
             var channel = GetChannel(ConectionType.Consume);
             EnsureQueueDeclared(channel, queueName);
 
-            var result = channel.BasicGet(queueName, false);
-            if (result == null)
-            {
-                func(null);
+            var message = channel.BasicGet(queueName, false);
+            if (message == null)
                 return;
-            }
 
-            bool succeeded = func(Encoding.UTF8.GetString(result.Body));
-
-            if (succeeded)
-                channel.BasicAck(result.DeliveryTag, false);
-            else
-                channel.BasicNack(result.DeliveryTag, false, true);
+            ProcessMessage(queueName, func, channel, message.Body, message.DeliveryTag);
         }
 
         ~RabbitMQTransport()
