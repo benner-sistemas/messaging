@@ -363,19 +363,35 @@ namespace Benner.Messaging.Tests.Acknowledge
 
         protected void StartListening_deve_acusar_erro_com_metodo_nulo()
         {
-            using (var client = new Messaging(_config))
+            var queueName = "bla";
+            try
             {
-                client.StartListening("blah", null);
+                using (var client = new Messaging(_config))
+                {
+                    client.StartListening(queueName, null);
+                }
+            }
+            finally
+            {
+                PurgeQueue(queueName);
             }
         }
 
         protected void Dequeue_de_fila_vazia_deve_retornar_null()
         {
-            var result = Messaging.Dequeue("bla", _config);
-            Assert.IsNull(result);
+            var queueName = "bla";
+            try
+            {
+                var result = Messaging.Dequeue(queueName, _config);
+                Assert.IsNull(result);
 
-            result = Messaging.Dequeue<string>("bla", _config);
-            Assert.IsNull(result);
+                result = Messaging.Dequeue<string>(queueName, _config);
+                Assert.IsNull(result);
+            }
+            finally
+            {
+                PurgeQueue(queueName);
+            }
         }
         
 
