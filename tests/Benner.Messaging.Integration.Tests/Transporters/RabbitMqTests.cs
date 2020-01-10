@@ -17,7 +17,7 @@ namespace Benner.Messaging.Tests.Transporters
                 {
                     {"UserName", "guest"},
                     {"Password", "guest"},
-                    {"HostName", ServerName}
+                    {"HostName", RabbitMQServerName}
                 })
                 .Create();
 
@@ -152,7 +152,7 @@ namespace Benner.Messaging.Tests.Transporters
             string queueName = $"fila-teste-rabbitmq-{guid}";
             var config = new MessagingConfigBuilder("RabbitMQ", BrokerType.RabbitMQ, new Dictionary<string, string>()
                 {
-                    { "HostName", ServerName }
+                    { "HostName", RabbitMQServerName }
                 }).Create();
 
             // garantir que a fila tem 0 mensagens

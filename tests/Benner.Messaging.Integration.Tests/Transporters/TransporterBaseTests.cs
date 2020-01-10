@@ -7,7 +7,12 @@ namespace Benner.Messaging.Tests
     [TestClass]
     public class TransporterBaseTests
     {
-        internal static string ServerName = "servername";
+        internal static string ActiveMQServerName = "bnu-vtec001";
+        internal static string ActiveMQUserName = "admin";
+        internal static string ActiveMQPassword = "admin";
+        internal static string ActiveMQPort = "admin";
+        internal static string RabbitMQServerName = "bnu-vtec012";
+
         internal static string AzureConnectionString = "DefaultEndpointsProtocol=https;AccountName=[account-name];AccountKey=[account-key];EndpointSuffix=core.windows.net";
 
         protected enum Broker { ActiveMQ, AmazonSQS, AzureQueue, RabbitMQ }
@@ -55,7 +60,7 @@ namespace Benner.Messaging.Tests
                           </queues>
                         <brokerList default='{defaultBroker.ToString()}'> 
                             <broker name='ActiveMQ' type='Benner.Messaging.ActiveMQConfig, Benner.Messaging'>
-                              <add key='Hostname' value='{ServerName}' />
+                              <add key='Hostname' value='{ActiveMQServerName}' />
                             </broker>
                             <broker name='AmazonSQS' type='Benner.Messaging.AmazonSQSConfig, Benner.Messaging'>
                               <add key='InvisibilityTime' value='15' />
@@ -65,7 +70,7 @@ namespace Benner.Messaging.Tests
                               <add key='InvisibilityTime' value='15' />
                             </broker>
                             <broker name='RabbitMQ' type='Benner.Messaging.RabbitMQConfig, Benner.Messaging'>
-                              <add key='HostName' value='{ServerName}' />
+                              <add key='HostName' value='{RabbitMQServerName}' />
                             </broker>
                         </brokerList>
                     </MessagingConfigSection>

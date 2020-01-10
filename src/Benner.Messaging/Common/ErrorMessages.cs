@@ -2,6 +2,7 @@
 {
     internal class ErrorMessages
     {
+        public const string ConsumerFunctionMustBeInformed = "Consumer function must be informed.";
         public const string EnqueueFailed = "Failed to enqueue message.";
         public const string InvalidInformed = "Informed {0} is not valid.";
         public const string MustBeInformed = "{0} must be informed.";

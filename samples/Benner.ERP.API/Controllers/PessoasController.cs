@@ -1,4 +1,4 @@
-﻿using Benner.ERP.API.Models;
+﻿using Benner.ERP.Models;
 using Benner.Messaging;
 using Benner.Messaging.Core;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +9,8 @@ namespace Benner.ERP.API.Controllers
     [ApiController]
     public class PessoasController : MessagingController
     {
+        protected override string QueueName { get => "fila-pessoa-consumer"; }
+
         // POST api/pessoas
         [HttpPost]
         public ActionResult<IEnterpriseIntegrationResponse> Post([FromBody] PessoaRequest request)
