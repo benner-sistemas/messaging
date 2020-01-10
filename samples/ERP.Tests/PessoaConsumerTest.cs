@@ -1,4 +1,4 @@
-using Benner.ERP.API.Models;
+using Benner.ERP.Models;
 using Benner.Listener;
 using ERP.Consumer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

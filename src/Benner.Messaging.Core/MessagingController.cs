@@ -6,11 +6,11 @@ using System.Linq;
 
 namespace Benner.Messaging.Core
 {
-    public class MessagingController : ControllerBase
+    public abstract class MessagingController : ControllerBase
     {
         private readonly IMessagingConfig _messagingConfig;
 
-        public MessagingController()
+        protected MessagingController()
         {
             // quando tem linha de comando, o primeiro argumento é um path
             try
@@ -35,10 +35,7 @@ namespace Benner.Messaging.Core
             }
         }
 
-        protected virtual string QueueName
-        {
-            get { return this.ControllerContext.ActionDescriptor.ControllerName.ToLower(); }
-        }
+        protected abstract string QueueName { get; }
 
         protected virtual IMessagingConfig MessagingConfig
         {

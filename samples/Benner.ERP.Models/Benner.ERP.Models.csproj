@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Benner.Listener\Benner.Listener.csproj" />
     <ProjectReference Include="..\..\src\Benner.Messaging\Benner.Messaging.csproj" />
-    <ProjectReference Include="..\Benner.ERP.Models\Benner.ERP.Models.csproj" />
   </ItemGroup>
 
 </Project>

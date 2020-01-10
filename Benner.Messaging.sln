@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Producer", "src\Benn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.Core", "src\Benner.Messaging.Core\Benner.Messaging.Core.csproj", "{84AA1F4E-94E2-4D39-8E28-3DB1E2E864EF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.ERP.Models", "samples\Benner.ERP.Models\Benner.ERP.Models.csproj", "{8A1BF2CD-47C0-4692-9624-13C36234CB28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,10 @@ Global
 		{84AA1F4E-94E2-4D39-8E28-3DB1E2E864EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84AA1F4E-94E2-4D39-8E28-3DB1E2E864EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84AA1F4E-94E2-4D39-8E28-3DB1E2E864EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A1BF2CD-47C0-4692-9624-13C36234CB28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A1BF2CD-47C0-4692-9624-13C36234CB28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A1BF2CD-47C0-4692-9624-13C36234CB28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A1BF2CD-47C0-4692-9624-13C36234CB28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -131,6 +137,7 @@ Global
 		{011252BD-CE6C-4480-86A8-0085205A870F} = {97839F13-D676-4324-941A-16FD5151B2F2}
 		{FF408277-E4EB-40DB-8EE6-B57B6AD37D56} = {97839F13-D676-4324-941A-16FD5151B2F2}
 		{A9695054-61F3-4845-87DB-9E709409ABD6} = {97839F13-D676-4324-941A-16FD5151B2F2}
+		{8A1BF2CD-47C0-4692-9624-13C36234CB28} = {97839F13-D676-4324-941A-16FD5151B2F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E33B176C-4421-406A-A00A-0FCB277089B1}

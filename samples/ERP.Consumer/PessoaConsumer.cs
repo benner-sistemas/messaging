@@ -1,5 +1,5 @@
 ﻿using System;
-using Benner.ERP.API.Models;
+using Benner.ERP.Models;
 using Benner.Listener;
 
 namespace ERP.Consumer
@@ -8,7 +8,7 @@ namespace ERP.Consumer
     {
         public IEnterpriseIntegrationSettings Settings => new EnterpriseIntegrationSettings()
         {
-            QueueName = "nome-da-fila",
+            QueueName = "fila-pessoa-consumer",
             RetryIntervalInMilliseconds = 1000,
             RetryLimit = 3
         };
@@ -36,6 +36,7 @@ namespace ERP.Consumer
                 throw new InvalidMessageException("Endereço deve ser preenchido");
 
             // fazer algo com a request
+            Console.WriteLine("PessoaConsumer.OnMessage:" + request);
         }
 
         public void OnInvalidMessage(object message)
@@ -43,6 +44,7 @@ namespace ERP.Consumer
             var request = message as PessoaRequest ?? throw new ArgumentNullException($"Request não é do tipo '{nameof(PessoaRequest)}'");
 
             // fazer algo com a request
+            Console.WriteLine("PessoaConsumer.OnInvalidMessage:" + request);
         }
 
         public void OnDeadMessage(object message)
@@ -50,6 +52,7 @@ namespace ERP.Consumer
             var request = message as PessoaRequest ?? throw new ArgumentNullException($"Request não é do tipo '{nameof(PessoaRequest)}'");
 
             // fazer algo com a request
+            Console.WriteLine("PessoaConsumer.OnDeadMessage:" + request);
         }
     }
 }
