@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 
 namespace Benner.Producer.Configuration
 {
@@ -31,6 +32,7 @@ namespace Benner.Producer.Configuration
             bool existsConfigFile = producerFileConfig != null && producerFileConfig.Controllers != null && producerFileConfig.Controllers.Count > 0;
             bool useCommandLine = (!existsConfigFile || producerFileConfig.UseCommandLine) && existsCommandLineDefinition;
 
+            var path = string.Format($@"{ Directory.GetCurrentDirectory()}\bin\");
             AssembliesControllers = new List<Assembly>();
 
             if (useCommandLine)
@@ -39,7 +41,11 @@ namespace Benner.Producer.Configuration
 
                 foreach (var assembly in listAssembliesControllers)
                 {
-                    AssembliesControllers.Add(Assembly.Load(assembly));
+                    var fullPath = AssemblyLoadContext.Default.LoadFromAssemblyPath(path + assembly);
+                    
+                    AssembliesControllers.Add(fullPath);
+
+                    LoadReferencedAssembly(fullPath);
                 }
             }
 
@@ -48,7 +54,14 @@ namespace Benner.Producer.Configuration
             {
                 foreach (var controller in producerFileConfig.Controllers)
                 {
-                    AssembliesControllers.Add(Assembly.Load(controller.assembly));
+                    if (!string.IsNullOrWhiteSpace(controller.Assembly))
+                    {
+                        var fullPath = AssemblyLoadContext.Default.LoadFromAssemblyPath(path + controller.Assembly);
+
+                        AssembliesControllers.Add(fullPath);
+
+                        LoadReferencedAssembly(fullPath);
+                    }
                 }
             }
 
@@ -65,7 +78,11 @@ namespace Benner.Producer.Configuration
 
                 foreach (var assembly in assembliesPathes)
                 {
-                    AssembliesControllers.Add(Assembly.Load(assembly));
+                    var fullPath = AssemblyLoadContext.Default.LoadFromAssemblyPath(path + assembly);
+
+                    AssembliesControllers.Add(fullPath);
+
+                    LoadReferencedAssembly(fullPath);
                 }
             }
         }
@@ -90,6 +107,24 @@ namespace Benner.Producer.Configuration
             }
 
             return null;
+        }
+
+        private void LoadReferencedAssembly(Assembly assembly)
+        {
+            foreach (AssemblyName name in assembly.GetReferencedAssemblies())
+            {
+                if (!AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName == name.FullName))
+                {
+                    try
+                    {
+                        this.LoadReferencedAssembly(Assembly.Load(name));
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        this.LoadReferencedAssembly(AssemblyLoadContext.Default.LoadFromAssemblyPath(Directory.GetCurrentDirectory() + "\\dependencias\\" + name.Name + ".dll"));
+                    }
+                }
+            }
         }
     }
 }

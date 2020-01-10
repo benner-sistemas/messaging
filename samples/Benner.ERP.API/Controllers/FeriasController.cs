@@ -9,6 +9,8 @@ namespace Benner.ERP.API.Controllers
     [ApiController]
     public class FeriasController : MessagingController
     {
+        protected override string QueueName { get => "ferias-producer"; }
+
         // POST: producer/adicionarMensagemFerias
         [HttpPost]
         [AcceptVerbs("POST")]

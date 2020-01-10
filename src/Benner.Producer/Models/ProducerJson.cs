@@ -11,6 +11,6 @@ namespace Benner.Producer.Models
 
     public class Controller
     {
-        public string assembly { get; set; }
+        public string Assembly { get; set; }
     }
 }

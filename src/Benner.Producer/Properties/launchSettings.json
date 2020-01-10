@@ -22,7 +22,7 @@
     },
     "Benner.Producer": {
       "commandName": "Project",
-      "commandLineArgs": "--controller=Benner.ERP.API produce rabbit -h bnu-vtec012 --port 5672 -u guest -p guest ",
+      "commandLineArgs": "--controller=Benner.ERP.API.dll produce rabbit -h bnu-vtec012 --port 5672 -u guest -p guest ",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

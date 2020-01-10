@@ -1,8 +1,8 @@
-﻿using Benner.Producer.Configuration;
+﻿using Benner.Messaging;
+using Benner.Producer.Configuration;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using System;
-using System.Linq;
 
 namespace Benner.Producer
 {
@@ -12,7 +12,7 @@ namespace Benner.Producer
         {
             try
             {
-                BrokerConfiguration brokerConfiguration = CreateBrokerConfiguration(args);
+                BrokerConfiguration brokerConfiguration = new BrokerConfiguration(Utils.RemoveController(args));
 
                 brokerConfiguration.SetConfiguration();
 
@@ -28,41 +28,6 @@ namespace Benner.Producer
                 PrintErrorMessageWithTip(e.Message);
 
                 return;
-            }
-        }
-
-        /// <summary>
-        /// The broker configuration does not suport the argument --controller.
-        /// </summary>
-        private static BrokerConfiguration CreateBrokerConfiguration(string[] args)
-        {
-            if (args.Length == 1 &&
-                args.Any(s => s.Contains("--controller")))
-            {
-                return new BrokerConfiguration(null);
-            }
-            else if (args.Length > 1 &&
-                     args.Any(s => s.Contains("--controller")))
-            {
-                string[] argsWithoutController;
-
-                if (args.Any(s => s.Contains("--controller=")))
-                {
-                    argsWithoutController = args.Where(w => !w.Contains("--controller=")).ToArray();
-                }
-                else
-                {
-                    int i = Array.IndexOf(args, "--controller");
-
-                    argsWithoutController = args.Where(w => w != args[i] && w != args[i + 1]).ToArray();
-                }
-
-                return new BrokerConfiguration(argsWithoutController);
-            }
-            else
-            {
-                return new BrokerConfiguration(args);
-
             }
         }
 
