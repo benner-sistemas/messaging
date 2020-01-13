@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 /*
@@ -20,6 +21,37 @@ namespace Benner.Messaging
         private static readonly int _queueMaxLength = 63;
         private static readonly RegexOptions _regexOptions = RegexOptions.Singleline | RegexOptions.ExplicitCapture | RegexOptions.CultureInvariant;
         private static readonly Regex _queueNameRegex = new Regex("^[a-z0-9]+(-[a-z0-9]+)*$", _regexOptions);
+
+        /// <summary>
+        /// The broker configuration does not suport the argument --controller.
+        /// </summary>
+        public static string[] RemoveController(string[] args)
+        {
+            //FIXME encontrar outra solução.
+            if (args.Length <= 2 &&
+                args.Any(s => s.Contains("--controller")))
+            {
+                return null;
+            }
+            else if (args.Length > 1 &&
+                     args.Any(s => s.Contains("--controller")))
+            {
+                if (args.Any(s => s.Contains("--controller=")))
+                {
+                    return args.Where(w => !w.Contains("--controller=")).ToArray();
+                }
+                else
+                {
+                    int i = Array.IndexOf(args, "--controller");
+
+                    return args.Where(w => w != args[i] && w != args[i + 1]).ToArray();
+                }
+            }
+            else
+            {
+                return args;
+            }
+        }
 
         /// <summary>
         /// Valida o nome de uma fila de acordo com as regras do AzureQueue. 

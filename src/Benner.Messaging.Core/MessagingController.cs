@@ -15,7 +15,9 @@ namespace Benner.Messaging.Core
             // quando tem linha de comando, o primeiro argumento é um path
             try
             {
-                var args = Environment.GetCommandLineArgs().ToList();
+                var args = Utils.RemoveController(Environment.GetCommandLineArgs()).ToList();
+
+                //FIXME - está considerando a linha de comando, mesmo com arquivo.
                 if (args.Count > 1)
                 {
                     if (System.IO.File.Exists(args[0]))
