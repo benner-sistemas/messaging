@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 
 namespace Benner.Listener
 {
@@ -39,7 +39,8 @@ namespace Benner.Listener
 
             foreach (string assemblyPath in assembliesPathes)
             {
-                Assembly assembly = Assembly.Load(File.ReadAllBytes(assemblyPath));
+                Assembly assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+
                 Type found = assembly.GetType(fullName, false, true);
                 if (found == null)
                     found = assembly.GetExportedTypes().FirstOrDefault(x => x.AssemblyQualifiedName.StartsWith(fullName, StringComparison.OrdinalIgnoreCase));
@@ -50,9 +51,17 @@ namespace Benner.Listener
                     var hasDefaultCtor = found.GetConstructor(Type.EmptyTypes) != null;
                     var isPubClass = found.IsClass && found.IsPublic;
                     if (isConsumer && hasDefaultCtor && isPubClass)
+                    {
+                        var allAssembliesPathes = Directory.EnumerateFiles(folder, "*.dll", SearchOption.TopDirectoryOnly)
+                            .Where(p => !Path.GetFileName(p).StartsWith("System") && !Path.GetFileName(p).StartsWith("Microsoft"));
+                        foreach (var path in allAssembliesPathes)
+                            AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
+
                         return Activator.CreateInstance(found) as IEnterpriseIntegrationConsumer;
+                    }
                 }
             }
+
             throw new FileNotFoundException($"Não foi encontrado a classe '{fullName}' em todos os assemblies Consumer encontrados.");
         }
     }

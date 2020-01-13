@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 
 namespace Benner.Messaging
 {
-    internal static class Utils
+    public static class Utils
     {
         private static readonly int _queueMinLength = 3;
         private static readonly int _queueMaxLength = 63;
@@ -79,7 +79,7 @@ namespace Benner.Messaging
             return string.IsNullOrWhiteSpace(value) ? defaultValue : value;
         }
 
-        internal static T DeserializeObject<T>(string content)
+        public static T DeserializeObject<T>(string content)
         {
             try
             {
