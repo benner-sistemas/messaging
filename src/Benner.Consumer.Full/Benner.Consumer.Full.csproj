@@ -55,10 +55,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Benner.Listener\Benner.Listener.csproj">
-      <Project>{B0FFBE35-F9B6-4764-92F6-97D063481487}</Project>
-      <Name>Benner.Listener</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Benner.Messaging.CLI\Benner.Messaging.CLI.csproj">
       <Project>{3f46b7fb-9dbc-4f1f-b61c-c25d734757cd}</Project>
       <Name>Benner.Messaging.CLI</Name>

@@ -111,7 +111,7 @@ namespace Benner.Messaging
             return string.IsNullOrWhiteSpace(value) ? defaultValue : value;
         }
 
-        internal static T DeserializeObject<T>(string content)
+        public static T DeserializeObject<T>(string content)
         {
             try
             {
