@@ -127,7 +127,7 @@ namespace Benner.Messaging
             }
         }
 
-        internal static string SerializeObject(object obj)
+        public static string SerializeObject(object obj)
         {
             try
             {

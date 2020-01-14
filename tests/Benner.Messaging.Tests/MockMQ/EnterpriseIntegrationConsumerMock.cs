@@ -1,5 +1,4 @@
 ﻿using Benner.Listener;
-using Benner.Messaging;
 using System;
 
 namespace Benner.Retry.Tests.MockMQ
@@ -14,24 +13,23 @@ namespace Benner.Retry.Tests.MockMQ
         public int OnDeadMessageCount { get; internal set; }
         public int OnInvalidMessageCount { get; internal set; }
 
-        public void OnDeadMessage(object message)
+        public void OnDeadMessage(string message)
         {
             ++OnDeadMessageCount;
         }
 
-        public void OnInvalidMessage(object message)
+        public void OnInvalidMessage(string message)
         {
             ++OnInvalidMessageCount;
         }
 
-        public void OnMessage(object message)
+        public void OnMessage(string message)
         {
             ++OnMessageCount;
 
-            var messageAsString = message as string;
-            if (messageAsString.Equals("emitir-excecao"))
-                throw new Exception(messageAsString);
-            if (messageAsString.Equals("emitir-excecao-mensagem-invalida"))
+            if (message.Equals("emitir-excecao"))
+                throw new Exception(message);
+            if (message.Equals("emitir-excecao-mensagem-invalida"))
                 throw new InvalidMessageException();
         }
     }

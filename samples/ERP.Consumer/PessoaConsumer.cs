@@ -11,14 +11,14 @@ namespace ERP.Consumer
         {
             QueueName = "fila-pessoa-consumer",
             RetryIntervalInMilliseconds = 1000,
-            RetryLimit = 3
+            RetryLimit = 3,
         };
 
-        public void OnMessage(object message)
+        public void OnMessage(string message)
         {
             try
             {
-                var request = Utils.DeserializeObject<PessoaRequest>((string)message);
+                var request = Utils.DeserializeObject<PessoaRequest>(message);
 
                 if (request == null)
                     throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
@@ -43,22 +43,25 @@ namespace ERP.Consumer
             catch (Exception e)
             {
                 Console.WriteLine("OnMessage ERROR: " + e.Message + "\r\n");
+                throw;
             }
         }
 
-        public void OnInvalidMessage(object message)
+        public void OnInvalidMessage(string message)
         {
-            var request = Utils.DeserializeObject<PessoaRequest>((string)message);
-            //var request = message as PessoaRequest ?? throw new ArgumentNullException($"Request não é do tipo '{nameof(PessoaRequest)}'");
+            var request = Utils.DeserializeObject<PessoaRequest>(message);
+            if (request == null)
+                throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
 
             // fazer algo com a request
             Console.WriteLine("PessoaConsumer.OnInvalidMessage:" + request + "\r\n");
         }
 
-        public void OnDeadMessage(object message)
+        public void OnDeadMessage(string message)
         {
-            var request = Utils.DeserializeObject<PessoaRequest>((string)message);
-            //var request = message as PessoaRequest ?? throw new ArgumentNullException($"Request não é do tipo '{nameof(PessoaRequest)}'");
+            var request = Utils.DeserializeObject<PessoaRequest>(message);
+            if (request == null)
+                throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
 
             // fazer algo com a request
             Console.WriteLine("PessoaConsumer.OnDeadMessage:" + request + "\r\n");

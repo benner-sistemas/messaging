@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Benner.Messaging
@@ -10,7 +9,7 @@ namespace Benner.Messaging
 
         public string MessageID { get; set; }
 
-        public object Body { get; set; }
+        public string Body { get; set; }
 
         public int RetryCount { get; set; }
 
@@ -22,7 +21,7 @@ namespace Benner.Messaging
         {
             return new EnterpriseIntegrationMessage()
             {
-                Body = JsonConvert.SerializeObject(resquest),
+                Body = Utils.SerializeObject(resquest),
                 MessageID = resquest.RequestID.ToString(),
             };
         }

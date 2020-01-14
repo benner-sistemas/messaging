@@ -7,7 +7,7 @@
         /// Método disparado ao receber uma mensagem, local onde a mensagem deve ser processada
         /// </summary>
         /// <param name="message">A mensagem recebida</param>
-        void OnMessage(object message);
+        void OnMessage(string message);
         
         /// <summary>
         /// Método disparado após a ocorrência de uma <see cref="InvalidMessageException"/> durante o <see cref="OnMessage(Message)"/>, 
@@ -15,12 +15,12 @@
         /// Esse método pode ser utilizado para disparar alguma ação de compensação, ou algum tipo de notificação ao produtor da mensagem.
         /// </summary>
         /// <param name="message"></param>
-        void OnInvalidMessage(object message);
+        void OnInvalidMessage(string message);
         
         /// <summary>
         /// Método disparado após as retentativas de processamento terem sido esgotadas.
         /// </summary>
         /// <param name="message"></param>
-        void OnDeadMessage(object message);
+        void OnDeadMessage(string message);
     }
 }
