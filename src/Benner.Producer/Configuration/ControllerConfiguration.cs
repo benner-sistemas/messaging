@@ -121,7 +121,7 @@ namespace Benner.Producer.Configuration
                     }
                     catch (FileNotFoundException)
                     {
-                        this.LoadReferencedAssembly(AssemblyLoadContext.Default.LoadFromAssemblyPath(Directory.GetCurrentDirectory() + "\\dependencias\\" + name.Name + ".dll"));
+                        this.LoadReferencedAssembly(AssemblyLoadContext.Default.LoadFromAssemblyPath(Directory.GetCurrentDirectory() + "\\bin\\" + name.Name + ".dll"));
                     }
                 }
             }
