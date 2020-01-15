@@ -21,14 +21,5 @@ namespace Benner.ERP.Models
 
         [Required]
         public Endereco Endereco { get; set; }
-
-        public override string ToString()
-        {
-            return $@"RequestID: {RequestID.Value}
-Nome: {Nome}
-CPF: {CPF}
-Nascimento: {(Nascimento.HasValue ? Nascimento.Value.ToLongDateString() : "null")}
-Endereço: {Endereco.ToString()}";
-        }
     }
 }

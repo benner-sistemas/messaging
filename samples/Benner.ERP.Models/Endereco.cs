@@ -22,15 +22,5 @@ namespace Benner.ERP.Models
 
         [Required]
         public string Estado { get; set; }
-
-        public override string ToString()
-        {
-            return $@"Estado: {Estado}
-Municipio: {Municipio}
-Bairro: {Bairro}
-Logradouro: {Logradouro}
-Numero: {(Numero.HasValue ? Numero.Value.ToString() : "null")}
-CEP: {CEP}";
-        }
     }
 }

@@ -1,24 +1,23 @@
-﻿using System;
-using Benner.ERP.Models;
+﻿using Benner.ERP.Models;
 using Benner.Listener;
-using Benner.Messaging;
+using System;
 
 namespace ERP.Consumer
 {
-    public class PessoaConsumer : IEnterpriseIntegrationConsumer
+    public class PessoaConsumer : EnterpriseIntegrationConsumerBase
     {
-        public IEnterpriseIntegrationSettings Settings => new EnterpriseIntegrationSettings()
+        public override IEnterpriseIntegrationSettings Settings => new EnterpriseIntegrationSettings()
         {
             QueueName = "fila-pessoa-consumer",
             RetryIntervalInMilliseconds = 1000,
             RetryLimit = 3,
         };
 
-        public void OnMessage(string message)
+        public override void OnMessage(string message)
         {
             try
             {
-                var request = Utils.DeserializeObject<PessoaRequest>(message);
+                var request = DeserializeMessage<PessoaRequest>(message);
 
                 if (request == null)
                     throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
@@ -47,9 +46,9 @@ namespace ERP.Consumer
             }
         }
 
-        public void OnInvalidMessage(string message)
+        public override void OnInvalidMessage(string message)
         {
-            var request = Utils.DeserializeObject<PessoaRequest>(message);
+            var request = DeserializeMessage<PessoaRequest>(message);
             if (request == null)
                 throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
 
@@ -57,9 +56,9 @@ namespace ERP.Consumer
             Console.WriteLine("PessoaConsumer.OnInvalidMessage:" + request + "\r\n");
         }
 
-        public void OnDeadMessage(string message)
+        public override void OnDeadMessage(string message)
         {
-            var request = Utils.DeserializeObject<PessoaRequest>(message);
+            var request = DeserializeMessage<PessoaRequest>(message);
             if (request == null)
                 throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
 
