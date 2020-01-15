@@ -1,6 +1,6 @@
 using Benner.ERP.Models;
 using Benner.Listener;
-using Benner.Messaging;
+using Benner.Messaging.Common;
 using ERP.Consumer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -27,18 +27,18 @@ namespace ERP.Tests
             var request = new PessoaRequest();
 
             // a ordem importa
-            Assert.ThrowsException<InvalidMessageException>(() => consumer.OnMessage(Utils.SerializeObject(request)));
+            Assert.ThrowsException<InvalidMessageException>(() => consumer.OnMessage(JsonParser.Serialize(request)));
             request.CPF = "01234567890";
-            Assert.ThrowsException<InvalidMessageException>(() => consumer.OnMessage(Utils.SerializeObject(request)));
+            Assert.ThrowsException<InvalidMessageException>(() => consumer.OnMessage(JsonParser.Serialize(request)));
             request.Nascimento = DateTime.Now;
-            Assert.ThrowsException<InvalidMessageException>(() => consumer.OnMessage(Utils.SerializeObject(request)));
+            Assert.ThrowsException<InvalidMessageException>(() => consumer.OnMessage(JsonParser.Serialize(request)));
             request.Nome = "Ciclano Butano";
-            Assert.ThrowsException<InvalidMessageException>(() => consumer.OnMessage(Utils.SerializeObject(request)));
+            Assert.ThrowsException<InvalidMessageException>(() => consumer.OnMessage(JsonParser.Serialize(request)));
             request.RequestID = Guid.NewGuid();
-            Assert.ThrowsException<InvalidMessageException>(() => consumer.OnMessage(Utils.SerializeObject(request)));
+            Assert.ThrowsException<InvalidMessageException>(() => consumer.OnMessage(JsonParser.Serialize(request)));
             request.Endereco = new Endereco();
 
-            consumer.OnMessage(Utils.SerializeObject(request));
+            consumer.OnMessage(JsonParser.Serialize(request));
         }
 
         [TestMethod]
@@ -47,9 +47,9 @@ namespace ERP.Tests
             IEnterpriseIntegrationConsumer consumer = new PessoaConsumer();
             object request = null;
 
-            Assert.ThrowsException<ArgumentNullException>(() => consumer.OnMessage(Utils.SerializeObject(request)));
-            Assert.ThrowsException<ArgumentNullException>(() => consumer.OnInvalidMessage(Utils.SerializeObject(request)));
-            Assert.ThrowsException<ArgumentNullException>(() => consumer.OnDeadMessage(Utils.SerializeObject(request)));
+            Assert.ThrowsException<ArgumentNullException>(() => consumer.OnMessage(JsonParser.Serialize(request)));
+            Assert.ThrowsException<ArgumentNullException>(() => consumer.OnInvalidMessage(JsonParser.Serialize(request)));
+            Assert.ThrowsException<ArgumentNullException>(() => consumer.OnDeadMessage(JsonParser.Serialize(request)));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Benner.Messaging.Common;
+using System;
 using System.Collections.Generic;
 
 namespace Benner.Messaging
@@ -21,7 +22,7 @@ namespace Benner.Messaging
         {
             return new EnterpriseIntegrationMessage()
             {
-                Body = Utils.SerializeObject(resquest),
+                Body = JsonParser.Serialize(resquest),
                 MessageID = resquest.RequestID.ToString(),
             };
         }

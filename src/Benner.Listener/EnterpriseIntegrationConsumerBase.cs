@@ -1,4 +1,4 @@
-﻿using Benner.Messaging;
+﻿using Benner.Messaging.Common;
 
 namespace Benner.Listener
 {
@@ -14,7 +14,7 @@ namespace Benner.Listener
 
         protected virtual T DeserializeMessage<T>(string message)
         {
-            return Utils.DeserializeObject<T>(message);
+            return JsonParser.Deserialize<T>(message);
         }
     }
 }

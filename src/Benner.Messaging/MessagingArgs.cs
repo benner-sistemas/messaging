@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using Benner.Messaging.Common;
 using System;
 using System.Text;
 
@@ -57,7 +57,7 @@ namespace Benner.Messaging
         /// <exception cref="InvalidCastException">Ocorre quando há algum tipo de erro na desserialização.</exception>
         public T GetMessage<T>()
         {
-            return Utils.DeserializeObject<T>(AsString);
+            return JsonParser.Deserialize<T>(AsString);
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Benner.Messaging.Interfaces;
-using Newtonsoft.Json;
+﻿using Benner.Messaging.Common;
+using Benner.Messaging.Interfaces;
 using System;
 using System.Collections.Generic;
 
@@ -85,7 +85,7 @@ namespace Benner.Messaging
 
                     try
                     {
-                        deserialized = Utils.DeserializeObject<T>(msg.AsString);
+                        deserialized = JsonParser.Deserialize<T>(msg.AsString);
                         return true;
                     }
                     catch (Exception e)
@@ -158,7 +158,7 @@ namespace Benner.Messaging
         /// <exception cref="InvalidOperationException">Occurs when the connection to the server fails.</exception>
         public static void Enqueue(string queueName, object objMessage, IMessagingConfig config)
         {
-            Enqueue(queueName, Utils.SerializeObject(objMessage), config);
+            Enqueue(queueName, JsonParser.Serialize(objMessage), config);
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace Benner.Messaging
         /// <exception cref="InvalidOperationException">Occurs when the connection to the server fails.</exception>
         public void EnqueueMessage(string queueName, object objMessage)
         {
-            EnqueueMessage(queueName, Utils.SerializeObject(objMessage));
+            EnqueueMessage(queueName, JsonParser.Serialize(objMessage));
         }
 
         /// <summary>
