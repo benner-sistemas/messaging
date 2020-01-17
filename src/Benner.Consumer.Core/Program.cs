@@ -48,7 +48,6 @@ namespace Benner.Consumer.Core
 
         /// <summary>
         /// Cria uma instancia de <see cref="IEnterpriseIntegrationConsumer"/> de acordo com o nome completo da classe.
-        /// Retorna null caso não seja encontrada uma classe.
         /// </summary>
         /// <param name="fullName">O nome da classe completo. Ex: "Namespace.Namespace.NomeClasse".</param>
         /// <example>
