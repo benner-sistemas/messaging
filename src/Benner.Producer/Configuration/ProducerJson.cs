@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Benner.Messaging.Common;
+using System.Collections.Generic;
 
 namespace Benner.Producer.Configuration
 {
-    internal class ProducerConfig : Configuration
+    internal class ProducerJson : JsonConfiguration
     {
-        protected override string FileName => "producer.json";
+        public override string FileName => "producer.json";
 
         public List<string> Controllers { get; set; }
+
+        public OidcSettings Oidc { get; set; }
 
         public void EnsureExtensionOnControllers()
         {

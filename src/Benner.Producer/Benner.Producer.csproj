@@ -22,7 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benner.Messaging.CLI\Benner.Messaging.CLI.csproj" />
+    <ProjectReference Include="..\Benner.Messaging\Benner.Messaging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="producer.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

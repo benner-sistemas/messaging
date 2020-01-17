@@ -1,5 +1,10 @@
 {
   "Controllers": [
     "Benner.ERP.API"
-  ]
+  ],
+  "Oidc": {
+    "TokenEndpoint": "http://dominio.com.br/caminho/para/endpoit/doi/oidc",
+    "ClientId": "id",
+    "ClientSecret": "secret"
+  }
 }

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using Benner.Messaging.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,9 +22,9 @@ namespace Benner.Producer.Configuration
         /// </summary>
         /// <param name="cliControllers">Controller's assemblies enter via command line.</param>
         /// <exception cref="Exception">If no assemblies found.</exception>
-        public void SetAssemblyControllers(string cliControllers)
+        public void SetAssemblyControllers()
         {
-            var producerFileConfig = Configuration.LoadConfiguration<ProducerConfig>();
+            var producerFileConfig = JsonConfiguration.LoadConfiguration<ProducerJson>();
 
             bool existsConfigFile = producerFileConfig != null && producerFileConfig.Controllers != null && producerFileConfig.Controllers.Count > 0;
 
