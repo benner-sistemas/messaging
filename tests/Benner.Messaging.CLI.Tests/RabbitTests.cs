@@ -18,7 +18,7 @@ namespace Benner.Messaging.CLI.Tests
         public void ListenRabbitDeveRetornarErrosDeCadaOpcaoFaltante()
         {
             var args = "listen rabbit".Split(' ');
-            var cliConfig = CliParserFactory.CreateForListener(args);
+            var cliConfig = new CliParser(args);
             cliConfig.Parse();
             IEnumerable<string> mensagensErro = cliConfig.ParsingErrors.InnerExceptions.Select(err => err.Message);
 
@@ -78,7 +78,7 @@ namespace Benner.Messaging.CLI.Tests
             var args = new string[] { "listen", "rabbit", "-h", originalHost, "--port",
                 originalPort.ToString(), "-u", originalUser, "-p", originalPass, "-n", "Namespace.Classe" };
 
-            var cliConfig = CliParserFactory.CreateForListener(args);
+            var cliConfig = new CliParser(args);
             cliConfig.Parse();
 
             var config = cliConfig.Configuration;

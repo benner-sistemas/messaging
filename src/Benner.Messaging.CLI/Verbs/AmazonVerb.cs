@@ -1,10 +1,10 @@
 ﻿using Benner.Messaging.Interfaces;
 using CommandLine;
 using System;
-namespace Benner.Messaging.CLI.Verbs.Producer
+namespace Benner.Messaging.CLI.Verbs.Listener
 {
     [Verb("amazon", HelpText = "Iniciar um listener para Amazon SQS")]
-    public class AmazonVerb : ProducerVerb
+    public class AmazonVerb : ListenerVerb
     {
         [Option('i', "invisibilityTime", HelpText = "O tempo que a mensagem permanecerá invisível para outras filas, em segundos.", Required = true)]
         public int InvisibilityTime { get; set; }
@@ -33,6 +33,7 @@ namespace Benner.Messaging.CLI.Verbs.Producer
 
         public override void ValidateParameters()
         {
+            OptionValidator.ValidateOption("-n/--consumerName", Consumer);
             OptionValidator.ValidateOption("-i/--invisibilityTime", InvisibilityTime);
 
             if (!string.IsNullOrWhiteSpace(AccessKeyId) != !string.IsNullOrWhiteSpace(SecretAccessKey))

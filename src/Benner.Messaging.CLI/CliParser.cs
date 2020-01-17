@@ -1,14 +1,10 @@
 ﻿using Benner.Messaging.CLI.Extensions;
-using Benner.Messaging.CLI.Verbs;
 using Benner.Messaging.CLI.Verbs.Listener;
-using Benner.Messaging.CLI.Verbs.Producer;
 using Benner.Messaging.Interfaces;
 using CommandLine;
 using CommandLine.Text;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Benner.Messaging.CLI
 {
@@ -29,26 +25,19 @@ namespace Benner.Messaging.CLI
         public AggregateException ParsingErrors { get; private set; }
 
         private readonly string[] _args;
-        private readonly string _obsMessage;
-        private readonly Type _toRemove;
 
-        internal CliParser(string[] args, Type toRemove, string obsMessage = null)
+        public CliParser(string[] args)
         {
-            _toRemove = toRemove;
             _args = args;
-            _obsMessage = obsMessage;
         }
 
         public void Parse()
         {
             try
             {
-                var tipos = new List<Type> { typeof(ListenerVerb), typeof(ProducerVerb) };
-                tipos.Remove(_toRemove);
-
                 var parsed = new Parser(p => p.HelpWriter = null)
-                    .ParseVerbs(_args, tipos.ToArray())
-                    .WithParsed(p => OnParseSuccess(p as IBrokerVerb));
+                    .ParseVerbs(_args, typeof(ListenerVerb))
+                    .WithParsed(p => OnParseSuccess(p as ListenerVerb));
                 parsed.WithNotParsed(e => OnParseError(parsed));
             }
             catch (Exception e)
@@ -66,8 +55,6 @@ namespace Benner.Messaging.CLI
             {
                 h.AdditionalNewLineAfterOption = false;
                 h.AutoVersion = false;
-                if (_obsMessage != null)
-                    h.AddPostOptionsLine(_obsMessage);
                 h.AddPostOptionsLine("");
 
                 return h;
@@ -85,10 +72,9 @@ namespace Benner.Messaging.CLI
             ParsingErrors = new AggregateException("Ocorreu um erro na conversão da linha de comando em configuração.", exceptions);
         }
 
-        private void OnParseSuccess(IBrokerVerb arg)
+        private void OnParseSuccess(ListenerVerb arg)
         {
-            if (arg is ListenerVerb listenResult)
-                Consumer = listenResult.Consumer;
+            Consumer = arg.Consumer;
 
             BrokerName = arg.BrokerName;
             try

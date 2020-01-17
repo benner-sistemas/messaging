@@ -1,8 +1,5 @@
 {
-  "usecommandline": "true",
-  "controllers": [
-    {
-      "assembly": "Benner.ERP.API"
-    }
+  "Controllers": [
+    "Benner.ERP.API"
   ]
 }

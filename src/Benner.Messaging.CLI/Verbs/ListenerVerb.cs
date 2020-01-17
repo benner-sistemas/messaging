@@ -14,5 +14,7 @@ namespace Benner.Messaging.CLI.Verbs.Listener
         public virtual string BrokerName { get; }
 
         public abstract IMessagingConfig GetConfiguration();
+
+        public abstract void ValidateParameters();
     }
 }

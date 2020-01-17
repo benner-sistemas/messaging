@@ -15,7 +15,7 @@ namespace Benner.Messaging.Core
             // quando tem linha de comando, o primeiro argumento é um path
             try
             {
-                var args = Utils.RemoveController(Environment.GetCommandLineArgs()).ToList();
+                var args = Environment.GetCommandLineArgs().ToList();
 
                 //FIXME - está considerando a linha de comando, mesmo com arquivo.
                 if (args.Count > 1)
@@ -23,7 +23,7 @@ namespace Benner.Messaging.Core
                     if (System.IO.File.Exists(args[0]))
                         args.RemoveAt(0);
 
-                    var parser = CliParserFactory.CreateForProducer(args.ToArray());
+                    var parser = new CliParser(args.ToArray());
                     parser.Parse();
 
                     _messagingConfig = parser.Configuration;

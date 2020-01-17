@@ -9,7 +9,7 @@ namespace Benner.Consumer.Core
     {
         static int Main(string[] args)
         {
-            var parser = CliParserFactory.CreateForListener(args);
+            var parser = new CliParser(args);
             try
             {
                 parser.Parse();

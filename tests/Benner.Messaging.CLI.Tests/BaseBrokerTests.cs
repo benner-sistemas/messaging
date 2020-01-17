@@ -12,7 +12,7 @@ namespace Benner.Messaging.CLI.Tests
         protected string ConfigAssemblyName { get; set; }
         protected string GetErrorMessage(string[] args)
         {
-            var cliConfig = CliParserFactory.CreateForListener(args);
+            var cliConfig = new CliParser(args);
             cliConfig.Parse();
             return cliConfig.Exception.Message;
         }

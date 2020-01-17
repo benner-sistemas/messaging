@@ -19,7 +19,7 @@ namespace Benner.Producer.Configuration
 
             if (Args.Length >= 1)
             {
-                var parser = CliParserFactory.CreateForProducer(Args);
+                var parser = new CliParser(Args);
 
                 parser.Parse();
 

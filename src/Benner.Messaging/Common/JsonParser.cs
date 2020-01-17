@@ -5,11 +5,11 @@ namespace Benner.Messaging.Common
 {
     public static class JsonParser
     {
-        public static T Deserialize<T>(string content)
+        public static T Deserialize<T>(string content, JsonSerializerSettings settings = null)
         {
             try
             {
-                return JsonConvert.DeserializeObject<T>(content, new JsonSerializerSettings
+                return JsonConvert.DeserializeObject<T>(content, settings ?? new JsonSerializerSettings
                 {
                     ObjectCreationHandling = ObjectCreationHandling.Replace,
                     TypeNameHandling = TypeNameHandling.All
@@ -21,11 +21,11 @@ namespace Benner.Messaging.Common
             }
         }
 
-        public static string Serialize(object obj)
+        public static string Serialize(object obj, JsonSerializerSettings settings = null)
         {
             try
             {
-                return JsonConvert.SerializeObject(obj, new JsonSerializerSettings
+                return JsonConvert.SerializeObject(obj, settings ?? new JsonSerializerSettings
                 {
                     ObjectCreationHandling = ObjectCreationHandling.Replace,
                     TypeNameHandling = TypeNameHandling.All

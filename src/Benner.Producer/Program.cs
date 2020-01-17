@@ -12,34 +12,17 @@ namespace Benner.Producer
         {
             try
             {
-                BrokerConfiguration brokerConfiguration = new BrokerConfiguration(Utils.RemoveController(args));
-
-                brokerConfiguration.SetConfiguration();
-
                 CreateWebHostBuilder(args).Build().Run();
             }
             catch (Exception e)
             {
-                if (string.IsNullOrWhiteSpace(e.Message))
-                {
-                    return;
-                }
-
-                PrintErrorMessageWithTip(e.Message);
-
-                return;
+                if (!string.IsNullOrWhiteSpace(e.Message))
+                    Console.WriteLine($"ERRO:\r\n   {e.Message}");
             }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();
-
-        private static void PrintErrorMessageWithTip(string msg)
-        {
-            Console.WriteLine("ERROR(S):");
-            Console.WriteLine($"  {msg}");
-            Console.WriteLine("Dica: utilize '--help'.");
-        }
     }
 }
