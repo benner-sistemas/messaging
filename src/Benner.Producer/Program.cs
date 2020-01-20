@@ -17,8 +17,14 @@ namespace Benner.Producer
             catch (Exception e)
             {
                 if (!string.IsNullOrWhiteSpace(e.Message))
-                    Console.WriteLine($"ERRO:\r\n   {e.Message}");
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"ERRO:");
+                    Console.ResetColor();
+                    Console.WriteLine($"   {e.Message}");
+                }
             }
+
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
