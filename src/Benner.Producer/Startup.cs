@@ -23,10 +23,8 @@ namespace Benner.Producer
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
-            var commandLineController = Configuration.GetValue<string>("controller");
-
             var configuration = new ControllerConfiguration();
-            configuration.SetAssemblyControllers(commandLineController);
+            configuration.SetAssemblyControllers();
 
             foreach (var assembly in configuration.AssembliesControllers)
             {

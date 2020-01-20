@@ -9,8 +9,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Benner.Listener\Benner.Listener.csproj" />
-    <ProjectReference Include="..\Benner.Messaging.CLI\Benner.Messaging.CLI.csproj" />
     <ProjectReference Include="..\Benner.Messaging\Benner.Messaging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="consumer.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

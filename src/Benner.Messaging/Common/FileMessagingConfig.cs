@@ -129,5 +129,15 @@ namespace Benner.Messaging
 
             return configInstance;
         }
+
+        /// <summary>
+        /// Gets the broker name configured for a specific queue name. Returns null if the queue is not found.
+        /// </summary>
+        /// <param name="queue"></param>
+        /// <returns></returns>
+        public string GetBrokerNameForQueue(string queue)
+        {
+            return _messagingConfig.QueueList.Queues.FirstOrDefault(q => q.Name == queue)?.Broker;
+        }
     }
 }

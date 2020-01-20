@@ -1,14 +1,13 @@
-﻿using Benner.Messaging.Common;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.IO;
 
-namespace Benner.Producer.Configuration
+namespace Benner.Messaging.Common
 {
-    internal abstract class Configuration
+    public abstract class JsonConfiguration
     {
-        protected abstract string FileName { get; }
+        public abstract string FileName { get; }
 
-        internal static T LoadConfiguration<T>() where T : Configuration, new()
+        public static T LoadConfiguration<T>() where T : JsonConfiguration, new()
         {
             return new T().LoadConfigurationFromFile<T>() as T;
         }
@@ -37,7 +36,7 @@ namespace Benner.Producer.Configuration
             return null;
         }
 
-        internal virtual void SaveConfigurationToFile()
+        public virtual void SaveConfigurationToFile()
         {
             SaveConfigurationToFile(FileName);
         }
