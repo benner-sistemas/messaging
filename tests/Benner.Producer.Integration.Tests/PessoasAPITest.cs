@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System;
 using Newtonsoft.Json;
 using System.Text;
+using IdentityModel.Client;
 
 namespace Benner.Producer.Integration.Tests
 {
@@ -18,6 +19,8 @@ namespace Benner.Producer.Integration.Tests
     public class PessoasAPITest
     {
         private readonly HttpClient _client;
+        private readonly HttpClient _authClient = new HttpClient();
+
         public PessoasAPITest()
         {
             var server = new TestServer(new WebHostBuilder()
@@ -30,7 +33,6 @@ namespace Benner.Producer.Integration.Tests
         [InlineData("POST")]
         public async Task PessoasPostTestAsync(string method)
         {
-            // Arrange
             var request = new
             {
                 Url = "/api/pessoas",
@@ -39,7 +41,7 @@ namespace Benner.Producer.Integration.Tests
                     RequestID = Guid.NewGuid(),
                     CPF = "123.567.901-34",
                     Nome = "Nome da Pessoa da Silva",
-                    Nascimento = new DateTime(1983,3,30),
+                    Nascimento = new DateTime(1983, 3, 30),
                     Endereco = new
                     {
                         Logradouro = "Rua Itajaí",
@@ -51,23 +53,46 @@ namespace Benner.Producer.Integration.Tests
                     },
                 },
             };
+            // Arrange
+            var username = "usuario.123";
+            var password = "benner";
+            var tokenAddress = "http://bnu-vtec012:7600/auth/realms/master/protocol/openid-connect/token";
+            var clientId = "producer-api";
+            var clientSecret = "54835680-02b3-4477-a5bc-a5b3cafe223d";
 
-            // Act
+            var passwordRequest = new PasswordTokenRequest
+            {
+                Address = tokenAddress,
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                UserName = username,
+                Password = password,
+                Scope = "openid profile email updated_at groups",
+            };
+
+
+            // recuperar o token soliticado
+            var passwordResponse = _authClient.RequestPasswordTokenAsync(passwordRequest).Result;
+
+            //
+            Assert.NotNull(passwordResponse);
+            Assert.False(passwordResponse.IsError);
+            Assert.False(string.IsNullOrEmpty(passwordResponse.AccessToken));
+
+            passwordRequest.Headers.Add("Authorization", passwordResponse.AccessToken);
+
             var httpResponse = await _client.PostAsync(request.Url, ContentHelper.GetStringContent(request.Body));
 
-            // Assert
-            httpResponse.EnsureSuccessStatusCode();
-            Assert.True(httpResponse.StatusCode == System.Net.HttpStatusCode.OK);
-            var value = await httpResponse.Content.ReadAsStringAsync();
-            dynamic response = JsonConvert.DeserializeObject<dynamic>(value);
-
-            Assert.Equal(request.Body.RequestID, new Guid(response.messageID.ToString()));
-            Assert.Equal("pessoas", response.queueName.ToString());
-
-
-            var createdAt = Convert.ToDateTime(response.createdAt);
-            TimeSpan diff = DateTime.Now.Subtract(createdAt);
-            Assert.True(diff.TotalSeconds < 20);
+            var userAddress = "http://bnu-vtec012:7600/auth/realms/master/protocol/openid-connect/userinfo";
+            var tokenRequest = new UserInfoRequest
+            {
+                Address = userAddress,
+                Token = passwordResponse.AccessToken,
+            };
+            var tokenResponse = _authClient.GetUserInfoAsync(tokenRequest).Result;
+            Assert.NotNull(tokenResponse);
+            Assert.False(tokenResponse.IsError);
+            Assert.False(string.IsNullOrEmpty(tokenResponse.Raw));
         }
     }
 }
