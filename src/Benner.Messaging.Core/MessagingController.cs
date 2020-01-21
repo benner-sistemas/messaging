@@ -1,6 +1,8 @@
 ﻿using Benner.Messaging.Interfaces;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net.Http;
 
 namespace Benner.Messaging.Core
 {
@@ -22,11 +24,8 @@ namespace Benner.Messaging.Core
 
         protected ActionResult<IEnterpriseIntegrationResponse> Enqueue(IEnterpriseIntegrationResquest request)
         {
-            /*
-            this.Authenticate(token);
-            var json = OpenIDConnectService.GetRawJson(accessToken);
-            var userInfo = OidcUserInfo.GetOidcUserInfo(json);
-            */
+            ValidateAuthentication();
+
             var message = EnterpriseIntegrationMessage.Create(request);
 
             Messaging.Enqueue(
@@ -42,6 +41,32 @@ namespace Benner.Messaging.Core
             };
 
             return new OkObjectResult(response);
+        }
+
+        private void ValidateAuthentication()
+        {
+            //Microsoft.Extensions.Primitives.StringValues tokenValue;
+            //if (!Request.Headers.TryGetValue("Authorization", out tokenValue))
+            //    throw new UnauthorizedAccessException("Token é nulo ou não é do tipo Bearer");
+            //
+            //string token = tokenValue[0]
+            //
+            //if (token.StartsWith("Bearer"))
+            //    token = token.Remove(0, 7);
+            //else
+            //    throw new UnauthorizedAccessException("Token é nulo ou não é do tipo Bearer");
+            //
+            //var userAddress = "http://bnu-vtec012:7600/auth/realms/master/protocol/openid-connect/userinfo";
+            //var tokenRequest = new UserInfoRequest
+            //{
+            //    Address = userAddress,
+            //    Token = token,
+            //};
+            //var _authClient = new HttpClient();
+            //var tokenResponse = _authClient.GetUserInfoAsync(tokenRequest).Result;
+            //
+            //if (tokenResponse.IsError)
+            //    throw new UnauthorizedAccessException();
         }
     }
 }

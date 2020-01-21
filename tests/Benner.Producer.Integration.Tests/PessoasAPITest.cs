@@ -7,6 +7,7 @@ using System;
 using Newtonsoft.Json;
 using System.Text;
 using IdentityModel.Client;
+using System.Net.Http.Headers;
 
 namespace Benner.Producer.Integration.Tests
 {
@@ -31,7 +32,7 @@ namespace Benner.Producer.Integration.Tests
 
         [Theory]
         [InlineData("POST")]
-        public async Task PessoasPostTestAsync(string method)
+        public async Task PessoasPostTestAsyncComTokenValido(string method)
         {
             var request = new
             {
@@ -74,25 +75,75 @@ namespace Benner.Producer.Integration.Tests
             // recuperar o token soliticado
             var passwordResponse = _authClient.RequestPasswordTokenAsync(passwordRequest).Result;
 
-            //
             Assert.NotNull(passwordResponse);
             Assert.False(passwordResponse.IsError);
             Assert.False(string.IsNullOrEmpty(passwordResponse.AccessToken));
 
-            passwordRequest.Headers.Add("Authorization", passwordResponse.AccessToken);
+            _client.SetBearerToken(passwordResponse.AccessToken);
 
             var httpResponse = await _client.PostAsync(request.Url, ContentHelper.GetStringContent(request.Body));
+            Assert.True(httpResponse.IsSuccessStatusCode);
+        }
 
-            var userAddress = "http://bnu-vtec012:7600/auth/realms/master/protocol/openid-connect/userinfo";
-            var tokenRequest = new UserInfoRequest
+
+        [Theory]
+        [InlineData("POST")]
+        public async Task PessoasPostTestAsyncComTokenInvalido(string method)
+        {
+            var request = new
             {
-                Address = userAddress,
-                Token = passwordResponse.AccessToken,
+                Url = "/api/pessoas",
+                Body = new
+                {
+                    RequestID = Guid.NewGuid(),
+                    CPF = "123.567.901-34",
+                    Nome = "Nome da Pessoa da Silva",
+                    Nascimento = new DateTime(1983, 3, 30),
+                    Endereco = new
+                    {
+                        Logradouro = "Rua Itajaí",
+                        Numero = 881,
+                        CEP = "12345-789",
+                        Bairro = "Centro",
+                        Municipio = "Blumenau",
+                        Estado = "Santa Catarina",
+                    },
+                },
             };
-            var tokenResponse = _authClient.GetUserInfoAsync(tokenRequest).Result;
-            Assert.NotNull(tokenResponse);
-            Assert.False(tokenResponse.IsError);
-            Assert.False(string.IsNullOrEmpty(tokenResponse.Raw));
+
+            _client.SetBearerToken("token invalido");
+
+            var httpResponse = await _client.PostAsync(request.Url, ContentHelper.GetStringContent(request.Body));
+            Assert.False(httpResponse.IsSuccessStatusCode);
+        }
+
+        [Theory]
+        [InlineData("POST")]
+        public async Task PessoasPostTestAsyncSemToken(string method)
+        {
+            var request = new
+            {
+                Url = "/api/pessoas",
+                Body = new
+                {
+                    RequestID = Guid.NewGuid(),
+                    CPF = "123.567.901-34",
+                    Nome = "Nome da Pessoa da Silva",
+                    Nascimento = new DateTime(1983, 3, 30),
+                    Endereco = new
+                    {
+                        Logradouro = "Rua Itajaí",
+                        Numero = 881,
+                        CEP = "12345-789",
+                        Bairro = "Centro",
+                        Municipio = "Blumenau",
+                        Estado = "Santa Catarina",
+                    },
+                },
+            };
+
+            var httpResponse = await _client.PostAsync(request.Url, ContentHelper.GetStringContent(request.Body));
+            Assert.False(httpResponse.IsSuccessStatusCode);
         }
     }
 }
