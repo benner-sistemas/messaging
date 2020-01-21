@@ -115,6 +115,47 @@ namespace Benner.Producer.Integration.Tests
 
             var httpResponse = await _client.PostAsync(request.Url, ContentHelper.GetStringContent(request.Body));
             Assert.False(httpResponse.IsSuccessStatusCode);
+            Assert.True(httpResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized);
+            Assert.Equal(
+                "{\"success\":false,\"message\":\"Unauthorized\"}",
+                httpResponse.Content.ReadAsStringAsync().Result);
+        }
+
+        [Theory]
+        [InlineData("POST")]
+        public async Task PessoasPostTestAsyncComBasicAuthentication(string method)
+        {
+            var request = new
+            {
+                Url = "/api/pessoas",
+                Body = new
+                {
+                    RequestID = Guid.NewGuid(),
+                    CPF = "123.567.901-34",
+                    Nome = "Nome da Pessoa da Silva",
+                    Nascimento = new DateTime(1983, 3, 30),
+                    Endereco = new
+                    {
+                        Logradouro = "Rua Itajaí",
+                        Numero = 881,
+                        CEP = "12345-789",
+                        Bairro = "Centro",
+                        Municipio = "Blumenau",
+                        Estado = "Santa Catarina",
+                    },
+                },
+            };
+
+            
+
+            _client.SetBasicAuthentication("frida","fritz");
+
+            var httpResponse = await _client.PostAsync(request.Url, ContentHelper.GetStringContent(request.Body));
+            Assert.False(httpResponse.IsSuccessStatusCode);
+            Assert.True(httpResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized);
+            Assert.Equal(
+                "{\"success\":false,\"message\":\"Authorization header with Bearer scheme not found\"}",
+                httpResponse.Content.ReadAsStringAsync().Result);
         }
 
         [Theory]
@@ -144,6 +185,10 @@ namespace Benner.Producer.Integration.Tests
 
             var httpResponse = await _client.PostAsync(request.Url, ContentHelper.GetStringContent(request.Body));
             Assert.False(httpResponse.IsSuccessStatusCode);
+            Assert.True(httpResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized);
+            Assert.Equal(
+                "{\"success\":false,\"message\":\"Authorization header not found\"}",
+                httpResponse.Content.ReadAsStringAsync().Result);
         }
     }
 }

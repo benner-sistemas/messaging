@@ -3,6 +3,7 @@
     "Benner.ERP.API"
   ],
   "Oidc": {
+    "UserInfoEndpoint": "http://bnu-vtec012:7600/auth/realms/master/protocol/openid-connect/userinfo",
     "TokenEndpoint": "http://dominio.com.br/caminho/para/endpoit/doi/oidc",
     "ClientId": "id",
     "ClientSecret": "secret"
