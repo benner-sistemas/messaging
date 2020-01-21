@@ -25,22 +25,22 @@ namespace Benner.Producer.Configuration
         public void SetAssemblyControllers()
         {
             var producerFileConfig = JsonConfiguration.LoadConfiguration<ProducerJson>();
-            bool existsConfigFile = producerFileConfig != null && producerFileConfig.Controllers != null;
+            if (producerFileConfig == null)
+                throw new FileNotFoundException("O arquivo 'producer.json' não foi encontrado.");
+
+            bool controllersIsEmpty = producerFileConfig.Controllers?.Count < 1;
             var path = Directory.GetCurrentDirectory();
             string[] assembliesPathes = Directory.EnumerateFiles(path, "*.Producer.dll", SearchOption.TopDirectoryOnly)
                 .Where(a => !a.EndsWith("Benner.Producer.dll"))
                 .ToArray();
 
-            if (!existsConfigFile && assembliesPathes.Length == 0)
-                throw new FileLoadException($"Não foi encontrado o arquivo de configuração '{new ProducerJson().FileName}' " +
-                    $"ou qualquer assembly de sufixo '*.Producer.dll' no diretório de trabalho atual.");
-
-            if (existsConfigFile && producerFileConfig.Controllers.Count < 1)
-                throw new Exception($"O arquivo de configuração {new ProducerJson().FileName} não contém uma lista de controllers.");
+            if (controllersIsEmpty && assembliesPathes.Length == 0)
+                throw new FileLoadException($"O arquivo de configuração '{new ProducerJson().FileName}' não contém uma lista de controllers, " +
+                    $"e nenhum assembly de sufixo '*.Producer.dll' foi encontrado no diretório de trabalho atual.");
 
             AssembliesControllers = new List<Assembly>();
 
-            if (existsConfigFile)
+            if (!controllersIsEmpty)
             {
                 producerFileConfig.EnsureExtensionOnControllers();
                 foreach (string controller in producerFileConfig.Controllers)
