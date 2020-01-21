@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{39620032-C
 		DETAILS.md = DETAILS.md
 		DETALHES.md = DETALHES.md
 		LEIAME.md = LEIAME.md
+		PRODUCER_CONFIGURATION.md = PRODUCER_CONFIGURATION.md
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -50,6 +51,15 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.Core", "src\Benner.Messaging.Core\Benner.Messaging.Core.csproj", "{84AA1F4E-94E2-4D39-8E28-3DB1E2E864EF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.ERP.Models", "samples\Benner.ERP.Models\Benner.ERP.Models.csproj", "{8A1BF2CD-47C0-4692-9624-13C36234CB28}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{3049F360-1358-40BF-8E84-59AFBCDDCC84}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "producer", "producer", "{5ACE8D1D-F5D5-4BC1-9A2D-20AC5F6ECF6B}"
+	ProjectSection(SolutionItems) = preProject
+		docker\producer\dockerfile = docker\producer\dockerfile
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "consumer", "consumer", "{3AE0AD0A-0137-4E07-8874-7E5C6FCF6D29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -140,6 +150,8 @@ Global
 		{FF408277-E4EB-40DB-8EE6-B57B6AD37D56} = {97839F13-D676-4324-941A-16FD5151B2F2}
 		{A9695054-61F3-4845-87DB-9E709409ABD6} = {97839F13-D676-4324-941A-16FD5151B2F2}
 		{8A1BF2CD-47C0-4692-9624-13C36234CB28} = {97839F13-D676-4324-941A-16FD5151B2F2}
+		{5ACE8D1D-F5D5-4BC1-9A2D-20AC5F6ECF6B} = {3049F360-1358-40BF-8E84-59AFBCDDCC84}
+		{3AE0AD0A-0137-4E07-8874-7E5C6FCF6D29} = {3049F360-1358-40BF-8E84-59AFBCDDCC84}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E33B176C-4421-406A-A00A-0FCB277089B1}
