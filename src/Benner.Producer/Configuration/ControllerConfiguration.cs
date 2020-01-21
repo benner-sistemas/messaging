@@ -25,30 +25,30 @@ namespace Benner.Producer.Configuration
         public void SetAssemblyControllers()
         {
             var producerFileConfig = JsonConfiguration.LoadConfiguration<ProducerJson>();
-
-            bool existsConfigFile = producerFileConfig != null && producerFileConfig.Controllers != null && producerFileConfig.Controllers.Count > 0;
-
+            bool existsConfigFile = producerFileConfig != null && producerFileConfig.Controllers != null;
             var path = Directory.GetCurrentDirectory();
+            string[] assembliesPathes = Directory.EnumerateFiles(path, "*.Producer.dll", SearchOption.TopDirectoryOnly)
+                .Where(a => !a.EndsWith("Benner.Producer.dll"))
+                .ToArray();
+
+            if (!existsConfigFile && assembliesPathes.Length == 0)
+                throw new FileLoadException($"Não foi encontrado o arquivo de configuração '{new ProducerJson().FileName}' " +
+                    $"ou qualquer assembly de sufixo '*.Producer.dll' no diretório de trabalho atual.");
+
+            if (existsConfigFile && producerFileConfig.Controllers.Count < 1)
+                throw new Exception($"O arquivo de configuração {new ProducerJson().FileName} não contém uma lista de controllers.");
 
             AssembliesControllers = new List<Assembly>();
 
-            if (existsConfigFile && AssembliesControllers.Count < 1)
+            if (existsConfigFile)
             {
                 producerFileConfig.EnsureExtensionOnControllers();
                 foreach (string controller in producerFileConfig.Controllers)
                     if (!string.IsNullOrWhiteSpace(controller))
                         LoadAssemblyReferencesAndAddToControllers(Path.Combine(path, controller));
             }
-
-            if (AssembliesControllers.Count < 1)
+            else
             {
-                string[] assembliesPathes = Directory.EnumerateFiles(path, "*.Producer.dll", SearchOption.TopDirectoryOnly)
-                    .Where(a => a != "Benner.Producer.dll")
-                    .ToArray();
-
-                if (assembliesPathes.Length == 0)
-                    throw new FileNotFoundException("Não foram encontrados assemblies \"*.Producer.dll\" no diretório.");
-
                 foreach (var assembly in assembliesPathes)
                     LoadAssemblyReferencesAndAddToControllers(assembly);
 

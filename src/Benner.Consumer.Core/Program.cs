@@ -22,8 +22,7 @@ namespace Benner.Consumer.Core
                     throw new FileNotFoundException($"Não foi encontrado o arquivo '{new ConsumerJson().FileName}' no diretório atual.");
 
                 var consumerClass = consumerConfig.Consumer;
-                var consumer = GetConsumerByClassName(consumerClass)
-                    ?? throw new FileNotFoundException($"Não foi encontrado uma classe '{consumerClass}' em nenhum assembly.");
+                var consumer = GetConsumerByClassName(consumerClass);
 
                 var brokersConfig = new FileMessagingConfig();
                 Console.WriteLine($"Classe '{consumerClass}' encontrada. Criando um listener...\r\n");
@@ -38,10 +37,10 @@ namespace Benner.Consumer.Core
             }
             catch (Exception e)
             {
-                Console.WriteLine("ERRO:\r\n " + e.Message);
-                var comparer = StringComparer.OrdinalIgnoreCase;
-                if (args.Contains("-verbose", comparer) || args.Contains("-v", comparer) || args.Contains("--verbose", comparer))
-                    Console.WriteLine(e);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"ERRO:");
+                Console.ResetColor();
+                Console.WriteLine($"   {e.Message}");
             }
             return 1;
         }
@@ -63,7 +62,7 @@ namespace Benner.Consumer.Core
             string[] assembliesPathes = Directory.EnumerateFiles(folder, "*.Consumer.dll", SearchOption.TopDirectoryOnly).ToArray();
 
             if (assembliesPathes.Length == 0)
-                throw new FileNotFoundException("Não foi encontrado qualquer assembly com pattern '*.Consumer.dll' no diretório de trabalho.");
+                throw new FileNotFoundException("Não foi encontrado qualquer assembly com pattern '*.Consumer.dll' no diretório de trabalho atual.");
 
             foreach (string assemblyPath in assembliesPathes)
             {
@@ -86,7 +85,7 @@ namespace Benner.Consumer.Core
                 }
             }
 
-            throw new FileNotFoundException($"Não foi encontrado a classe '{fullName}' em todos os assemblies Consumer encontrados.");
+            throw new FileNotFoundException($"Não foi possível encontrar a classe '{fullName}' no diretório de trabalho atual.");
         }
 
         private static void LoadReferencedAssembly(Assembly assembly)
