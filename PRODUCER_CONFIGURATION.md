@@ -6,7 +6,7 @@ Existem 2 arquivos necessários para configurar um producer:
  Ambos devem estar presentes no mesmo diretório que o Benner.Producer a ser executado.
  
 ## Messaging.config
-Este arquivo serve para as configurações de broker para o qual o producer enviará as mensagens. [Clique aqui](LEIAME.md#configurão-dos-serviços) para detalhes de como configurá-lo.
+Este arquivo serve para as configurações de broker para o qual o producer enviará as mensagens. [Clique aqui](LEIAME.md#configuração-dos-serviços) para detalhes de como configurá-lo.
 
 ##  Producer.json
 Este arquivo serve para configurar a lista de controllers que devem ser carregados e os *endpoints* do servidor de autenticação Open Id Connect, responsável pela segurança do envio de requisições para o servidor de mensageria.

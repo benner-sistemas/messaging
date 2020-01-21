@@ -8,8 +8,8 @@ Documentação referente à construção de um contêiner linux para o Benner.Pr
 
 # Passo a passo:
  1. Primeiro é necessário criar arquivos para a configuração do producer. Em um novo diretório, crie os seguintes arquivos, já os configurando:
-    - [**messaging.config**](LEIAME.md#configurão-dos-serviços)
-    - [**producer.json**](PRODUCER_CONFIGURATION.md#producer.json)
+    - [**messaging.config**](LEIAME.md#configuração-dos-serviços)
+    - [**producer.json**](PRODUCER_CONFIGURATION.md#producerjson)
    2. Copie suas dlls de controllers para o diretório, com suas respectivas dependências.
    3. Crie um arquivo de texto com nome "dockerfile" com o seguinte conteúdo:
 ```dockerfile
