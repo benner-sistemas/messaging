@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Benner.Producer.Configuration
 {
-    internal class ProducerJson : JsonConfiguration
+    public class ProducerJson : JsonConfiguration
     {
         public override string FileName => "producer.json";
 
