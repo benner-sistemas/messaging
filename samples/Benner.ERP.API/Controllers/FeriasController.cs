@@ -17,7 +17,7 @@ namespace Benner.ERP.API.Controllers
         [Route("adicionarMensagemFerias")]
         public ActionResult<IEnterpriseIntegrationResponse> AdicionarMensagemFerias([FromBody] FeriasRequest request)
         {
-            return base.Enqueue(request as IEnterpriseIntegrationResquest);
+            return base.Enqueue(request as IEnterpriseIntegrationRequest);
         }
     }
 }

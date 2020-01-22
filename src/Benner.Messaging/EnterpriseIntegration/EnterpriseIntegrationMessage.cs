@@ -4,26 +4,23 @@ using System.Collections.Generic;
 
 namespace Benner.Messaging
 {
-    public class EnterpriseIntegrationMessage
+    public class EnterpriseIntegrationMessage : MessageBase
     {
-        public EnterpriseIntegrationMessage() => ExceptionList = new List<Exception>();
+        public EnterpriseIntegrationMessage() : base()
+        { }
 
         public string MessageID { get; set; }
-
-        public string Body { get; set; }
 
         public int RetryCount { get; set; }
 
         public DateTime WaitUntil { get; set; }
 
-        public List<Exception> ExceptionList { get; set; }
-
-        public static EnterpriseIntegrationMessage Create(IEnterpriseIntegrationResquest resquest)
+        public static EnterpriseIntegrationMessage Create(IEnterpriseIntegrationRequest request)
         {
             return new EnterpriseIntegrationMessage()
             {
-                Body = JsonParser.Serialize(resquest),
-                MessageID = resquest.RequestID.ToString(),
+                Body = JsonParser.Serialize(request),
+                MessageID = request.RequestID.ToString(),
             };
         }
     }

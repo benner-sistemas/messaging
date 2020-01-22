@@ -2,7 +2,7 @@
 
 namespace Benner.Messaging
 {
-    public interface IEnterpriseIntegrationResquest
+    public interface IEnterpriseIntegrationRequest
     {
         Guid? RequestID { get; set; }
     }

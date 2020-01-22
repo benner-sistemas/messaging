@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Benner.ERP.Models
 {
-    public class PessoaRequest : IEnterpriseIntegrationResquest
+    public class PessoaRequest : IEnterpriseIntegrationRequest
     {
         [Key]
         public Guid? RequestID { get; set; }

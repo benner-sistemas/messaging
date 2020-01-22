@@ -15,7 +15,7 @@ namespace Benner.ERP.API.Controllers
         [HttpPost]
         public ActionResult<IEnterpriseIntegrationResponse> Post([FromBody] PessoaRequest request)
         {
-            return base.Enqueue(request as IEnterpriseIntegrationResquest);
+            return base.Enqueue(request as IEnterpriseIntegrationRequest);
         }
     }
 }
