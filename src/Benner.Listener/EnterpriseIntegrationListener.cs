@@ -82,7 +82,7 @@ namespace Benner.Listener
         {
             integrationMessage.ExceptionList.Add(invalidMessageException);
             _sender.EnqueueMessage(_queueName.Invalid, integrationMessage);
-            Task.Run(() => { try { _consumer.OnInvalidMessage(integrationMessage.Body); } catch { /*silent!*/ } });
+            Task.Run(() => { try { _consumer.OnInvalidMessage(integrationMessage.Body, invalidMessageException); } catch { /*silent!*/ } });
             return true;
         }
         private bool CallRetryOrDeadMessage(EnterpriseIntegrationMessage integrationMessage, Exception exception)
@@ -97,7 +97,7 @@ namespace Benner.Listener
             else
             {
                 _sender.EnqueueMessage(_queueName.Dead, integrationMessage);
-                Task.Run(() => { try { _consumer.OnDeadMessage(integrationMessage.Body); } catch { /*silent!*/ } });
+                Task.Run(() => { try { _consumer.OnDeadMessage(integrationMessage.Body, exception); } catch { /*silent!*/ } });
             }
             return true;
         }

@@ -1,4 +1,5 @@
 ﻿using Benner.Messaging.Common;
+using System;
 
 namespace Benner.Listener
 {
@@ -6,9 +7,9 @@ namespace Benner.Listener
     {
         public abstract IEnterpriseIntegrationSettings Settings { get; }
 
-        public abstract void OnDeadMessage(string message);
+        public abstract void OnDeadMessage(string message, Exception exception);
 
-        public abstract void OnInvalidMessage(string message);
+        public abstract void OnInvalidMessage(string message, InvalidMessageException exception);
 
         public abstract void OnMessage(string message);
 

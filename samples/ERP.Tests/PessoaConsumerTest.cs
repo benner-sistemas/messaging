@@ -48,8 +48,8 @@ namespace ERP.Tests
             object request = null;
 
             Assert.ThrowsException<ArgumentNullException>(() => consumer.OnMessage(JsonParser.Serialize(request)));
-            Assert.ThrowsException<ArgumentNullException>(() => consumer.OnInvalidMessage(JsonParser.Serialize(request)));
-            Assert.ThrowsException<ArgumentNullException>(() => consumer.OnDeadMessage(JsonParser.Serialize(request)));
+            Assert.ThrowsException<ArgumentNullException>(() => consumer.OnInvalidMessage(JsonParser.Serialize(request), new InvalidMessageException()));
+            Assert.ThrowsException<ArgumentNullException>(() => consumer.OnDeadMessage(JsonParser.Serialize(request), new Exception()));
         }
     }
 }

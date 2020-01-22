@@ -46,7 +46,7 @@ namespace ERP.Consumer
             }
         }
 
-        public override void OnInvalidMessage(string message)
+        public override void OnInvalidMessage(string message, InvalidMessageException exception)
         {
             var request = DeserializeMessage<PessoaRequest>(message);
             if (request == null)
@@ -56,7 +56,7 @@ namespace ERP.Consumer
             Console.WriteLine("PessoaConsumer.OnInvalidMessage:" + request + "\r\n");
         }
 
-        public override void OnDeadMessage(string message)
+        public override void OnDeadMessage(string message, Exception exception)
         {
             var request = DeserializeMessage<PessoaRequest>(message);
             if (request == null)
