@@ -25,8 +25,8 @@ namespace Benner.Producer.Configuration
         public void SetAssemblyControllers()
         {
             var producerFileConfig = JsonConfiguration.LoadConfiguration<ProducerJson>();
-            if (producerFileConfig == null)
-                throw new FileNotFoundException("O arquivo 'producer.json' não foi encontrado.");
+
+            ValidateProducerJson(producerFileConfig);
 
             bool controllersIsEmpty = producerFileConfig.Controllers?.Count < 1;
             var path = Directory.GetCurrentDirectory();
@@ -54,6 +54,17 @@ namespace Benner.Producer.Configuration
 
                 Console.WriteLine("Foram carregados os Controllers de todos os assemblies \"*.Producer.dll\" presentes do diretório atual.");
             }
+        }
+
+        private void ValidateProducerJson(ProducerJson producer)
+        {
+            if (producer == null)
+                throw new FileNotFoundException("O arquivo 'producer.json' não foi encontrado.");
+
+            if (producer.Oidc == null)
+                throw new Exception("A configuração de Oidc deve ser informada.");
+
+            //validar parametros de oidc com suas mensagens de erro
         }
 
         private void LoadAssemblyReferencesAndAddToControllers(string assemblyPath)
