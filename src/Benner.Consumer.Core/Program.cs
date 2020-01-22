@@ -18,8 +18,11 @@ namespace Benner.Consumer.Core
             {
                 var consumerConfig = JsonConfiguration.LoadConfiguration<ConsumerJson>();
 
-                if (consumerConfig == null || string.IsNullOrWhiteSpace(consumerConfig?.Consumer))
+                if (consumerConfig == null)
                     throw new FileNotFoundException($"Não foi encontrado o arquivo '{new ConsumerJson().FileName}' no diretório atual.");
+
+                if (string.IsNullOrWhiteSpace(consumerConfig.Consumer))
+                    throw new ArgumentException($"A propriedade 'Consumer' do arquivo '{new ConsumerJson().FileName}' não pode ser vazia.");
 
                 var consumerClass = consumerConfig.Consumer;
                 var consumer = GetConsumerByClassName(consumerClass);
