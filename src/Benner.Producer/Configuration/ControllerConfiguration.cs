@@ -64,20 +64,20 @@ namespace Benner.Producer.Configuration
             if (producer.Oidc == null)
                 throw new Exception("A configuração de Oidc deve ser informada.");
 
-            if (producer.Oidc.TokenEndpoint == null)
-                throw new Exception("TokenEndpoint deve ser informado.");
+            var oidc = producer.Oidc;
+            string msg = "{0} deve ser informado.";
 
-            if (producer.Oidc.ClientId == null)
-                throw new Exception("ClientId deve ser informado.");
+            if (string.IsNullOrWhiteSpace(oidc.TokenEndpoint))
+                throw new Exception(string.Format(msg, nameof(oidc.TokenEndpoint)));
 
-            if (producer.Oidc.ClientSecret == null)
-                throw new Exception("ClientSecret deve ser informado.");
+            if (string.IsNullOrWhiteSpace(oidc.ClientId))
+                throw new Exception(string.Format(msg, nameof(oidc.ClientId)));
 
-            if (producer.Oidc.UserInfoEndpoint == null)
-                throw new Exception("UserInfoEndpoint deve ser informado.");
+            if (string.IsNullOrWhiteSpace(oidc.ClientSecret))
+                throw new Exception(string.Format(msg, nameof(oidc.ClientSecret)));
 
-
-            //validar parametros de oidc com suas mensagens de erro
+            if (string.IsNullOrWhiteSpace(oidc.UserInfoEndpoint))
+                throw new Exception(string.Format(msg, nameof(oidc.UserInfoEndpoint)));
         }
 
         private void LoadAssemblyReferencesAndAddToControllers(string assemblyPath)
