@@ -1,46 +1,41 @@
 # Benner.Producer
 
-Documentação referente a autenticação do Producer com OIDC de um container linux para o Benner.Consumer.Core
+Documentação referente a autenticação do Producer com OIDC
 
 ## O que você precisa?
 
-- Uma máquina com o Docker hub rodando para containers Linux ou uma máquina Linux com Docker rodando.
-- Um container ou servidor rodando o RabbitMQ
+- 
+- 
 
 # Passo a passo:
 
-1 - Realizar o Publish do Benner.Consumer.Core
+Acesse em seu navegador o gerenciador do KeyCloak. Entre em Administration Console para acessar a tela de login, utilizando os dados previamente configurados na instalação  do keycloak. Você será redirecionado para o Realm Master.
 
-2 - Abrir a pasta onde os arquivos do Publish foram gerados
+No menu lateral esquerdo, acesse Clients, e então no canto direito clique em `Create` para criar um novo client a ser usado na autenticação do Producer. Preencha o Client ID, por exemplo `producer-api`, e então salve. Você será redirecionado para a página completa de configuração.
 
-3 - Criar um Dockerfile NA MESMA PASTA que se encontram os arquivos gerados do Publish com o seguinte conteúdo:
+Nesta página precisaremos seguir alguns passos:
 
-```csharp
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
-WORKDIR /app
+Altere o Access Type para confidential.
+Habilite as opções:
 
-COPY . /app/out
-COPY . /app
-COPY . /app/bin/Release/netcoreapp2.2
+Standard Flow Enabled;
+Implicit Flow Enabled;
+Direct Access Grants Enabled;
+Service Accounts Enabled;
+Authorization Enabled;
 
-ENTRYPOINT ["dotnet", "Benner.Consumer.Core.dll"]
-```
+Salve as configurações.
 
-4 - Rodar o seguinte comando para buildar a imagem Docker:
-```shell
-docker build -t consumercore .
-```
 
-5 - Após o térimo do Build, rodar o seguinte comando para iniciar o docker, passando por parametro os dados utilizados:
-```shell
+No menu lateral esquerdo, acesse Roles, e então no canto direito clique em `Add Role` para criar uma nova role. Preencha o Role Name, por exemplo `acesso-producer`, e então salve. Você será redirecionado para a página completa de configuração, porém nenhuma configuração adicional é necessária.
 
-docker run consumercore listen broker -h hostname --port porta -u user -p password
+No menu lateral esquerdo, acesse Users, e então no canto direito clique em `Add user` para criar um novo usuário. Preencha o Username com o nome do usuário, por exemplo `usuario-fulano`, e então salve. Você será redirecionado para a página completa de configuração, onde deve seguir os seguintes passos:
 
-```
-Exemplo: 
-```shell
-docker run consumercore listen rabbit -h tec-rabbit --port 5672 -u guest -p guest -n Benner.Consumer.Core.ContabilizacaoConsumer
+Na aba `Credentials`, adicione uma senha e a confiramção da mesma nos campos `Password` e `Password Confirmation`, respectivamente;
+Na aba `Role Mappings`, selecione a rola criada anteriormente (`acesso-producer`) dentro do quadro Available Roles, e clique em `Add selectec >`
 
-```
+Estas são as configurações necessárias no Keycloak, agora você está pronto para realizar autenticação no Producer! 
 
-Pronto! Para testar se funcionou, envie uma mensagem para a uma fila e configure o cunsumer para consumir as mensagem desta mesma fila e verifique se a mensagem realmente foi consumida.
+
+
+
