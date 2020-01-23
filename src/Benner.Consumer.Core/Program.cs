@@ -17,6 +17,7 @@ namespace Benner.Consumer.Core
         {
             try
             {
+                Log.ConfigureLog();
                 var consumerConfig = JsonConfiguration.LoadConfiguration<ConsumerJson>();
 
                 if (consumerConfig == null)

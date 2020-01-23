@@ -11,6 +11,7 @@ namespace Benner.Producer
         {
             try
             {
+                Log.ConfigureLog();
                 CreateWebHostBuilder(args).Build().Run();
             }
             catch (Exception e)

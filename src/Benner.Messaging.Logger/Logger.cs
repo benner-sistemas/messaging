@@ -8,26 +8,24 @@ namespace Benner.Messaging.Logger
 {
     public class Log
     {
+        private const string FILE_NAME = "elasticsearch.json";
         private static Serilog.Core.Logger _logger;
 
-        static Log()
-        {
-            ConfigureLog();
-        }
-
-        private static void ConfigureLog()
+        public static void ConfigureLog()
         {
             if (_logger == null)
             {
-                var elasticConfig = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("elasticsearch.json")
-                    .Build();
+                var config = new LoggerConfiguration()
+                    .WriteTo.Console(outputTemplate: "[{Timestamp:dd/MM/yyy HH:mm:ss} {Level:u3}]: {Message:lj}{NewLine}{Exception}");
 
-                _logger = new LoggerConfiguration()
-                    .WriteTo.Console(outputTemplate: "[{Timestamp:dd/MM/yyy HH:mm:ss} {Level:u3}]: {Message:lj}{NewLine}{Exception}")
-                    .ReadFrom.Configuration(elasticConfig)
-                    .CreateLogger();
+                string basePath = Directory.GetCurrentDirectory();
+                if (File.Exists(Path.Combine(basePath, FILE_NAME)))
+                    config.ReadFrom.Configuration(new ConfigurationBuilder()
+                        .SetBasePath(basePath)
+                        .AddJsonFile(FILE_NAME)
+                        .Build());
+
+                _logger = config.CreateLogger();
             }
         }
 
