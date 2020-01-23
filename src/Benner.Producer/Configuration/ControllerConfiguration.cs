@@ -59,7 +59,7 @@ namespace Benner.Producer.Configuration
         private void ValidateProducerJson(ProducerJson producer)
         {
             if (producer == null)
-                throw new FileNotFoundException("O arquivo 'producer.json' não foi encontrado.");
+                throw new FileNotFoundException($"O arquivo '{new ProducerJson().FileName}' não foi encontrado.");
 
             if (producer.Oidc == null)
                 throw new Exception("A configuração de Oidc deve ser informada.");

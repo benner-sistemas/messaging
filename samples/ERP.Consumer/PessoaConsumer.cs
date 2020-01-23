@@ -15,9 +15,10 @@ namespace ERP.Consumer
 
         public override void OnMessage(string message)
         {
+            PessoaRequest request = null;
             try
             {
-                var request = DeserializeMessage<PessoaRequest>(message);
+                request = DeserializeMessage<PessoaRequest>(message);
 
                 if (request == null)
                     throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
@@ -37,11 +38,11 @@ namespace ERP.Consumer
                 if (request.Endereco == null)
                     throw new InvalidMessageException("Endereço deve ser preenchido");
 
-                Console.WriteLine("\r\nPessoaConsumer.OnMessage:" + request + "\r\n");
+                LogInformation("PessoaConsumer.OnMessage {requestId}:", request.RequestID);
             }
             catch (Exception e)
             {
-                Console.WriteLine("OnMessage ERROR: " + e.Message + "\r\n");
+                LogError(e, "Erro OnMessage: {requestId}:", request?.RequestID);
                 throw;
             }
         }
@@ -53,7 +54,7 @@ namespace ERP.Consumer
                 throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
 
             // fazer algo com a request
-            Console.WriteLine("PessoaConsumer.OnInvalidMessage:" + request + "\r\n");
+            LogInformation("PessoaConsumer.OnInvalidMessage {requestId}:", request.RequestID);
         }
 
         public override void OnDeadMessage(string message)
@@ -63,7 +64,7 @@ namespace ERP.Consumer
                 throw new ArgumentNullException($"Request não é '{nameof(PessoaRequest)}'");
 
             // fazer algo com a request
-            Console.WriteLine("PessoaConsumer.OnDeadMessage:" + request + "\r\n");
+            LogInformation("PessoaConsumer.OnDeadMessage {requestId}:", request.RequestID);
         }
     }
 }

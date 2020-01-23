@@ -1,0 +1,14 @@
+{
+  "Serilog": {
+    "WriteTo": [
+      {
+        "Name": "Elasticsearch",
+        "Args": {
+          "nodeUris": "http://bnu-leonardofo.benner.com.br:9200",
+          "autoRegisterTemplate": true,
+          "autoRegisterTemplateVersion": "ESv6"
+        }
+      }
+    ]
+  }
+}

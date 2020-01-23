@@ -1,5 +1,6 @@
 ﻿using Benner.Messaging;
 using Benner.Messaging.Interfaces;
+using Benner.Messaging.Logger;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace Benner.Listener
         private readonly Messaging.Messaging _receiver;
         private readonly Messaging.Messaging _sender;
         private readonly QueueName _queueName;
-        
+
         public EnterpriseIntegrationListener(IMessagingConfig config, IEnterpriseIntegrationConsumer consumer)
         {
             _consumer = consumer;
@@ -31,7 +32,9 @@ namespace Benner.Listener
         public void Start()
         {
             _receiver.StartListening(_queueName.Default, ProcessDefaultQueue);
+            Log.Information("Escutando fila default {default}", _queueName.Default);
             _receiver.StartListening(_queueName.Retry, ProcessRetryQueue);
+            Log.Information("Escutando fila retry {retry}", _queueName.Retry);
         }
         private bool ProcessDefaultQueue(MessagingArgs arg)
         {
@@ -76,13 +79,26 @@ namespace Benner.Listener
         private bool CallConsumeMessage(EnterpriseIntegrationMessage integrationMessage)
         {
             _consumer.OnMessage(integrationMessage.Body);
+            Log.Information("OnMessage {id}", integrationMessage.MessageID);
             return true;
         }
         private bool CallInvalidMessage(EnterpriseIntegrationMessage integrationMessage, InvalidMessageException invalidMessageException)
         {
             integrationMessage.ExceptionList.Add(invalidMessageException);
             _sender.EnqueueMessage(_queueName.Invalid, integrationMessage);
-            Task.Run(() => { try { _consumer.OnInvalidMessage(integrationMessage.Body); } catch { /*silent!*/ } });
+            Log.Information("Mensagem {id} enfileirada em {queueName}", integrationMessage.MessageID, _queueName.Invalid);
+            Task.Run(() =>
+            {
+                try
+                {
+                    _consumer.OnInvalidMessage(integrationMessage.Body);
+                    Log.Information("OnInvalidMessage {id}", integrationMessage.MessageID);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, e.Message);
+                }
+            });
             return true;
         }
         private bool CallRetryOrDeadMessage(EnterpriseIntegrationMessage integrationMessage, Exception exception)
@@ -93,11 +109,24 @@ namespace Benner.Listener
             {
                 integrationMessage.WaitUntil = DateTime.Now.AddMilliseconds(_consumer.Settings.RetryIntervalInMilliseconds);
                 _sender.EnqueueMessage(_queueName.Retry, integrationMessage);
+                Log.Information("Mensagem {id} enfileirada em {queueName}", integrationMessage.MessageID, _queueName.Retry);
             }
             else
             {
                 _sender.EnqueueMessage(_queueName.Dead, integrationMessage);
-                Task.Run(() => { try { _consumer.OnDeadMessage(integrationMessage.Body); } catch { /*silent!*/ } });
+                Log.Information("Mensagem {id} enfileirada em {queueName}", integrationMessage.MessageID, _queueName.Dead);
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        _consumer.OnDeadMessage(integrationMessage.Body);
+                        Log.Information("OnDeadMessage {id}", integrationMessage.MessageID);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e, e.Message);
+                    }
+                });
             }
             return true;
         }

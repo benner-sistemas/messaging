@@ -137,7 +137,7 @@ namespace Benner.Messaging
         /// <returns></returns>
         public string GetBrokerNameForQueue(string queue)
         {
-            return _messagingConfig.QueueList.Queues.FirstOrDefault(q => q.Name == queue)?.Broker;
+            return _messagingConfig.QueueList.Queues.FirstOrDefault(q => q.Name == queue)?.Broker ?? _messagingConfig.BrokerList.Default;
         }
     }
 }

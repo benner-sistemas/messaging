@@ -1,5 +1,4 @@
-﻿using Benner.Messaging;
-using Benner.Producer.Configuration;
+﻿using Benner.Messaging.Logger;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using System;
@@ -16,15 +15,8 @@ namespace Benner.Producer
             }
             catch (Exception e)
             {
-                if (!string.IsNullOrWhiteSpace(e.Message))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"ERRO:");
-                    Console.ResetColor();
-                    Console.WriteLine($"   {e.Message}");
-                }
+                Log.Error(e, e.Message);
             }
-
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
