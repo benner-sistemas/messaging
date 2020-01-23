@@ -91,7 +91,7 @@ namespace Benner.Listener
             {
                 try
                 {
-                    _consumer.OnInvalidMessage(integrationMessage.Body);
+                    _consumer.OnInvalidMessage(integrationMessage.Body, invalidMessageException);
                     Log.Information("OnInvalidMessage {id}", integrationMessage.MessageID);
                 }
                 catch (Exception e)
@@ -119,7 +119,7 @@ namespace Benner.Listener
                 {
                     try
                     {
-                        _consumer.OnDeadMessage(integrationMessage.Body);
+                        _consumer.OnDeadMessage(integrationMessage.Body, exception);
                         Log.Information("OnDeadMessage {id}", integrationMessage.MessageID);
                     }
                     catch (Exception e)

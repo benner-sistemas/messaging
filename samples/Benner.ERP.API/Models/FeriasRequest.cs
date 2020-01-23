@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Benner.ERP.API.Models
 {
-    public class FeriasRequest : IEnterpriseIntegrationResquest
+    public class FeriasRequest : IEnterpriseIntegrationRequest
     {
         [Key]
         public Guid? RequestID { get; set; }

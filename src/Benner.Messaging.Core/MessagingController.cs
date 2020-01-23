@@ -26,7 +26,7 @@ namespace Benner.Messaging.Core
             get { return _messagingConfig; }
         }
 
-        protected ActionResult<IEnterpriseIntegrationResponse> Enqueue(IEnterpriseIntegrationResquest request)
+        protected ActionResult<IEnterpriseIntegrationResponse> Enqueue(IEnterpriseIntegrationRequest request)
         {
             var authenticationResult = ValidateAuthentication();
             if (!authenticationResult.Success)

@@ -13,12 +13,12 @@ namespace Benner.Retry.Tests.MockMQ
         public int OnDeadMessageCount { get; internal set; }
         public int OnInvalidMessageCount { get; internal set; }
 
-        public void OnDeadMessage(string message)
+        public void OnDeadMessage(string message, Exception exception)
         {
             ++OnDeadMessageCount;
         }
 
-        public void OnInvalidMessage(string message)
+        public void OnInvalidMessage(string message, InvalidMessageException exception)
         {
             ++OnInvalidMessageCount;
         }

@@ -1,4 +1,6 @@
-﻿namespace Benner.Listener
+﻿using System;
+
+namespace Benner.Listener
 {
     public interface IEnterpriseIntegrationConsumer
     {
@@ -15,12 +17,12 @@
         /// Esse método pode ser utilizado para disparar alguma ação de compensação, ou algum tipo de notificação ao produtor da mensagem.
         /// </summary>
         /// <param name="message"></param>
-        void OnInvalidMessage(string message);
+        void OnInvalidMessage(string message, InvalidMessageException exception);
         
         /// <summary>
         /// Método disparado após as retentativas de processamento terem sido esgotadas.
         /// </summary>
         /// <param name="message"></param>
-        void OnDeadMessage(string message);
+        void OnDeadMessage(string message, Exception exception);
     }
 }

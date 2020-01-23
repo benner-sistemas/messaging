@@ -62,7 +62,7 @@ public PessoasAPITest()
 Para realizar o teste de requisição do token, temos o seguinte código, onde criamos um request passando a Url da API e um Body contendo os dados requisitados na API de pessoas, e temos também as informações previamente configuradas no Keycloak. Estas informações podem ser obtidas no painel de aministração do Keycloak. No menu lateral esquerdo, selecione a opção `Realm Settings`, e na aba `General`, clique em cima do texto `OpenID Endpoint Configuration`. Será aberto um uma nova aba um arquivo Json, onde podemos encontrar o Token Endpoint. Precisamos das credenciais do usuário que foi adicionado anteriormente nas configurações do keycloak, onde username será o `usuario-fulano` e a senha será a que você definiu. P ClientId também foi definido previamente, e neste caso seria `producer-api`. ClientSecret pode ser encontrado no painel de administração do Keycloak também. No menu esquerdo, selecione `Clients` e depois abra a aba `Credentials`. Selecione o texto que está na caixa ao lado de `Secret`.  Abaixo segue um modelo de como serão usadas estas informações no código:
 
 ```csharp
-[Theory]
+        [Theory]
         [InlineData("POST")]
         public async Task PessoasPostTestAsyncComTokenValido(string method)
         {
