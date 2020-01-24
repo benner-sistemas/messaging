@@ -67,6 +67,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "consumer", "consumer", "{3A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Messaging.Configuration", "src\Benner.Messaging.Configuration\Benner.Messaging.Configuration.csproj", "{256CC050-3207-4FD9-B9DD-B70651926DF6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Messaging.Logger", "src\Benner.Messaging.Logger\Benner.Messaging.Logger.csproj", "{160C96EE-74D1-4DCB-A42C-CB4E56758A83}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,10 @@ Global
 		{8A1BF2CD-47C0-4692-9624-13C36234CB28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A1BF2CD-47C0-4692-9624-13C36234CB28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A1BF2CD-47C0-4692-9624-13C36234CB28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{160C96EE-74D1-4DCB-A42C-CB4E56758A83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{160C96EE-74D1-4DCB-A42C-CB4E56758A83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{160C96EE-74D1-4DCB-A42C-CB4E56758A83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{160C96EE-74D1-4DCB-A42C-CB4E56758A83}.Release|Any CPU.Build.0 = Release|Any CPU
 		{256CC050-3207-4FD9-B9DD-B70651926DF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{256CC050-3207-4FD9-B9DD-B70651926DF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{256CC050-3207-4FD9-B9DD-B70651926DF6}.Release|Any CPU.ActiveCfg = Release|Any CPU

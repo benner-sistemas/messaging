@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Benner.Messaging.Logger\Benner.Messaging.Logger.csproj" />
     <ProjectReference Include="..\Benner.Messaging.Configuration\Benner.Messaging.Configuration.csproj" />
   </ItemGroup>
 

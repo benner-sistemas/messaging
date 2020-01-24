@@ -1,6 +1,7 @@
 ﻿using Benner.Listener;
 using Benner.Messaging;
 using Benner.Messaging.Configuration;
+using Benner.Messaging.Logger;
 using System;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace Benner.Consumer.Core
         {
             try
             {
+                Log.ConfigureLog();
                 var consumerConfig = JsonConfiguration.LoadConfiguration<ConsumerJson>();
 
                 if (consumerConfig == null)
@@ -28,22 +30,19 @@ namespace Benner.Consumer.Core
                 var consumer = GetConsumerByClassName(consumerClass);
 
                 var brokersConfig = new FileMessagingConfig();
-                Console.WriteLine($"Classe '{consumerClass}' encontrada. Criando um listener...\r\n");
+                Log.Information("Classe {consumerClass} encontrada. Criando um listener...", consumerClass);
 
                 var listener = new EnterpriseIntegrationListener(brokersConfig, consumer);
-                listener.Start();
                 string queueName = consumer.Settings.QueueName;
-                Console.WriteLine($"Escutando fila '{queueName}' em broker '{brokersConfig.GetBrokerNameForQueue(queueName)}'...\r\n");
+                Log.Information("Iniciando a escuta da fila {queueName} do broker {brokerName}", queueName, brokersConfig.GetBrokerNameForQueue(queueName));
+                listener.Start();
                 Thread.Sleep(Timeout.Infinite);
-                Console.WriteLine("Ação cancelada pelo usuário.");
+                Log.Information("Listener encerrado por ação do usuário.");
                 return 0;
             }
             catch (Exception e)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"ERRO:");
-                Console.ResetColor();
-                Console.WriteLine($"   {e.Message}");
+                Log.Error(e, e.Message);
             }
             return 1;
         }
