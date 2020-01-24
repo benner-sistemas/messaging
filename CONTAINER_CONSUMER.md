@@ -1,46 +1,26 @@
-# Benner.Producer
 
-Documentação referente a produção de um container linux para o Benner.Consumer.Core
+# Benner.Producer
+Documentação referente à construção de um contêiner linux para o Benner.Consumer.Core.
 
 ## O que você precisa?
-
-- Uma máquina com o Docker hub rodando para containers Linux ou uma máquina Linux com Docker rodando.
-- Um container ou servidor rodando o RabbitMQ
+- Uma máquina com Docker rodando contêineres Linux.
+- Um contêiner ou servidor de mensageria (exemplo: RabbitMQ).
 
 # Passo a passo:
-
-1 - Realizar o Publish do Benner.Consumer.Core
-
-2 - Abrir a pasta onde os arquivos do Publish foram gerados
-
-3 - Criar um Dockerfile NA MESMA PASTA que se encontram os arquivos gerados do Publish com o seguinte conteúdo:
-
-```csharp
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
-WORKDIR /app
-
-COPY . /app/out
+ 1. Primeiro é necessário criar arquivos para a configuração do consumer. Em um novo diretório, crie os seguintes arquivos, já os configurando:
+    - [**messaging.config**](LEIAME.md#configuração-dos-serviços)
+    - [**consumer.json**](CONFIGURATION_FILES.md#consumerjson)
+   2. Copie suas dlls de controllers para o diretório, com suas respectivas dependências.
+   3. Crie um arquivo de texto com nome "dockerfile" com o seguinte conteúdo:
+```dockerfile
+FROM bennersistemas/comsumer:1.0.0
 COPY . /app
-COPY . /app/bin/Release/netcoreapp2.2
-
-ENTRYPOINT ["dotnet", "Benner.Consumer.Core.dll"]
 ```
-
-4 - Rodar o seguinte comando para buildar a imagem Docker:
+ 4. Para construir a imagem Docker navegue via linha de comando até seu diretório e execute:
 ```shell
-docker build -t consumercore .
+docker build -t [nome da imagem] .
 ```
-
-5 - Após o térimo do Build, rodar o seguinte comando para iniciar o docker, passando por parametro os dados utilizados:
+ 5. Para rodar o contêiner a partir da imagem construída, publicando uma porta local, por exemplo 5004, para o contêiner, execute:
 ```shell
-
-docker run consumercore listen broker -h hostname --port porta -u user -p password
-
+docker run -p 5004:80 [nome da imagem]
 ```
-Exemplo: 
-```shell
-docker run consumercore listen rabbit -h tec-rabbit --port 5672 -u guest -p guest -n Benner.Consumer.Core.ContabilizacaoConsumer
-
-```
-
-Pronto! Para testar se funcionou, envie uma mensagem para a uma fila e configure o cunsumer para consumir as mensagem desta mesma fila e verifique se a mensagem realmente foi consumida.
