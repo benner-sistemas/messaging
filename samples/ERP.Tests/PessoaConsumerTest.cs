@@ -1,6 +1,7 @@
 using Benner.ERP.Models;
 using Benner.Listener;
 using Benner.Messaging.Configuration;
+using Benner.Messaging.Logger;
 using ERP.Consumer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -10,6 +11,12 @@ namespace ERP.Tests
     [TestClass]
     public class PessoaConsumerTest
     {
+        [TestInitialize]
+        public void Initializer()
+        {
+            Log.ConfigureLog();
+        }
+
         [TestMethod]
         public void ConfiguracoesDePessoaConsumerDeveSerPreenchidaPorPadrao()
         {

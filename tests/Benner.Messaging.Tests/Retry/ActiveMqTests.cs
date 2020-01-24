@@ -1,5 +1,6 @@
 ﻿using Apache.NMS;
 using Apache.NMS.ActiveMQ;
+using Benner.Messaging.Logger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,6 +19,13 @@ namespace Benner.Messaging.Retry.Tests
                 {"Port", "61616" }
             }).Create())
         { }
+
+
+       [TestInitialize]
+        public void Initializer()
+        {
+            Log.ConfigureLog();
+        }
 
         [TestMethod]
         public void EnterpriseIntegrationListener_deve_disparar_fluxo_de_retentativas_com_activeMQ()
