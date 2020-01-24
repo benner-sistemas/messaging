@@ -1,6 +1,6 @@
 using Benner.ERP.Models;
 using Benner.Listener;
-using Benner.Messaging.Common;
+using Benner.Messaging.Configuration;
 using ERP.Consumer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;

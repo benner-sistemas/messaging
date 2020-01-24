@@ -1,6 +1,5 @@
-﻿using Benner.Messaging.Common;
-
-namespace Benner.Consumer.Core
+﻿
+namespace Benner.Messaging.Configuration
 {
     public class ConsumerJson : JsonConfiguration 
     {

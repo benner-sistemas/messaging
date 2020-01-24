@@ -1,6 +1,4 @@
-﻿using Benner.Messaging;
-using Benner.Producer.Configuration;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using System;
 

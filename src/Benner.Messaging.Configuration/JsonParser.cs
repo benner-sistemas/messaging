@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Benner.Messaging.Common
+namespace Benner.Messaging.Configuration
 {
     public static class JsonParser
     {

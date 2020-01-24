@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
 
-namespace Benner.Messaging.Common
+namespace Benner.Messaging.Configuration
 {
     public abstract class JsonConfiguration
     {

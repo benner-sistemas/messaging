@@ -1,6 +1,6 @@
 ﻿using Benner.Messaging.Common;
+using Benner.Messaging.Configuration;
 using System;
-using System.Collections.Generic;
 
 namespace Benner.Messaging
 {

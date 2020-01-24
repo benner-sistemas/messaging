@@ -1,4 +1,4 @@
-﻿using Benner.Messaging.Common;
+﻿using Benner.Messaging.Configuration;
 using Benner.Messaging.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -85,7 +85,7 @@ namespace Benner.Messaging
 
                     try
                     {
-                        deserialized = JsonParser.Deserialize<T>(msg.AsString);
+                        deserialized =  JsonParser.Deserialize<T>(msg.AsString);
                         return true;
                     }
                     catch (Exception e)

@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Benner.Messaging\Benner.Messaging.csproj" />
-    <ProjectReference Include="..\Benner.Producer\Benner.Producer.csproj" />
   </ItemGroup>
 
 </Project>

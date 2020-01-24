@@ -1,7 +1,4 @@
 ﻿//using Benner.Listener;
-using Benner.Messaging.CLI;
-using System;
-using System.Threading;
 
 namespace Benner.Consumer.Core
 {

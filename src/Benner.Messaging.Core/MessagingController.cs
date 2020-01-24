@@ -1,10 +1,8 @@
-﻿using Benner.Messaging.Common;
+﻿using Benner.Messaging.Configuration;
 using Benner.Messaging.Interfaces;
-using Benner.Producer.Configuration;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Net;
 using System.Net.Http;
 
 namespace Benner.Messaging.Core

@@ -1,6 +1,6 @@
 ﻿using Benner.Listener;
 using Benner.Messaging;
-using Benner.Messaging.Common;
+using Benner.Messaging.Configuration;
 using System;
 using System.IO;
 using System.Linq;

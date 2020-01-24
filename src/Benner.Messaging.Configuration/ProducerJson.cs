@@ -1,7 +1,6 @@
-﻿using Benner.Messaging.Common;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Benner.Producer.Configuration
+namespace Benner.Messaging.Configuration
 {
     public class ProducerJson : JsonConfiguration
     {

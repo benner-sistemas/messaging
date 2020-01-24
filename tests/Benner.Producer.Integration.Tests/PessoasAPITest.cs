@@ -1,13 +1,14 @@
-using Xunit;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.AspNetCore.Hosting;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System;
-using Newtonsoft.Json;
-using System.Text;
+using Benner.ERP.API;
+using Benner.Messaging.Configuration;
 using IdentityModel.Client;
-using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Newtonsoft.Json;
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Benner.Producer.Integration.Tests
 {
@@ -19,8 +20,10 @@ namespace Benner.Producer.Integration.Tests
 
     public class PessoasAPITest
     {
+
         private readonly HttpClient _client;
         private readonly HttpClient _authClient = new HttpClient();
+        private readonly ProducerJson config = JsonConfiguration.LoadConfiguration<ProducerJson>();
 
         public PessoasAPITest()
         {
@@ -54,20 +57,15 @@ namespace Benner.Producer.Integration.Tests
                     },
                 },
             };
-            // Arrange
-            var username = "usuario.123";
-            var password = "benner";
-            var tokenAddress = "http://bnu-vtec012:7600/auth/realms/master/protocol/openid-connect/token";
-            var clientId = "producer-api";
-            var clientSecret = "54835680-02b3-4477-a5bc-a5b3cafe223d";
+
 
             var passwordRequest = new PasswordTokenRequest
             {
-                Address = tokenAddress,
-                ClientId = clientId,
-                ClientSecret = clientSecret,
-                UserName = username,
-                Password = password,
+                Address = config.Oidc.TokenEndpoint,
+                ClientId = config.Oidc.ClientId,
+                ClientSecret = config.Oidc.ClientSecret,
+                UserName = config.Oidc.Username,
+                Password = config.Oidc.Password,
                 Scope = "openid profile email updated_at groups",
             };
 

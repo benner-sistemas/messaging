@@ -1,4 +1,4 @@
-﻿using Benner.Messaging.Common;
+﻿using Benner.Messaging.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Benner.Producer.Configuration
+namespace Benner.Producer
 {
     public class ControllerConfiguration
     {
@@ -78,6 +78,12 @@ namespace Benner.Producer.Configuration
 
             if (string.IsNullOrWhiteSpace(oidc.UserInfoEndpoint))
                 throw new Exception(string.Format(msg, nameof(oidc.UserInfoEndpoint)));
+
+            if (string.IsNullOrWhiteSpace(oidc.UserInfoEndpoint))
+                throw new Exception(string.Format(msg, nameof(oidc.Username)));
+
+            if (string.IsNullOrWhiteSpace(oidc.UserInfoEndpoint))
+                throw new Exception(string.Format(msg, nameof(oidc.Password)));
         }
 
         private void LoadAssemblyReferencesAndAddToControllers(string assemblyPath)

@@ -1,4 +1,4 @@
-﻿using Benner.Messaging.Common;
+﻿using Benner.Messaging.Configuration;
 using System;
 
 namespace Benner.Listener

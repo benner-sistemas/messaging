@@ -54,15 +54,5 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Benner.Messaging.CLI\Benner.Messaging.CLI.csproj">
-      <Project>{3f46b7fb-9dbc-4f1f-b61c-c25d734757cd}</Project>
-      <Name>Benner.Messaging.CLI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Benner.Messaging\Benner.Messaging.csproj">
-      <Project>{9C4E3388-9EF3-41AA-91EE-D855D341DA7C}</Project>
-      <Name>Benner.Messaging</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
