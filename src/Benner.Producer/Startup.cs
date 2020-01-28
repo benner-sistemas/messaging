@@ -68,7 +68,6 @@ namespace Benner.Producer
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
