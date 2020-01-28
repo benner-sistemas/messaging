@@ -1,6 +1,5 @@
 ﻿using Benner.Messaging.Configuration;
 using Benner.Messaging.Interfaces;
-using IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using System;

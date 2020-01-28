@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="benner.messaging" Version="0.0.5" />
+    <ProjectReference Include="..\..\src\Benner.Messaging\Benner.Messaging.csproj" />
   </ItemGroup>
 
 </Project>
