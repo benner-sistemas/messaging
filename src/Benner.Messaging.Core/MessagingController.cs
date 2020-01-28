@@ -2,6 +2,7 @@
 using Benner.Messaging.Interfaces;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Net.Http;
 
@@ -26,9 +27,9 @@ namespace Benner.Messaging.Core
 
         protected ActionResult<IEnterpriseIntegrationResponse> Enqueue(IEnterpriseIntegrationRequest request)
         {
-            var authenticationResult = ValidateAuthentication();
-            if (!authenticationResult.Success)
-                return Unauthorized(authenticationResult);
+            //var authenticationResult = ValidateAuthentication();
+            //if (!authenticationResult.Success)
+            //    return Unauthorized(authenticationResult);
 
             var message = EnterpriseIntegrationMessage.Create(request);
             Messaging.Enqueue(
@@ -48,8 +49,7 @@ namespace Benner.Messaging.Core
 
         private dynamic ValidateAuthentication()
         {
-            Microsoft.Extensions.Primitives.StringValues tokenValue;
-            if (!Request.Headers.TryGetValue("Authorization", out tokenValue))
+            if (!Request.Headers.TryGetValue("Authorization", out StringValues tokenValue))
                 return new { Success = false, Message = "Authorization header not found" };
 
             string token = tokenValue[0];
@@ -60,17 +60,17 @@ namespace Benner.Messaging.Core
                 return new { Success = false, Message = "Authorization header with Bearer scheme not found" };
 
             var configuration = JsonConfiguration.LoadConfiguration<ProducerJson>();
-            
-     
-            var tokenRequest = new UserInfoRequest
-            {
-                Address = configuration.Oidc.UserInfoEndpoint,
-                Token = token,
-            };
-            var tokenResponse = _httpClient.GetUserInfoAsync(tokenRequest).Result;
 
-            if (tokenResponse.IsError)
-                return new { Success = false, Message = tokenResponse.Error };
+
+            //var tokenRequest = new UserInfoRequest
+            //{
+            //    Address = configuration.Oidc.UserInfoEndpoint,
+            //    Token = token,
+            //};
+            //var tokenResponse = _httpClient.GetUserInfoAsync(tokenRequest).Result;
+
+            //if (tokenResponse.IsError)
+            //    return new { Success = false, Message = tokenResponse.Error };
 
             return new { Success = true };
         }
