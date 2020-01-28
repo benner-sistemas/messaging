@@ -1,4 +1,5 @@
 ﻿using Benner.Messaging.Configuration;
+using Benner.Messaging.Logger;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,24 +25,12 @@ namespace Benner.Producer
         /// <exception cref="Exception">If no assemblies found.</exception>
         public void SetAssemblyControllers()
         {
-            var producerFileConfig = JsonConfiguration.LoadConfiguration<ProducerJson>();
-
-            ValidateProducerJson(producerFileConfig);
-
-            bool controllersIsEmpty = producerFileConfig.Controllers?.Count < 1;
-            var path = Directory.GetCurrentDirectory();
-            string[] assembliesPathes = Directory.EnumerateFiles(path, "*.Producer.dll", SearchOption.TopDirectoryOnly)
-                .Where(a => !a.EndsWith("Benner.Producer.dll"))
-                .ToArray();
-
-            if (controllersIsEmpty && assembliesPathes.Length == 0)
-                throw new FileLoadException($"O arquivo de configuração '{new ProducerJson().FileName}' não contém uma lista de controllers, " +
-                    $"e nenhum assembly de sufixo '*.Producer.dll' foi encontrado no diretório de trabalho atual.");
-
             AssembliesControllers = new List<Assembly>();
-
-            if (!controllersIsEmpty)
+            var path = Directory.GetCurrentDirectory();
+            var producerFileConfig = JsonConfiguration.LoadConfiguration<ProducerJson>();
+            if (producerFileConfig != null)
             {
+                ValidateProducerJson(producerFileConfig);
                 producerFileConfig.EnsureExtensionOnControllers();
                 foreach (string controller in producerFileConfig.Controllers)
                     if (!string.IsNullOrWhiteSpace(controller))
@@ -49,17 +38,25 @@ namespace Benner.Producer
             }
             else
             {
+                string[] assembliesPathes = Directory.EnumerateFiles(path, "*.Producer.dll", SearchOption.TopDirectoryOnly)
+                    .Where(a => !a.EndsWith("Benner.Producer.dll"))
+                    .ToArray();
+
+                if (assembliesPathes.Length == 0)
+                    throw new FileLoadException($"O arquivo de configuração '{new ProducerJson().FileName}' não contém uma lista de controllers, " +
+                        $"e nenhum assembly de sufixo '*.Producer.dll' foi encontrado no diretório de trabalho atual.");
+
                 foreach (var assembly in assembliesPathes)
                     LoadAssemblyReferencesAndAddToControllers(assembly);
 
-                Console.WriteLine("Foram carregados os Controllers de todos os assemblies \"*.Producer.dll\" presentes do diretório atual.");
+                Log.Information("Foram carregados os Controllers de todos os assemblies {sufixo} presentes do diretório atual.", "*.Producer.dll");
             }
         }
 
         private void ValidateProducerJson(ProducerJson producer)
         {
-            if (producer == null)
-                throw new FileNotFoundException($"O arquivo '{new ProducerJson().FileName}' não foi encontrado.");
+            if (producer.Controllers?.Count < 1)
+                throw new Exception("A lista Controllers não pode ser vazia.");
 
             if (producer.Oidc == null)
                 throw new Exception("A configuração de Oidc deve ser informada.");
@@ -79,10 +76,10 @@ namespace Benner.Producer
             if (string.IsNullOrWhiteSpace(oidc.UserInfoEndpoint))
                 throw new Exception(string.Format(msg, nameof(oidc.UserInfoEndpoint)));
 
-            if (string.IsNullOrWhiteSpace(oidc.UserInfoEndpoint))
+            if (string.IsNullOrWhiteSpace(oidc.Username))
                 throw new Exception(string.Format(msg, nameof(oidc.Username)));
 
-            if (string.IsNullOrWhiteSpace(oidc.UserInfoEndpoint))
+            if (string.IsNullOrWhiteSpace(oidc.Password))
                 throw new Exception(string.Format(msg, nameof(oidc.Password)));
         }
 
