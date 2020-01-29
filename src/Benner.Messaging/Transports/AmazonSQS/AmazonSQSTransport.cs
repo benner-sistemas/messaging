@@ -1,6 +1,7 @@
 ﻿using Amazon;
 using Amazon.SQS;
 using Amazon.SQS.Model;
+using Benner.Messaging.Logger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -125,6 +126,7 @@ namespace Benner.Messaging
                     }
                     catch (Exception exception)
                     {
+                        Log.Error(exception, exception.Message);
                         EnqueueMessage(QueueName.DeadQueueName(queueName), string.Concat(exception.Message, "\r\n", receivedMessage.Body));
                     }
                     finally

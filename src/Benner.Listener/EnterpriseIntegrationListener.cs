@@ -79,20 +79,20 @@ namespace Benner.Listener
         private bool CallConsumeMessage(EnterpriseIntegrationMessage integrationMessage)
         {
             _consumer.OnMessage(integrationMessage.Body);
-            Log.Information("OnMessage {id}", integrationMessage.MessageID);
+            Log.Information("Mensagem com id {id} processada com sucesso", integrationMessage.MessageID);
             return true;
         }
         private bool CallInvalidMessage(EnterpriseIntegrationMessage integrationMessage, InvalidMessageException invalidMessageException)
         {
             integrationMessage.ExceptionList.Add(invalidMessageException);
             _sender.EnqueueMessage(_queueName.Invalid, integrationMessage);
-            Log.Information("Mensagem {id} enfileirada em {queueName}", integrationMessage.MessageID, _queueName.Invalid);
+            Log.Information("Mensagem com id {id} é inválida. Enfileirando em {queueName}", integrationMessage.MessageID, _queueName.Invalid);
             Task.Run(() =>
             {
                 try
                 {
                     _consumer.OnInvalidMessage(integrationMessage.Body, invalidMessageException);
-                    Log.Information("OnInvalidMessage {id}", integrationMessage.MessageID);
+                    Log.Information("Mensagem inválida com id {id} processada em OnInvalidMessage()", integrationMessage.MessageID);
                 }
                 catch (Exception e)
                 {
@@ -105,22 +105,24 @@ namespace Benner.Listener
         {
             integrationMessage.ExceptionList.Add(exception);
             integrationMessage.RetryCount = integrationMessage.RetryCount + 1;
+            Log.Information("Tentando processar mensagem com id {id}. Tentativa: {num}", integrationMessage.MessageID, integrationMessage.RetryCount);
             if (integrationMessage.RetryCount < _consumer.Settings.RetryLimit)
             {
                 integrationMessage.WaitUntil = DateTime.Now.AddMilliseconds(_consumer.Settings.RetryIntervalInMilliseconds);
                 _sender.EnqueueMessage(_queueName.Retry, integrationMessage);
-                Log.Information("Mensagem {id} enfileirada em {queueName}", integrationMessage.MessageID, _queueName.Retry);
+                Log.Information("Mensagem com id {id} enfileirada em {queueName}", integrationMessage.MessageID, _queueName.Retry);
             }
             else
             {
+                Log.Information("Mensagem com id {id} esgotou o limite de retentativas", integrationMessage.MessageID);
                 _sender.EnqueueMessage(_queueName.Dead, integrationMessage);
-                Log.Information("Mensagem {id} enfileirada em {queueName}", integrationMessage.MessageID, _queueName.Dead);
+                Log.Information("Mensagem com id {id} enfileirada em {queueName}", integrationMessage.MessageID, _queueName.Dead);
                 Task.Run(() =>
                 {
                     try
                     {
                         _consumer.OnDeadMessage(integrationMessage.Body, exception);
-                        Log.Information("OnDeadMessage {id}", integrationMessage.MessageID);
+                        Log.Information("Mensagem morta com id {id} processada em OnDeadMessage()", integrationMessage.MessageID);
                     }
                     catch (Exception e)
                     {

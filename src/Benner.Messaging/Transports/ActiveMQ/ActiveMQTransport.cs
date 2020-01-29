@@ -1,5 +1,6 @@
 ﻿using Apache.NMS;
 using Apache.NMS.ActiveMQ;
+using Benner.Messaging.Logger;
 using System;
 using System.Threading.Tasks;
 
@@ -157,6 +158,7 @@ namespace Benner.Messaging
                 }
                 catch (Exception exception)
                 {
+                    Log.Error(exception, exception.Message);
                     EnqueueMessage(QueueName.DeadQueueName(queueName), string.Concat(exception.Message, "\r\n", textMessage?.Text));
                 }
                 finally

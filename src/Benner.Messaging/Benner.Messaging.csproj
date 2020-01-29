@@ -46,6 +46,7 @@ Visit https://github.com/benner-sistemas/messaging for details</PackageReleaseNo
 
   <ItemGroup>
     <ProjectReference Include="..\Benner.Messaging.Configuration\Benner.Messaging.Configuration.csproj" />
+    <ProjectReference Include="..\Benner.Messaging.Logger\Benner.Messaging.Logger.csproj" />
   </ItemGroup>
 
   <ItemGroup>

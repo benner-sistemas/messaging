@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Storage;
+﻿using Benner.Messaging.Logger;
+using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
 using System;
 using System.Collections.Generic;
@@ -85,6 +86,7 @@ namespace Benner.Messaging
                     }
                     catch (Exception exception)
                     {
+                        Log.Error(exception, exception.Message);
                         EnqueueMessage(QueueName.DeadQueueName(queue.Name), string.Concat(exception.Message, "\r\n", message.AsString));
                     }
                     finally

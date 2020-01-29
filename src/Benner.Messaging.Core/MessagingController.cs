@@ -1,5 +1,6 @@
 ﻿using Benner.Messaging.Configuration;
 using Benner.Messaging.Interfaces;
+using Benner.Messaging.Logger;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -29,7 +30,6 @@ namespace Benner.Messaging.Core
             //var authenticationResult = ValidateAuthentication();
             //if (!authenticationResult.Success)
             //    return Unauthorized(authenticationResult);
-
             var message = EnterpriseIntegrationMessage.Create(request);
             Messaging.Enqueue(
                 QueueName,
@@ -42,7 +42,7 @@ namespace Benner.Messaging.Core
                 QueueName = QueueName,
                 CreatedAt = DateTime.Now,
             };
-
+            Log.Information("Request {@request} enviado para fila {queueName}", request, QueueName);
             return new OkObjectResult(response);
         }
 

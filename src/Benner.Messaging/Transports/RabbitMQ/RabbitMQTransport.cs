@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Benner.Messaging.Logger;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using System;
@@ -158,6 +159,7 @@ namespace Benner.Messaging
             }
             catch (Exception exception)
             {
+                Log.Error(exception, exception.Message);
                 EnqueueMessage(QueueName.DeadQueueName(queueName), string.Concat(exception.Message, "\r\n", Encoding.UTF8.GetString(messageBody)));
             }
             finally
