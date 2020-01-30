@@ -33,6 +33,7 @@ namespace Benner.Listener
         {
             _receiver.StartListening(_queueName.Default, ProcessDefaultQueue);
             Log.Information("Escutando fila default {default}", _queueName.Default);
+
             _receiver.StartListening(_queueName.Retry, ProcessRetryQueue);
             Log.Information("Escutando fila retry {retry}", _queueName.Retry);
         }
@@ -44,15 +45,15 @@ namespace Benner.Listener
         private bool ProcessRetryQueue(MessagingArgs arg)
         {
             var integrationMessage = arg.GetMessage<EnterpriseIntegrationMessage>();
-            var waitUntil = integrationMessage.WaitUntil.Subtract(DateTime.Now).TotalSeconds;
-            if (waitUntil > 20)
+            var waitUntil = integrationMessage.WaitUntil.Subtract(DateTime.Now).TotalMilliseconds;
+            if (waitUntil > 20_000)
             {
-                Thread.Sleep(2000);
+                Thread.Sleep(15_000);
                 return false;
             }
             if (waitUntil > 0)
             {
-                Thread.Sleep((int)waitUntil * 1000);
+                Thread.Sleep((int)waitUntil);
             }
 
             return ProcessMessage(integrationMessage);
@@ -78,25 +79,37 @@ namespace Benner.Listener
         }
         private bool CallConsumeMessage(EnterpriseIntegrationMessage integrationMessage)
         {
-            _consumer.OnMessage(integrationMessage.Body);
-            Log.Information("Mensagem com id {id} processada com sucesso", integrationMessage.MessageID);
-            return true;
+            var attempt = integrationMessage.RetryCount == 0 ? "default attempt" : $"retry {integrationMessage.RetryCount}";
+            try
+            {
+                Log.Information("{id} EnterpriseIntegrationListener.OnMessage() {attempt} - begin", integrationMessage.MessageID, attempt);
+                _consumer.OnMessage(integrationMessage.Body);
+                return true;
+            }
+            finally
+            {
+                Log.Information("{id} EnterpriseIntegrationListener.OnMessage() {attempt} - end", integrationMessage.MessageID, attempt);
+            }
         }
         private bool CallInvalidMessage(EnterpriseIntegrationMessage integrationMessage, InvalidMessageException invalidMessageException)
         {
             integrationMessage.ExceptionList.Add(invalidMessageException);
             _sender.EnqueueMessage(_queueName.Invalid, integrationMessage);
-            Log.Information("Mensagem com id {id} é inválida. Enfileirando em {queueName}", integrationMessage.MessageID, _queueName.Invalid);
+            Log.Information("{id} @ '{queueName}' mensagem inválida e foi arquivada", integrationMessage.MessageID, _queueName.Invalid);
             Task.Run(() =>
             {
                 try
                 {
+                    Log.Information("{id} EnterpriseIntegrationListener.OnInvalidMessage() - begin", integrationMessage.MessageID);
                     _consumer.OnInvalidMessage(integrationMessage.Body, invalidMessageException);
-                    Log.Information("Mensagem inválida com id {id} processada em OnInvalidMessage()", integrationMessage.MessageID);
                 }
                 catch (Exception e)
                 {
                     Log.Error(e, e.Message);
+                }
+                finally
+                {
+                    Log.Information("{id} EnterpriseIntegrationListener.OnInvalidMessage() - end", integrationMessage.MessageID);
                 }
             });
             return true;
@@ -104,29 +117,31 @@ namespace Benner.Listener
         private bool CallRetryOrDeadMessage(EnterpriseIntegrationMessage integrationMessage, Exception exception)
         {
             integrationMessage.ExceptionList.Add(exception);
-            integrationMessage.RetryCount = integrationMessage.RetryCount + 1;
-            Log.Information("Tentando processar mensagem com id {id}. Tentativa: {num}", integrationMessage.MessageID, integrationMessage.RetryCount);
             if (integrationMessage.RetryCount < _consumer.Settings.RetryLimit)
             {
+                integrationMessage.RetryCount = integrationMessage.RetryCount + 1;
                 integrationMessage.WaitUntil = DateTime.Now.AddMilliseconds(_consumer.Settings.RetryIntervalInMilliseconds);
                 _sender.EnqueueMessage(_queueName.Retry, integrationMessage);
-                Log.Information("Mensagem com id {id} enfileirada em {queueName}", integrationMessage.MessageID, _queueName.Retry);
+                Log.Information("{id} @{queueName} mensagem falhou e está em espera", integrationMessage.MessageID, _queueName.Retry);
             }
             else
             {
-                Log.Information("Mensagem com id {id} esgotou o limite de retentativas", integrationMessage.MessageID);
                 _sender.EnqueueMessage(_queueName.Dead, integrationMessage);
-                Log.Information("Mensagem com id {id} enfileirada em {queueName}", integrationMessage.MessageID, _queueName.Dead);
+                Log.Information("{id} @{queueName} mensagem morta e foi arquivada", integrationMessage.MessageID, _queueName.Dead);
                 Task.Run(() =>
                 {
                     try
                     {
+                        Log.Information("{id} EnterpriseIntegrationListener.OnDeadMessage() - begin", integrationMessage.MessageID);
                         _consumer.OnDeadMessage(integrationMessage.Body, exception);
-                        Log.Information("Mensagem morta com id {id} processada em OnDeadMessage()", integrationMessage.MessageID);
                     }
                     catch (Exception e)
                     {
                         Log.Error(e, e.Message);
+                    }
+                    finally
+                    {
+                        Log.Information("{id} EnterpriseIntegrationListener.OnDeadMessage() - end", integrationMessage.MessageID);
                     }
                 });
             }
