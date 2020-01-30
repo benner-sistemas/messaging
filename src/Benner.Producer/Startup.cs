@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using System.IO;
+using System.Linq;
 
 namespace Benner.Producer
 {
@@ -34,10 +36,13 @@ namespace Benner.Producer
                     .AddControllersAsServices();
             }
 
-            // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Enterprise Integration APIs", Version = "v1" });
+
+                Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.xml", SearchOption.TopDirectoryOnly)
+                   .ToList()
+                   .ForEach(x => c.IncludeXmlComments(x));
             });
         }
 

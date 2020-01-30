@@ -30,6 +30,7 @@ namespace Benner.Messaging.Core
             //var authenticationResult = ValidateAuthentication();
             //if (!authenticationResult.Success)
             //    return Unauthorized(authenticationResult);
+
             var message = EnterpriseIntegrationMessage.Create(request);
             Messaging.Enqueue(
                 QueueName,
@@ -42,8 +43,8 @@ namespace Benner.Messaging.Core
                 QueueName = QueueName,
                 CreatedAt = DateTime.Now,
             };
-            Log.Information("Request com id {@request} enviado para fila {queueName}", request.RequestID, QueueName);
-            return new OkObjectResult(response);
+            Log.Information("{id} @{queueName}", request.RequestID, QueueName);
+            return new ObjectResult(response) { StatusCode = 201 };
         }
 
         private dynamic ValidateAuthentication()

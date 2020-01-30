@@ -80,27 +80,29 @@ namespace Benner.Listener
         private bool CallConsumeMessage(EnterpriseIntegrationMessage integrationMessage)
         {
             var attempt = integrationMessage.RetryCount == 0 ? "default attempt" : $"retry {integrationMessage.RetryCount}";
+            Log.Information("{id} {attempt}", integrationMessage.MessageID, attempt);
             try
             {
-                Log.Information("{id} EnterpriseIntegrationListener.OnMessage() {attempt} - begin", integrationMessage.MessageID, attempt);
+                //Log.Information("{id} EnterpriseIntegrationListener.OnMessage() {attempt} - begin", integrationMessage.MessageID, attempt);
                 _consumer.OnMessage(integrationMessage.Body);
+                Log.Information("{id} {attempt} succeeded", integrationMessage.MessageID, attempt);
                 return true;
             }
             finally
             {
-                Log.Information("{id} EnterpriseIntegrationListener.OnMessage() {attempt} - end", integrationMessage.MessageID, attempt);
+                //Log.Information("{id} EnterpriseIntegrationListener.OnMessage() {attempt} - end", integrationMessage.MessageID, attempt);
             }
         }
         private bool CallInvalidMessage(EnterpriseIntegrationMessage integrationMessage, InvalidMessageException invalidMessageException)
         {
             integrationMessage.ExceptionList.Add(invalidMessageException);
             _sender.EnqueueMessage(_queueName.Invalid, integrationMessage);
-            Log.Information("{id} @ '{queueName}' mensagem inválida e foi arquivada", integrationMessage.MessageID, _queueName.Invalid);
+            Log.Information("{id} @{queueName} mensagem inválida e foi arquivada", integrationMessage.MessageID, _queueName.Invalid);
             Task.Run(() =>
             {
                 try
                 {
-                    Log.Information("{id} EnterpriseIntegrationListener.OnInvalidMessage() - begin", integrationMessage.MessageID);
+                    //Log.Information("{id} EnterpriseIntegrationListener.OnInvalidMessage() - begin", integrationMessage.MessageID);
                     _consumer.OnInvalidMessage(integrationMessage.Body, invalidMessageException);
                 }
                 catch (Exception e)
@@ -109,7 +111,7 @@ namespace Benner.Listener
                 }
                 finally
                 {
-                    Log.Information("{id} EnterpriseIntegrationListener.OnInvalidMessage() - end", integrationMessage.MessageID);
+                    //Log.Information("{id} EnterpriseIntegrationListener.OnInvalidMessage() - end", integrationMessage.MessageID);
                 }
             });
             return true;
@@ -132,7 +134,7 @@ namespace Benner.Listener
                 {
                     try
                     {
-                        Log.Information("{id} EnterpriseIntegrationListener.OnDeadMessage() - begin", integrationMessage.MessageID);
+                        //Log.Information("{id} EnterpriseIntegrationListener.OnDeadMessage() - begin", integrationMessage.MessageID);
                         _consumer.OnDeadMessage(integrationMessage.Body, exception);
                     }
                     catch (Exception e)
@@ -141,7 +143,7 @@ namespace Benner.Listener
                     }
                     finally
                     {
-                        Log.Information("{id} EnterpriseIntegrationListener.OnDeadMessage() - end", integrationMessage.MessageID);
+                        //Log.Information("{id} EnterpriseIntegrationListener.OnDeadMessage() - end", integrationMessage.MessageID);
                     }
                 });
             }

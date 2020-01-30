@@ -17,6 +17,9 @@ namespace Benner.Messaging
 
         public static EnterpriseIntegrationMessage Create(IEnterpriseIntegrationRequest request)
         {
+            if (request.RequestID == null)
+                request.RequestID = Guid.NewGuid();
+
             return new EnterpriseIntegrationMessage()
             {
                 Body = JsonParser.Serialize(request),
