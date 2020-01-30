@@ -42,7 +42,7 @@ namespace Benner.Messaging.Core
                 QueueName = QueueName,
                 CreatedAt = DateTime.Now,
             };
-            Log.Information("Request {@request} enviado para fila {queueName}", request, QueueName);
+            Log.Information("Request com id {@request} enviado para fila {queueName}", request.RequestID, QueueName);
             return new OkObjectResult(response);
         }
 
