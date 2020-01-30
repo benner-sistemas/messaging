@@ -1,6 +1,7 @@
 ﻿using Benner.Messaging.Configuration;
 using Benner.Messaging.Interfaces;
 using Benner.Messaging.Logger;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -27,9 +28,9 @@ namespace Benner.Messaging.Core
 
         protected ActionResult<IEnterpriseIntegrationResponse> Enqueue(IEnterpriseIntegrationRequest request)
         {
-            //var authenticationResult = ValidateAuthentication();
-            //if (!authenticationResult.Success)
-            //    return Unauthorized(authenticationResult);
+            var authenticationResult = ValidateAuthentication();
+            if (!authenticationResult.Success)
+                return Unauthorized(authenticationResult);
             var message = EnterpriseIntegrationMessage.Create(request);
             Messaging.Enqueue(
                 QueueName,
@@ -61,15 +62,15 @@ namespace Benner.Messaging.Core
             var configuration = JsonConfiguration.LoadConfiguration<ProducerJson>();
 
 
-            //var tokenRequest = new UserInfoRequest
-            //{
-            //    Address = configuration.Oidc.UserInfoEndpoint,
-            //    Token = token,
-            //};
-            //var tokenResponse = _httpClient.GetUserInfoAsync(tokenRequest).Result;
+            var tokenRequest = new UserInfoRequest
+            {
+                Address = configuration.Oidc.UserInfoEndpoint,
+                Token = token,
+            };
+            var tokenResponse = _httpClient.GetUserInfoAsync(tokenRequest).Result;
 
-            //if (tokenResponse.IsError)
-            //    return new { Success = false, Message = tokenResponse.Error };
+            if (tokenResponse.IsError)
+                return new { Success = false, Message = tokenResponse.Error };
 
             return new { Success = true };
         }

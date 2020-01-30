@@ -26,7 +26,7 @@ namespace Benner.Producer
         public void SetAssemblyControllers()
         {
             AssembliesControllers = new List<Assembly>();
-            var path = Directory.GetCurrentDirectory();
+            var path = DirectoryHelper.GetExecutingDirectoryName();
             var producerFileConfig = JsonConfiguration.LoadConfiguration<ProducerJson>();
             if (producerFileConfig != null)
             {
@@ -108,7 +108,7 @@ namespace Benner.Producer
                     catch (FileNotFoundException)
                     {
                         this.LoadReferencedAssembly(
-                            AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(Directory.GetCurrentDirectory(), $"{name.Name}.dll")));
+                            AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(DirectoryHelper.GetExecutingDirectoryName(), $"{name.Name}.dll")));
                     }
                 }
             }

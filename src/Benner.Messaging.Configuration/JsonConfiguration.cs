@@ -19,7 +19,7 @@ namespace Benner.Messaging.Configuration
 
         protected static object LoadConfigurationFromFile<T>(string fileName)
         {
-            return LoadConfigurationFromFile<T>(Directory.GetCurrentDirectory(), fileName);
+            return LoadConfigurationFromFile<T>(DirectoryHelper.GetExecutingDirectoryName(), fileName);
         }
 
         protected static object LoadConfigurationFromFile<T>(string path, string fileName)
@@ -43,7 +43,7 @@ namespace Benner.Messaging.Configuration
 
         protected void SaveConfigurationToFile(string fileName)
         {
-            SaveConfigurationToFile(Directory.GetCurrentDirectory(), fileName);
+            SaveConfigurationToFile(DirectoryHelper.GetExecutingDirectoryName(), fileName);
         }
 
         protected void SaveConfigurationToFile(string path, string fileName)

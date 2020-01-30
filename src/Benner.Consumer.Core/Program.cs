@@ -60,7 +60,7 @@ namespace Benner.Consumer.Core
             if (fullName == null)
                 return null;
 
-            string folder = Directory.GetCurrentDirectory();
+            string folder = DirectoryHelper.GetExecutingDirectoryName();
             string[] assembliesPathes = Directory.EnumerateFiles(folder, "*.Consumer.dll", SearchOption.TopDirectoryOnly).ToArray();
 
             if (assembliesPathes.Length == 0)
@@ -103,7 +103,7 @@ namespace Benner.Consumer.Core
                     catch (FileNotFoundException)
                     {
                         LoadReferencedAssembly(
-                            AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(Directory.GetCurrentDirectory(), $"{name.Name}.dll")));
+                            AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(DirectoryHelper.GetExecutingDirectoryName(), $"{name.Name}.dll")));
                     }
                 }
             }

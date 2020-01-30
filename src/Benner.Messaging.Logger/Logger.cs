@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Benner.Messaging.Configuration;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
@@ -18,7 +19,7 @@ namespace Benner.Messaging.Logger
                 var config = new LoggerConfiguration()
                     .WriteTo.Console(outputTemplate: "[{Timestamp:dd/MM/yyy HH:mm:ss} {Level:u3}]: {Message:lj}{NewLine}{Exception}");
 
-                string basePath = Directory.GetCurrentDirectory();
+                string basePath = DirectoryHelper.GetExecutingDirectoryName();
                 if (File.Exists(Path.Combine(basePath, FILE_NAME)))
                     config.ReadFrom.Configuration(new ConfigurationBuilder()
                         .SetBasePath(basePath)
