@@ -5,6 +5,7 @@ namespace Benner.Messaging.Configuration
 {
     public abstract class JsonConfiguration
     {
+        [JsonIgnore]
         public abstract string FileName { get; }
 
         public static T LoadConfiguration<T>() where T : JsonConfiguration, new()
