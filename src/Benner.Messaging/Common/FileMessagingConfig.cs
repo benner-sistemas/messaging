@@ -27,7 +27,7 @@ namespace Benner.Messaging
         private readonly Dictionary<string, IBrokerConfig> _configurations;
 
         private readonly MessagingFileConfigSection _messagingConfig;
-        private static string _defaultConfigPath = Path.Combine(DirectoryHelper.GetExecutingDirectoryName(), "messaging.config");
+        private static string _defaultConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "messaging.config");
 
         public static bool DefaultConfigFileExists
         {
