@@ -1,4 +1,5 @@
-﻿using Benner.Messaging.Interfaces;
+﻿using Benner.Messaging.Configuration;
+using Benner.Messaging.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

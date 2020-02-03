@@ -13,7 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="elasticsearch.json">
+    <ProjectReference Include="..\Benner.Messaging.Configuration\Benner.Messaging.Configuration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="logSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
