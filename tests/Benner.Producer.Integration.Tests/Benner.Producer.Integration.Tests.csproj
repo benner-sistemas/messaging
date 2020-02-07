@@ -7,13 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="producer.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="producer.json">
+    <Content Include="..\..\src\Benner.Producer\producer.json" Link="producer.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 

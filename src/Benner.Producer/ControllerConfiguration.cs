@@ -23,16 +23,15 @@ namespace Benner.Producer
         /// </summary>
         /// <param name="cliControllers">Controller's assemblies enter via command line.</param>
         /// <exception cref="Exception">If no assemblies found.</exception>
-        public void SetAssemblyControllers()
+        public void SetAssemblyControllers(ProducerJson settings)
         {
             AssembliesControllers = new List<Assembly>();
             var path = DirectoryHelper.GetExecutingDirectoryName();
-            var producerFileConfig = JsonConfiguration.LoadConfiguration<ProducerJson>();
-            if (producerFileConfig != null)
+
+            if (settings.Controllers != null && settings.Controllers?.Count > 0)
             {
-                ValidateProducerJson(producerFileConfig);
-                producerFileConfig.EnsureExtensionOnControllers();
-                foreach (string controller in producerFileConfig.Controllers)
+                settings.EnsureExtensionOnControllers();
+                foreach (string controller in settings.Controllers)
                     if (!string.IsNullOrWhiteSpace(controller))
                         LoadAssemblyReferencesAndAddToControllers(Path.Combine(path, controller));
             }
@@ -51,36 +50,6 @@ namespace Benner.Producer
 
                 Log.Information("Foram carregados os Controllers de todos os assemblies {sufixo} presentes do diretório atual.", "*.Producer.dll");
             }
-        }
-
-        private void ValidateProducerJson(ProducerJson producer)
-        {
-            if (producer.Controllers?.Count < 1)
-                throw new Exception("A lista Controllers não pode ser vazia.");
-
-            if (producer.Oidc == null)
-                throw new Exception("A configuração de Oidc deve ser informada.");
-
-            var oidc = producer.Oidc;
-            string msg = "{0} deve ser informado.";
-
-            if (string.IsNullOrWhiteSpace(oidc.TokenEndpoint))
-                throw new Exception(string.Format(msg, nameof(oidc.TokenEndpoint)));
-
-            if (string.IsNullOrWhiteSpace(oidc.ClientId))
-                throw new Exception(string.Format(msg, nameof(oidc.ClientId)));
-
-            if (string.IsNullOrWhiteSpace(oidc.ClientSecret))
-                throw new Exception(string.Format(msg, nameof(oidc.ClientSecret)));
-
-            if (string.IsNullOrWhiteSpace(oidc.UserInfoEndpoint))
-                throw new Exception(string.Format(msg, nameof(oidc.UserInfoEndpoint)));
-
-            if (string.IsNullOrWhiteSpace(oidc.Username))
-                throw new Exception(string.Format(msg, nameof(oidc.Username)));
-
-            if (string.IsNullOrWhiteSpace(oidc.Password))
-                throw new Exception(string.Format(msg, nameof(oidc.Password)));
         }
 
         private void LoadAssemblyReferencesAndAddToControllers(string assemblyPath)

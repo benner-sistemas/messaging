@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Benner.Messaging.Configuration;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using System;
 using System.IO;
-using System.Linq;
 
 namespace Benner.Producer
 {
@@ -24,25 +25,50 @@ namespace Benner.Producer
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
-            var configuration = new ControllerConfiguration();
-            configuration.SetAssemblyControllers();
+            var controllerConfig = new ControllerConfiguration();
+            var config = JsonConfiguration.LoadConfiguration<ProducerJson>();
+            if (config == null)
+                throw new FileNotFoundException($"Arquivo de configuração obrigatório '{new ProducerJson().FileName}' não encontrado.");
+            OidcSettings.Validate(config.Oidc);
 
-            foreach (var assembly in configuration.AssembliesControllers)
-            {
-                services
-                    .AddMvc()
-                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                    .AddApplicationPart(assembly) //add controllers from another assembly
-                    .AddControllersAsServices();
-            }
+            controllerConfig.SetAssemblyControllers(config);
+
+            var mvcBuilder = services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            foreach (var assembly in controllerConfig.AssembliesControllers)
+                mvcBuilder.AddApplicationPart(assembly).AddControllersAsServices();
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Enterprise Integration APIs", Version = "v1" });
 
-                Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.xml", SearchOption.TopDirectoryOnly)
-                   .ToList()
-                   .ForEach(x => c.IncludeXmlComments(x));
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        Implicit = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri(config.Oidc.AuthorizationEndpoint),
+                            TokenUrl = new Uri(config.Oidc.TokenEndpoint)
+                        }
+                    }
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "oauth2"
+                            }
+                        },
+                        new string[0]
+                    }
+                });
             });
         }
 
@@ -64,14 +90,10 @@ namespace Benner.Producer
             });
 
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
-            {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-            }
 
             app.UseMvc();
         }

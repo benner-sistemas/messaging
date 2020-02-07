@@ -28,9 +28,10 @@ namespace Benner.Messaging.Core
 
         protected ActionResult<IEnterpriseIntegrationResponse> Enqueue(IEnterpriseIntegrationRequest request)
         {
-            var authenticationResult = ValidateAuthentication();
+            var authenticationResult = ValidateBearerToken();
             if (!authenticationResult.Success)
                 return Unauthorized(authenticationResult);
+            
             var message = EnterpriseIntegrationMessage.Create(request);
             Messaging.Enqueue(
                 QueueName,
@@ -47,7 +48,7 @@ namespace Benner.Messaging.Core
             return new ObjectResult(response) { StatusCode = 201 };
         }
 
-        private dynamic ValidateAuthentication()
+        private dynamic ValidateBearerToken()
         {
             if (!Request.Headers.TryGetValue("Authorization", out StringValues tokenValue))
                 return new { Success = false, Message = "Authorization header not found" };
@@ -60,7 +61,6 @@ namespace Benner.Messaging.Core
                 return new { Success = false, Message = "Authorization header with Bearer scheme not found" };
 
             var configuration = JsonConfiguration.LoadConfiguration<ProducerJson>();
-
 
             var tokenRequest = new UserInfoRequest
             {
