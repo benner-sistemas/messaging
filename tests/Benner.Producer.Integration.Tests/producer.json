@@ -1,0 +1,14 @@
+{
+  "Controllers": [
+    "Benner.ERP.API"
+  ],
+  "Oidc": {
+    "UserInfoEndpoint": "http://bnu-vtec012:7600/auth/realms/master/protocol/openid-connect/userinfo",
+    "TokenEndpoint": "http://bnu-vtec012:7600/auth/realms/master/protocol/openid-connect/token",
+    "AuthorizationEndpoint": "http://bnu-vtec012:7600/auth/realms/master/protocol/openid-connect/auth",
+    "ClientId": "producer-api",
+    "ClientSecret": "54835680-02b3-4477-a5bc-a5b3cafe223d",
+    "Username": "usuario.123",
+    "Password": "benner"
+  }
+}

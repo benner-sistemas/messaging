@@ -1,4 +1,5 @@
 ﻿using Benner.Listener;
+using Benner.Messaging.Logger;
 using Benner.Retry.Tests.MockMQ;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -14,6 +15,7 @@ namespace Benner.Messaging.Retry.Tests
         public RetryTestsBase(MessagingConfig config)
         {
             _config = config;
+            Log.ConfigureLog();
         }
 
         private static IEnterpriseIntegrationSettings _settings = new EnterpriseIntegrationSettings
@@ -75,7 +77,7 @@ namespace Benner.Messaging.Retry.Tests
             Assert.AreEqual(0, GetQueueSize(_queueName.Retry));
             Assert.AreEqual(0, GetQueueSize(_queueName.Invalid));
 
-            Assert.AreEqual(4, _consumer.OnMessageCount);
+            Assert.AreEqual(6, _consumer.OnMessageCount);
             Assert.AreEqual(2, _consumer.OnDeadMessageCount);
             Assert.AreEqual(0, _consumer.OnInvalidMessageCount);
 

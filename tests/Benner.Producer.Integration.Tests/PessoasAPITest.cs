@@ -1,5 +1,6 @@
 using Benner.ERP.API;
 using Benner.Messaging.Configuration;
+using Benner.Messaging.Logger;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -31,6 +32,7 @@ namespace Benner.Producer.Integration.Tests
                 .UseEnvironment("Development")
                 .UseStartup<Startup>());
             _client = server.CreateClient();
+            Log.ConfigureLog();
         }
 
         [Theory]
@@ -144,9 +146,9 @@ namespace Benner.Producer.Integration.Tests
                 },
             };
 
-            
 
-            _client.SetBasicAuthentication("frida","fritz");
+
+            _client.SetBasicAuthentication("frida", "fritz");
 
             var httpResponse = await _client.PostAsync(request.Url, ContentHelper.GetStringContent(request.Body));
             Assert.False(httpResponse.IsSuccessStatusCode);
