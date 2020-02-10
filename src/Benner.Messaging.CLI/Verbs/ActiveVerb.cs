@@ -1,42 +1,51 @@
-﻿using Benner.Messaging.CLI.Verbs.Listener;
-using Benner.Messaging.Interfaces;
-using CommandLine;
+﻿using CommandLine;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
-namespace Benner.Messaging.CLI.Verbs.Listener
+namespace Benner.Messaging.CLI.Verbs
 {
-    [Verb("active", HelpText = "Iniciar um listener para ActiveMQ")]
-    public class ActiveVerb : ListenerVerb
+
+    [Verb("active", HelpText = "Configura um broker ActiveMQ no arquivo 'messaging.config'")]
+    public class ActiveVerb : BrokerBase, IVerb
     {
-        [Option('h', "hostName", HelpText = "O nome do host.", Required = true)]
+        private const string ACTIVEMQ_TYPE = "Benner.Messaging.ActiveMQConfig, Benner.Messaging, Culture=neutral, PublicKeyToken=257abf4668fbf313";
+
+        [Option('h', "hostName", HelpText = "O nome do host.")]
         public string Host { get; set; }
 
-        [Option("port", HelpText = "A porta de comunicação com o broker.", Required = true)]
-        public int Port { get; set; }
+        [Option("port", HelpText = "A porta de comunicação com o broker.")]
+        public int? Port { get; set; }
 
-        [Option('u', "user", HelpText = "O usuário de login do broker.", Required = true)]
+        [Option('u', "user", HelpText = "O usuário de login do broker.")]
         public string User { get; set; }
 
-        [Option('p', "password", HelpText = "A senha de login do broker.", Required = true)]
+        [Option('p', "password", HelpText = "A senha de login do broker.")]
         public string Password { get; set; }
 
-        public override string BrokerName => "ActiveMQ";
+        public void Configure() => base.BaseConfigure(ACTIVEMQ_TYPE, GetActiveAdds());
 
-        public override IMessagingConfig GetConfiguration()
+        public bool HasNoInformedParams()
         {
-            ValidateParameters();
-
-            return new MessagingConfigBuilder()
-                .WithActiveMQBroker("active", Host, port: Port, userName: User, password: Password, setAsDefault: true)
-                .Create();
+            return Host == null && Port == null && User == null && Password == null;
         }
 
-        public override void ValidateParameters()
+        private XElement[] GetActiveAdds()
         {
-            OptionValidator.ValidateOption("-n/--consumerName", Consumer);
-            OptionValidator.ValidateOption("-h/--hostName", Host);
-            OptionValidator.ValidateOption("--port", Port);
-            OptionValidator.ValidateOption("-u/--user", User);
-            OptionValidator.ValidateOption("-p/--password", Password);
+            var adds = new List<XElement>();
+
+            if (!string.IsNullOrWhiteSpace(Host))
+                adds.Add(CreateNodeAdd("Hostname", Host));
+
+            if (Port != null)
+                adds.Add(CreateNodeAdd("Port", Port.ToString()));
+
+            if (!string.IsNullOrWhiteSpace(User))
+                adds.Add(CreateNodeAdd("Username", User));
+
+            if (!string.IsNullOrWhiteSpace(Password))
+                adds.Add(CreateNodeAdd("Password", Password));
+
+            return adds.ToArray();
         }
     }
 }

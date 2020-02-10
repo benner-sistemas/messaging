@@ -12,7 +12,7 @@ namespace Benner.Messaging.Configuration
 
         public string MinimumLogLevel { get; set; }
 
-        public bool EnableElasticSearch { get; set; }
+        public bool? EnableElasticSearch { get; set; }
     }
 
     public class ElasticSearchSettings

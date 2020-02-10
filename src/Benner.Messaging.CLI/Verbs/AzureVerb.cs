@@ -1,33 +1,38 @@
-﻿using Benner.Messaging.Interfaces;
-using CommandLine;
+﻿using CommandLine;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
-namespace Benner.Messaging.CLI.Verbs.Listener
+namespace Benner.Messaging.CLI.Verbs
 {
-    [Verb("azure", HelpText = "Iniciar um listener para Azuere Queue")]
-    public class AzureVerb : ListenerVerb
+    [Verb("azure", HelpText = "Configura um broker Azure Queue no arquivo 'messaging.config'")]
+    public class AzureVerb : BrokerBase, IVerb
     {
-        [Option('c', "connectionString", HelpText = "A string de conexão com o serviço Azure.", Required = true)]
+        private const string AZURE_TYPE = "Benner.Messaging.AzureQueueConfig, Benner.Messaging, Culture=neutral, PublicKeyToken=257abf4668fbf313";
+
+        [Option('c', "connectionString", HelpText = "A string de conexão com o serviço Azure.")]
         public string ConnectionString { get; set; }
 
-        [Option('i', "invisibilityTime", HelpText = "O tempo que a mensagem permanecerá invisível para outras filas, em segundos.", Required = true)]
-        public int InvisibilityTime { get; set; }
+        [Option('i', "invisibilityTime", HelpText = "O tempo que a mensagem permanecerá invisível para outras filas, em segundos.")]
+        public int? InvisibilityTime { get; set; }
 
-        public override string BrokerName => "AzureQueue";
+        public void Configure() => base.BaseConfigure(AZURE_TYPE, GetAzureAdds());
 
-        public override IMessagingConfig GetConfiguration()
+        public bool HasNoInformedParams()
         {
-            ValidateParameters();
-
-            return new MessagingConfigBuilder()
-                .WithAzureQueueBroker("azure", ConnectionString, InvisibilityTime, setAsDefault: true)
-                .Create();
+            return InvisibilityTime == null && ConnectionString == null;
         }
 
-        public override void ValidateParameters()
+        private XElement[] GetAzureAdds()
         {
-            OptionValidator.ValidateOption("-n/--consumerName", Consumer);
-            OptionValidator.ValidateOption("-i/--invisibilityTime", InvisibilityTime);
-            OptionValidator.ValidateOption("-c/--connectionString", ConnectionString);
+            var adds = new List<XElement>();
+
+            if (!string.IsNullOrWhiteSpace(ConnectionString))
+                adds.Add(CreateNodeAdd("ConnectionString", ConnectionString));
+
+            if (InvisibilityTime != null)
+                adds.Add(CreateNodeAdd("Port", InvisibilityTime.ToString()));
+
+            return adds.ToArray();
         }
     }
 }

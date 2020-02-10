@@ -4,6 +4,6 @@
       //"http://bnu-leonardofo.benner.com.br:9200"
     ]
   },
-  //"EnableElasticSearch": "true"
-  //"MinimumLogLevel": ""
+  "EnableElasticSearch": "true",
+  "MinimumLogLevel": ""
 }
