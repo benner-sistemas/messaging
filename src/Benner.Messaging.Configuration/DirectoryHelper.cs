@@ -10,7 +10,7 @@ namespace Benner.Messaging.Configuration
     {
         public static string GetExecutingDirectoryName()
         {
-            var location = new Uri(Assembly.GetEntryAssembly().GetName().CodeBase);
+            var location = new Uri(Assembly.GetExecutingAssembly().GetName().CodeBase);
             return new FileInfo(location.LocalPath).Directory.FullName;
         }
     }
