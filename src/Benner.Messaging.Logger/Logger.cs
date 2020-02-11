@@ -33,7 +33,7 @@ namespace Benner.Messaging.Logger
                         LogEventLevel level = GetLoggingLevel();
                         _loggerConfig.MinimumLevel.Is(level);
 
-                        if (_configFile.EnableElasticSearch)
+                        if (_configFile.EnableElasticSearch.Value)
                             ConfigureElastic();
                     }
                 }
