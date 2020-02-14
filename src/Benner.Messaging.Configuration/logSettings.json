@@ -1,9 +1,9 @@
 {
   "ElasticSearch": {
     "NodeUris": [
-      //"http://bnu-leonardofo.benner.com.br:9200"
+      "http://bnu-leonardofo.benner.com.br:9200"
     ]
   },
-  "EnableElasticSearch": "true",
+  "EnableElasticSearch": "false",
   "MinimumLogLevel": ""
 }
