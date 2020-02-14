@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E7BA2632
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging", "src\Benner.Messaging\Benner.Messaging.csproj", "{9C4E3388-9EF3-41AA-91EE-D855D341DA7C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Listener", "src\Benner.Listener\Benner.Listener.csproj", "{B0FFBE35-F9B6-4764-92F6-97D063481487}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Enterprise.Integration.Messaging", "src\Benner.Listener\Benner.Enterprise.Integration.Messaging.csproj", "{B0FFBE35-F9B6-4764-92F6-97D063481487}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benner.Consumer.Full", "src\Benner.Consumer.Full\Benner.Consumer.Full.csproj", "{A7D08415-0E32-4A5D-B5D9-0D9C5D72E87F}"
 EndProject
@@ -47,8 +47,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ERP.Tests", "samples\ERP.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Producer", "src\Benner.Producer\Benner.Producer.csproj", "{5730AAB6-7EB5-41F9-9A28-EBAA98444BE7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.Core", "src\Benner.Messaging.Core\Benner.Messaging.Core.csproj", "{84AA1F4E-94E2-4D39-8E28-3DB1E2E864EF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.ERP.Models", "samples\Benner.ERP.Models\Benner.ERP.Models.csproj", "{8A1BF2CD-47C0-4692-9624-13C36234CB28}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{3049F360-1358-40BF-8E84-59AFBCDDCC84}"
@@ -63,9 +61,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "consumer", "consumer", "{3A
 		docker\consumer\dockerfile = docker\consumer\dockerfile
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.Configuration", "src\Benner.Messaging.Configuration\Benner.Messaging.Configuration.csproj", "{256CC050-3207-4FD9-B9DD-B70651926DF6}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.Logger", "src\Benner.Messaging.Logger\Benner.Messaging.Logger.csproj", "{160C96EE-74D1-4DCB-A42C-CB4E56758A83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benner.Messaging.Common", "src\Benner.Messaging.Configuration\Benner.Messaging.Common.csproj", "{256CC050-3207-4FD9-B9DD-B70651926DF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,10 +125,6 @@ Global
 		{5730AAB6-7EB5-41F9-9A28-EBAA98444BE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5730AAB6-7EB5-41F9-9A28-EBAA98444BE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5730AAB6-7EB5-41F9-9A28-EBAA98444BE7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{84AA1F4E-94E2-4D39-8E28-3DB1E2E864EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84AA1F4E-94E2-4D39-8E28-3DB1E2E864EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84AA1F4E-94E2-4D39-8E28-3DB1E2E864EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84AA1F4E-94E2-4D39-8E28-3DB1E2E864EF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8A1BF2CD-47C0-4692-9624-13C36234CB28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8A1BF2CD-47C0-4692-9624-13C36234CB28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A1BF2CD-47C0-4692-9624-13C36234CB28}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -141,10 +133,6 @@ Global
 		{256CC050-3207-4FD9-B9DD-B70651926DF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{256CC050-3207-4FD9-B9DD-B70651926DF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{256CC050-3207-4FD9-B9DD-B70651926DF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{160C96EE-74D1-4DCB-A42C-CB4E56758A83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{160C96EE-74D1-4DCB-A42C-CB4E56758A83}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{160C96EE-74D1-4DCB-A42C-CB4E56758A83}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{160C96EE-74D1-4DCB-A42C-CB4E56758A83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

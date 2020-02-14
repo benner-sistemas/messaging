@@ -27,15 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benner.Messaging.Core\Benner.Messaging.Core.csproj">
-      <Private>true</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Benner.Messaging.Logger\Benner.Messaging.Logger.csproj">
-      <Private>true</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Benner.Messaging.Configuration\Benner.Messaging.Configuration.csproj">
-      <Private>true</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\Benner.Messaging.Configuration\Benner.Messaging.Common.csproj" />
     <ProjectReference Include="..\Benner.Messaging\Benner.Messaging.csproj">
       <Private>true</Private>
     </ProjectReference>

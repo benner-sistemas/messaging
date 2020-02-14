@@ -1,4 +1,4 @@
-﻿using Benner.Listener;
+﻿using Benner.Enterprise.Integration.Messaging;
 using System;
 
 namespace Benner.Retry.Tests.MockMQ

@@ -1,4 +1,4 @@
-﻿using Benner.Listener;
+﻿using Benner.Enterprise.Integration.Messaging;
 using Benner.Messaging.Logger;
 using Benner.Retry.Tests.MockMQ;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

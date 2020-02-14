@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Benner.Messaging.Logger;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 
@@ -7,6 +8,12 @@ namespace Benner.Messaging.Tests.Transporters
     [TestClass]
     public class RabbitMqTests : TransporterBaseTests
     {
+        [TestInitialize]
+        public void Initialize()
+        {
+            Log.ConfigureLog();
+        }
+
         [TestMethod]
         public void RabbitMQ_deve_enviar_e_receber_mensagens_com_configuracao_em_memoria()
         {

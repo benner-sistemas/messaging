@@ -2,7 +2,7 @@
 using Benner.Messaging.Logger;
 using System;
 
-namespace Benner.Listener
+namespace Benner.Enterprise.Integration.Messaging
 {
     public abstract class EnterpriseIntegrationConsumerBase : IEnterpriseIntegrationConsumer
     {

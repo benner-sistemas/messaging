@@ -1,6 +1,6 @@
-﻿using Benner.ERP.Models;
+﻿using Benner.Enterprise.Integration.Messaging;
+using Benner.ERP.Models;
 using Benner.Messaging;
-using Benner.Messaging.Core;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Benner.ERP.API.Controllers

@@ -1,5 +1,5 @@
 ﻿using Benner.ERP.Models;
-using Benner.Listener;
+using Benner.Enterprise.Integration.Messaging;
 using System;
 
 namespace ERP.Consumer

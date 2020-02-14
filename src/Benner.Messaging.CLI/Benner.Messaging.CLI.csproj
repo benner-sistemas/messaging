@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benner.Messaging.Configuration\Benner.Messaging.Configuration.csproj" />
+    <ProjectReference Include="..\Benner.Messaging.Configuration\Benner.Messaging.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

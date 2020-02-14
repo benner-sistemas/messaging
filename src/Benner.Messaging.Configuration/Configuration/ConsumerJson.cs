@@ -1,5 +1,4 @@
-﻿
-namespace Benner.Messaging.Configuration
+﻿namespace Benner.Messaging.Configuration
 {
     public class ConsumerJson : JsonConfiguration 
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Benner.Listener
+namespace Benner.Enterprise.Integration.Messaging
 {
     public interface IEnterpriseIntegrationConsumer
     {

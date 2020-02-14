@@ -1,25 +1,25 @@
-﻿using Benner.Messaging;
-using Benner.Messaging.Interfaces;
+﻿using Benner.Messaging.Interfaces;
 using Benner.Messaging.Logger;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Benner.Messaging;
 
-namespace Benner.Listener
+namespace Benner.Enterprise.Integration.Messaging
 {
     public class EnterpriseIntegrationListener : IDisposable
     {
         private readonly IEnterpriseIntegrationConsumer _consumer;
-        private readonly Messaging.Messaging _receiver;
-        private readonly Messaging.Messaging _sender;
+        private readonly Benner.Messaging.Messaging _receiver;
+        private readonly Benner.Messaging.Messaging _sender;
         private readonly QueueName _queueName;
 
         public EnterpriseIntegrationListener(IMessagingConfig config, IEnterpriseIntegrationConsumer consumer)
         {
             _consumer = consumer;
             _queueName = new QueueName(consumer.Settings.QueueName);
-            _receiver = new Messaging.Messaging(config);
-            _sender = new Messaging.Messaging(config);
+            _receiver = new Benner.Messaging.Messaging(config);
+            _sender = new Benner.Messaging.Messaging(config);
         }
         public void Dispose()
         {

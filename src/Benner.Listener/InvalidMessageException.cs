@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Benner.Listener
+namespace Benner.Enterprise.Integration.Messaging
 {
     [Serializable]
     public class InvalidMessageException : Exception

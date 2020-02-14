@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Benner.Messaging.CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "oidc --clientId \" \""
+    }
+  }
+}

@@ -1,4 +1,4 @@
-﻿using Benner.Listener;
+﻿using Benner.Enterprise.Integration.Messaging;
 using Benner.Messaging;
 using Benner.Messaging.Configuration;
 using Benner.Messaging.Logger;
