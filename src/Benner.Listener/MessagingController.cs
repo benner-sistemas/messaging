@@ -45,7 +45,7 @@ namespace Benner.Enterprise.Integration.Messaging
                 QueueName = QueueName,
                 CreatedAt = DateTime.Now,
             };
-            Log.Information("{id} @{queueName}", request.RequestID, QueueName);
+            Log.Information("{id} @{queueName}", request, QueueName);
             return new ObjectResult(response) { StatusCode = 201 };
         }
 
