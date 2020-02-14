@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\samples\Benner.ERP.API\Benner.ERP.API.csproj" />
-    <ProjectReference Include="..\..\src\Benner.Messaging.Configuration\Benner.Messaging.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

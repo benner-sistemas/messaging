@@ -8,11 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benner.Listener\Benner.Enterprise.Integration.Messaging.csproj" />
-    <ProjectReference Include="..\Benner.Messaging.Configuration\Benner.Messaging.Common.csproj" />
-    <ProjectReference Include="..\Benner.Messaging\Benner.Messaging.csproj">
-      <Private>true</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\Benner.Enterprise.Integration.Messaging\Benner.Enterprise.Integration.Messaging.csproj" />
+    <ProjectReference Include="..\Benner.Messaging\Benner.Messaging.csproj" />
   </ItemGroup>
 
   <ItemGroup>

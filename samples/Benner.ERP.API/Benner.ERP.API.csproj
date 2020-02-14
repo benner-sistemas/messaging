@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Benner.Listener\Benner.Enterprise.Integration.Messaging.csproj" />
+    <ProjectReference Include="..\..\src\Benner.Enterprise.Integration.Messaging\Benner.Enterprise.Integration.Messaging.csproj" />
     <ProjectReference Include="..\Benner.ERP.Models\Benner.ERP.Models.csproj" />
   </ItemGroup>
 
